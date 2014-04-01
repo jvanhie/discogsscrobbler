@@ -158,9 +158,13 @@ public class ReleaseAdapter extends BaseAdapter implements Filterable {
 
     public void updateReleases(List<Release> releases) {
         mReleases = releases;
+        //TODO: DO we really need to reinit imageloader?
         initImageLoader();
         notifyDataSetChanged();
     }
 
-
+    @Override
+    public boolean hasStableIds() {
+        return true;
+    }
 }

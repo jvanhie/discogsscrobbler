@@ -49,4 +49,10 @@ public interface DiscogsService {
     @GET("/releases/{id}")
     void getRelease(@Path("id") long id, Callback<DiscogsRelease> callback);
 
+    @GET("/database/search")
+    void search(@Query("q") String query, Callback<DiscogsSearch> callback);
+
+    @GET("/database/search")
+    void searchBarcode(@Query("barcode") String barcode, Callback<DiscogsSearch> callback);
+
 }
