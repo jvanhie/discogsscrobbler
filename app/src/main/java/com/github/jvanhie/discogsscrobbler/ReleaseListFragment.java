@@ -22,7 +22,6 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -39,6 +38,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.github.jvanhie.discogsscrobbler.adapters.ReleaseAdapter;
 import com.github.jvanhie.discogsscrobbler.models.Release;
 import com.github.jvanhie.discogsscrobbler.util.Discogs;
 

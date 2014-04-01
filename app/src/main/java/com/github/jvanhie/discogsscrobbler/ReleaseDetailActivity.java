@@ -39,7 +39,7 @@ import android.widget.Toast;
  * This activity is mostly just a 'shell' activity containing nothing
  * more than a {@link ReleaseDetailFragment}.
  */
-public class ReleaseDetailActivity extends FragmentActivity {
+public class ReleaseDetailActivity extends DrawerActivity {
 
     private ViewPager mPager;
     private PagerAdapter mPagerAdapter;
@@ -59,6 +59,8 @@ public class ReleaseDetailActivity extends FragmentActivity {
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
 
+        //set navigation drawer
+        setDrawer(R.id.detail_drawer_layout,R.id.detail_drawer,getTitle().toString(),getTitle().toString(),false);
     }
 
     @Override

@@ -19,12 +19,13 @@ package com.github.jvanhie.discogsscrobbler;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
+
+import java.util.ArrayList;
 
 
 /**
@@ -43,7 +44,7 @@ import android.widget.SearchView;
  * {@link ReleaseListFragment.Callbacks} interface
  * to listen for item selections.
  */
-public class ReleaseListActivity extends FragmentActivity
+public class ReleaseListActivity extends DrawerActivity
         implements ReleaseListFragment.Callbacks {
 
     /**
@@ -65,6 +66,7 @@ public class ReleaseListActivity extends FragmentActivity
         PreferenceManager.setDefaultValues(this, R.xml.pref_discogs, false);
 
         setContentView(R.layout.activity_release_list);
+
         mReleaseProgressBar = (ProgressBar) findViewById(R.id.release_list_progressBar);
         mReleaseList = ((ReleaseListFragment) getSupportFragmentManager().findFragmentById(R.id.release_list));
 
@@ -81,8 +83,9 @@ public class ReleaseListActivity extends FragmentActivity
             // 'activated' state when touched.
             mReleaseList.setActivateOnItemClick(true);
         }
+        //create navigation drawer
+        setDrawer(R.id.list_drawer_layout,R.id.list_drawer,getTitle().toString(),getTitle().toString(),true);
 
-        // TODO: If exposing deep links into your app, handle intents here.
     }
 
     @Override
@@ -114,10 +117,6 @@ public class ReleaseListActivity extends FragmentActivity
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            Intent settingsIntent = new Intent(this, SettingsActivity.class);
-            startActivity(settingsIntent);
-        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -147,12 +146,6 @@ public class ReleaseListActivity extends FragmentActivity
             Intent detailIntent = new Intent(this, ReleaseDetailActivity.class);
             detailIntent.putExtra(ReleaseDetailFragment.ARG_ITEM_ID, id);
             startActivity(detailIntent);
-
-            /*
-            Intent detailIntent = new Intent(this, ReleaseTracklistActivity.class);
-            detailIntent.putExtra(ReleaseTracklistFragment.ARG_ITEM_ID, id);
-            startActivity(detailIntent);
-            */
         }
     }
 

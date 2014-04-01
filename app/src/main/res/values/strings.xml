@@ -28,4 +28,22 @@
     <string name="delete_releases_title">Delete releases?</string>
     <string name="delete_releases_message">This will remove the selected releases from your Discogs collection, both online and on your device.</string>
 
+    <!-- Nav Drawer Menu Items -->
+    <string-array name="nav_drawer_items">
+        <item >Collection</item>
+        <item >Search</item>
+        <item >Now Playing</item>
+        <item >Settings</item>
+        <item >Help</item>
+    </string-array>
+
+    <!-- Nav Drawer List Item Icons -->
+    <array name="nav_drawer_icons">
+        <item>@android:drawable/ic_dialog_dialer</item>
+        <item>@android:drawable/ic_menu_search</item>
+        <item>@android:drawable/ic_media_play</item>
+        <item>@android:drawable/ic_menu_manage</item>
+        <item>@android:drawable/ic_menu_help</item>
+    </array>
+
 </resources>

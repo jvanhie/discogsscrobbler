@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.jvanhie.discogsscrobbler;
+package com.github.jvanhie.discogsscrobbler.adapters;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -30,6 +30,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.github.jvanhie.discogsscrobbler.R;
 import com.github.jvanhie.discogsscrobbler.models.Release;
 import com.github.jvanhie.discogsscrobbler.util.Discogs;
 import com.github.jvanhie.discogsscrobbler.util.DiscogsImageDownloader;
