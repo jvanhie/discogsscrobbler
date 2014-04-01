@@ -1,0 +1,77 @@
+<!--
+  ~ Copyright (c) 2014 Jono Vanhie-Van Gerwen
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+        <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- Discogs settings -->
+    <string name="pref_header_discogs">Discogs</string>
+
+    <string name="pref_title_enable_discogs">Enable Discogs</string>
+    <string name="pref_description_enable_discogs">Enables Discogs collection management</string>
+
+    <string name="pref_title_collection_view">Collection view</string>
+    <string name="pref_description_collection_view">How to display your Discogs collection</string>
+    <string name="pref_collection_view_default">list</string>
+    <string-array name="pref_collection_view_entries">
+        <item>List</item>
+        <item>Grid</item>
+    </string-array>
+    <string-array name="pref_collection_view_values">
+        <item>list</item>
+        <item>grid</item>
+    </string-array>
+
+    <string name="pref_title_enable_ratings">Enable Rating</string>
+    <string name="pref_description_enable_ratings">Enables the display of your rating in the release detail</string>
+
+    <!--string name="pref_title_add_friends_to_messages">Add friends to messages</string>
+    <string-array name="pref_example_list_titles">
+        <item>Always</item>
+        <item>When possible</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="pref_example_list_values">
+        <item>1</item>
+        <item>0</item>
+        <item>-1</item>
+    </string-array>
+
+    <string name="pref_header_data_sync">Data &amp; sync</string>
+
+    <string name="pref_title_sync_frequency">Sync frequency</string>
+    <string-array name="pref_sync_frequency_titles">
+        <item>15 minutes</item>
+        <item>30 minutes</item>
+        <item>1 hour</item>
+        <item>3 hours</item>
+        <item>6 hours</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="pref_sync_frequency_values">
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>180</item>
+        <item>360</item>
+        <item>-1</item>
+    </string-array>
+
+    <string name="pref_title_system_sync_settings">System sync settings</string-->
+
+</resources>

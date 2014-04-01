@@ -1,0 +1,240 @@
+<!--
+  ~ Copyright (c) 2014 Jono Vanhie-Van Gerwen
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/release_detail_container">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/detail_thumb_height"
+                android:id="@+id/detail_image"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:src="@drawable/default_release"
+                android:scaleType="centerCrop" />
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignBottom="@+id/detail_image"
+                android:layout_alignParentEnd="false"
+                android:background="#ffffff"
+                android:alpha="0.5"
+                android:id="@+id/linearLayout">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="Title"
+                    android:id="@+id/detail_title"
+                    android:layout_marginLeft="5dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearance"
+                    android:text="Artist"
+                    android:id="@+id/detail_artist"
+                    android:layout_marginLeft="5dp" />
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:id="@+id/detail_thumb"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:visibility="invisible"
+                android:scaleType="centerCrop"
+                android:layout_above="@+id/linearLayout" />
+
+            <RatingBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/detail_ratingBar"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:numStars="5"
+                android:stepSize="1" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Label:"
+                android:id="@+id/textView"
+                android:layout_below="@+id/detail_image"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:minWidth="100dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="5dp" />
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Medium Text"
+                android:id="@+id/detail_label"
+                android:layout_alignTop="@+id/textView"
+                android:layout_toRightOf="@+id/textView"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentStart="false"
+                android:singleLine="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Format:"
+                android:id="@+id/textView3"
+                android:layout_below="@+id/detail_label"
+                android:layout_alignLeft="@+id/textView"
+                android:layout_alignStart="@+id/textView"
+                android:minWidth="100dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Country:"
+                android:id="@+id/textView4"
+                android:layout_below="@+id/detail_format"
+                android:layout_alignLeft="@+id/textView"
+                android:layout_alignStart="@+id/textView"
+                android:minWidth="100dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Released:"
+                android:id="@+id/textView5"
+                android:layout_below="@+id/detail_country"
+                android:layout_alignLeft="@+id/textView4"
+                android:layout_alignStart="@+id/textView4"
+                android:minWidth="100dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Genres:"
+                android:id="@+id/textView6"
+                android:layout_below="@+id/detail_released"
+                android:layout_alignLeft="@+id/textView"
+                android:layout_alignStart="@+id/textView5"
+                android:minWidth="100dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Styles:"
+                android:id="@+id/textView7"
+                android:layout_below="@+id/detail_genre"
+                android:layout_alignLeft="@+id/textView"
+                android:layout_alignStart="@+id/textView6"
+                android:minWidth="100dp"
+                 />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Medium Text"
+                android:id="@+id/detail_format"
+                android:layout_below="@+id/detail_label"
+                android:layout_toRightOf="@+id/textView" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Medium Text"
+                android:id="@+id/detail_country"
+                android:layout_toRightOf="@+id/textView3"
+                android:layout_below="@+id/detail_format" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Medium Text"
+                android:id="@+id/detail_released"
+                android:layout_toRightOf="@+id/textView5"
+                android:layout_below="@+id/detail_country" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Medium Text"
+                android:id="@+id/detail_genre"
+                android:layout_alignTop="@+id/textView6"
+                android:layout_toRightOf="@+id/textView6" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Medium Text"
+                android:id="@+id/detail_style"
+                android:layout_toRightOf="@+id/textView7"
+                android:layout_alignTop="@+id/textView7" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="Notes"
+                android:id="@+id/textView2"
+                android:layout_below="@+id/detail_style"
+                android:layout_alignLeft="@+id/textView7"
+                android:layout_alignStart="@+id/textView6"
+                android:layout_marginTop="5dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Small Text"
+                android:id="@+id/detail_notes"
+                android:layout_below="@+id/textView2"
+                android:layout_alignLeft="@+id/textView2"
+                android:layout_alignStart="@+id/textView2"
+                android:layout_marginRight="5dp" />
+
+        </RelativeLayout>
+    </ScrollView>
+</LinearLayout>
