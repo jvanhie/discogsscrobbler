@@ -37,8 +37,6 @@
         <item>grid</item>
     </string-array>
 
-    <string name="pref_title_enable_ratings">Enable Rating</string>
-    <string name="pref_description_enable_ratings">Enables the display of your rating in the release detail</string>
 
     <!--string name="pref_title_add_friends_to_messages">Add friends to messages</string>
     <string-array name="pref_example_list_titles">

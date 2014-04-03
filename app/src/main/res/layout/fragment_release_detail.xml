@@ -77,16 +77,6 @@
                 android:scaleType="centerCrop"
                 android:layout_above="@+id/linearLayout" />
 
-            <RatingBar
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/detail_ratingBar"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true"
-                android:numStars="5"
-                android:stepSize="1" />
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

@@ -34,12 +34,4 @@
         android:entryValues="@array/pref_collection_view_values"
         android:defaultValue="@string/pref_collection_view_default" />
 
-    <CheckBoxPreference
-        android:key="enable_ratings"
-        android:dependency="enable_discogs"
-        android:title="@string/pref_title_enable_ratings"
-        android:summary="@string/pref_description_enable_ratings"
-        android:defaultValue="true" />
-        />
-
 </PreferenceScreen>

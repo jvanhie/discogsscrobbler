@@ -141,19 +141,19 @@ public class Discogs extends ContextWrapper {
     /*STATIC formatter functions*/
     public static String formatArtist(List<DiscogsRelease.Artist> artists) {
         String ret = "";
-        if(artists.size()>0) ret = artists.get(0).name;
+        if(artists != null && artists.size()>0) ret = artists.get(0).name;
         return ret;
     }
 
     public static String formatLabel(List<DiscogsRelease.Label> labels) {
         String ret = "";
-        if(labels.size()>0) ret = labels.get(0).name;
+        if(labels != null && labels.size()>0) ret = labels.get(0).name;
         return ret;
     }
 
     public static String formatFormat(List<DiscogsRelease.Format> formats) {
         String ret = "";
-        if(formats.size()>0) ret = formats.get(0).name;
+        if(formats != null && formats.size()>0) ret = formats.get(0).name;
         return ret;
     }
 
@@ -177,7 +177,7 @@ public class Discogs extends ContextWrapper {
                     ret += ", " + format.text;
                 }
 
-                if (i < formats.size() - 1) ret += ", ";
+                if (i < formats.size() - 1) ret += "\n";
             }
         }
         return ret;
@@ -367,7 +367,47 @@ public class Discogs extends ContextWrapper {
             @Override
             public void failure(RetrofitError error) {
                 waiter.onResult(false,null);
-                parseRetrofitError(error);
+            }
+        });
+    }
+
+    public void addRelease(final long id, final DiscogsWaiter waiter) {
+        mDiscogsService.getCollectionRelease(mUserName,id, new Callback<DiscogsRelease>() {
+            @Override
+            public void success(DiscogsRelease discogsRelease, Response response) {
+                //release is already in the collection, we won't add it again!
+                waiter.onResult(false);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                //this is actually what we expect -> release not found, we can add it now
+                mDiscogsService.addRelease(mUserName,id,new Callback<Response>() {
+                    @Override
+                    public void success(Response response, Response response2) {
+                        waiter.onResult(true);
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        waiter.onResult(false);
+                    }
+                });
+            }
+        });
+    }
+
+    public void removeRelease(long id, final DiscogsWaiter waiter) {
+        mDiscogsService.removeRelease(mUserName, id, new Callback<Response>() {
+            @Override
+            public void success(Response r, Response response) {
+                System.out.println(r.getBody());
+                waiter.onResult(true);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                waiter.onResult(false);
             }
         });
     }
@@ -403,6 +443,30 @@ public class Discogs extends ContextWrapper {
                     int updates = ctr.incrementAndGet();
                     if(updates == total) {
                         //all updates done, return total result
+                        waiter.onResult(allSuccess.get());
+                    }
+                }
+            });
+        }
+    }
+
+    public void removeReleases(List<Release> releases, final DiscogsWaiter waiter) {
+        final AtomicBoolean allSuccess = new AtomicBoolean(true);
+        final AtomicInteger ctr = new AtomicInteger(0);
+        final int total = releases.size();
+        final Set<Long> toRemove = new TreeSet<Long>();
+
+        for (Release r : releases) {
+            toRemove.add(r.releaseid);
+            removeRelease(r.releaseid, new DiscogsWaiter() {
+                @Override
+                public void onResult(boolean success) {
+                    if (!success) allSuccess.set(false);
+                    int updates = ctr.incrementAndGet();
+                    if (updates == total) {
+                        //all updates done, return total result and remove releases from the db
+                        removeFromCollection(toRemove);
+                        loadCollection();
                         waiter.onResult(allSuccess.get());
                     }
                 }

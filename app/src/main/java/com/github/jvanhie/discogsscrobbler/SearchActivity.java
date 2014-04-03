@@ -90,7 +90,7 @@ public class SearchActivity extends DrawerActivity
                 menu.findItem(R.id.search_field).collapseActionView();
                 //pass query to search fragment
                 mSearchFragment.search(s);
-                return true;
+                return false;
             }
 
             @Override

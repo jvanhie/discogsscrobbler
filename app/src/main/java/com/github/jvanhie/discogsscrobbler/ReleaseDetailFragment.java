@@ -21,11 +21,15 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.github.jvanhie.discogsscrobbler.models.Image;
@@ -60,7 +64,6 @@ public class ReleaseDetailFragment extends Fragment {
 
     private View mRootView;
 
-    private boolean mEnableRatings;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -90,11 +93,38 @@ public class ReleaseDetailFragment extends Fragment {
                     .build();
             mImageLoader.init(config);
         }
-        mEnableRatings = PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("enable_ratings",true);
         //get id from arguments
         if (getArguments().containsKey(ARG_ITEM_ID)) {
             mRelease = mDiscogs.getRelease(getArguments().getLong(ARG_ITEM_ID,0));
         }
+
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        if(mRelease==null || mRelease.isTransient) {
+            //the release is not in the collection, give the user the opportunity to add it
+            inflater.inflate(R.menu.release_detail_search, menu);
+        }
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.detail_add_to_discogs) {
+            mDiscogs.addRelease(mRelease.releaseid, new Discogs.DiscogsWaiter() {
+                @Override
+                public void onResult(boolean success) {
+                    if(success) {
+                        Toast.makeText(getActivity(), "Added release to Discogs collection", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -118,7 +148,6 @@ public class ReleaseDetailFragment extends Fragment {
                 });
             }
         } else {
-            //we don't have this release in the local db, fetch is from the web
             mDiscogs.getRelease(getArguments().getLong(ARG_ITEM_ID,0), new Discogs.DiscogsDataWaiter<Release>() {
                 @Override
                 public void onResult(boolean success, Release data) {
@@ -143,12 +172,6 @@ public class ReleaseDetailFragment extends Fragment {
         ((TextView) mRootView.findViewById(R.id.detail_genre)).setText(mRelease.genres);
         ((TextView) mRootView.findViewById(R.id.detail_style)).setText(mRelease.styles);
         ((TextView) mRootView.findViewById(R.id.detail_notes)).setText(mRelease.notes);
-        //display ratings?
-        if(mEnableRatings) {
-            ((RatingBar) mRootView.findViewById(R.id.detail_ratingBar)).setRating(mRelease.rating);
-        } else {
-            mRootView.findViewById(R.id.detail_ratingBar).setVisibility(RatingBar.INVISIBLE);
-        }
         //decide to load big or small image
         if(!mRelease.hasExtendedInfo) {
             //we don't got extended info on this release yet, only display thumbnail

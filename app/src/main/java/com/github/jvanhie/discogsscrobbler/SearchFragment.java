@@ -115,6 +115,7 @@ public class SearchFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRetainInstance(true);
     }
 
     @Override
@@ -131,57 +132,10 @@ public class SearchFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        String layout = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("collection_view","");
         mList = new ExpandableListView(getActivity());
-        mList.setId(android.R.id.list);
+        mList.setAdapter(mAdapter);
 
-        mList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
-            @Override
-            public boolean onGroupClick(ExpandableListView expandableListView, View view, final int i, long l) {
-                DiscogsSearchResult result = (DiscogsSearchResult)mAdapter.getGroup(i);
-                if(result.type.equals("release")) {
-                    onItemSelected(result.id);
-                } else {
-                    //this is a group item, fetch it's content and add it dynamically to the list if collapsed and first click, else let the listview do it's magic
-                    if(mList.isGroupExpanded(i) || mAdapter.getChildrenCount(i) != 0) return false;
-
-                    if(result.type.equals("artist")) {
-                        mDiscogs.getArtistReleases(result.id, new Discogs.DiscogsDataWaiter<List<DiscogsSearchRelease>>() {
-                            @Override
-                            public void onResult(boolean success, List<DiscogsSearchRelease> data) {
-                                if(success) {
-                                    mAdapter.addChildren(i,data);
-                                    mList.expandGroup(i);
-                                }
-                            }
-                        });
-                    } else if(result.type.equals("label")) {
-                        mDiscogs.getLabelReleases(result.id, new Discogs.DiscogsDataWaiter<List<DiscogsSearchRelease>>() {
-                            @Override
-                            public void onResult(boolean success, List<DiscogsSearchRelease> data) {
-                                if (success) {
-                                    mAdapter.addChildren(i, data);
-                                    mList.expandGroup(i);
-                                }
-                            }
-                        });
-                    } else if(result.type.equals("master")) {
-                        mDiscogs.getMasterReleases(result.id, new Discogs.DiscogsDataWaiter<List<DiscogsSearchRelease>>() {
-                            @Override
-                            public void onResult(boolean success, List<DiscogsSearchRelease> data) {
-                                if (success) {
-                                    mAdapter.addChildren(i, data);
-                                    mList.expandGroup(i);
-                                }
-                            }
-                        });
-                    }
-
-                }
-                //I handled it
-                return true;
-            }
-        });
+        mList.setOnGroupClickListener(new GroupClickHandler());
 
         mList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
@@ -194,6 +148,7 @@ public class SearchFragment extends Fragment {
         if (mDiscogs == null) mDiscogs = Discogs.getInstance(getActivity());
 
         mList.setGroupIndicator(null);
+
         return mList;
     }
 
@@ -265,5 +220,53 @@ public class SearchFragment extends Fragment {
         }
 
         mActivatedPosition = position;
+    }
+
+    private class GroupClickHandler implements ExpandableListView.OnGroupClickListener {
+        @Override
+        public boolean onGroupClick(ExpandableListView expandableListView, View view, final int i, long l) {
+            DiscogsSearchResult result = (DiscogsSearchResult)mAdapter.getGroup(i);
+            if(result.type.equals("release")) {
+                onItemSelected(result.id);
+            } else {
+                //this is a group item, fetch it's content and add it dynamically to the list if collapsed and first click, else let the listview do it's magic
+                if(mList.isGroupExpanded(i) || mAdapter.getChildrenCount(i) != 0) return false;
+
+                if(result.type.equals("artist")) {
+                    mDiscogs.getArtistReleases(result.id, new Discogs.DiscogsDataWaiter<List<DiscogsSearchRelease>>() {
+                        @Override
+                        public void onResult(boolean success, List<DiscogsSearchRelease> data) {
+                            if(success) {
+                                mAdapter.addChildren(i,data);
+                                mList.expandGroup(i);
+                            }
+                        }
+                    });
+                } else if(result.type.equals("label")) {
+                    mDiscogs.getLabelReleases(result.id, new Discogs.DiscogsDataWaiter<List<DiscogsSearchRelease>>() {
+                        @Override
+                        public void onResult(boolean success, List<DiscogsSearchRelease> data) {
+                            if (success) {
+                                mAdapter.addChildren(i, data);
+                                mList.expandGroup(i);
+                            }
+                        }
+                    });
+                } else if(result.type.equals("master")) {
+                    mDiscogs.getMasterReleases(result.id, new Discogs.DiscogsDataWaiter<List<DiscogsSearchRelease>>() {
+                        @Override
+                        public void onResult(boolean success, List<DiscogsSearchRelease> data) {
+                            if (success) {
+                                mAdapter.addChildren(i, data);
+                                mList.expandGroup(i);
+                            }
+                        }
+                    });
+                }
+
+            }
+            //I handled it
+            return true;
+        }
     }
 }

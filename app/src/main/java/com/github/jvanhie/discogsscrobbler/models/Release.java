@@ -48,9 +48,6 @@ public class Release extends Model{
     @Column(name = "thumb")
     public String thumb;
 
-    @Column(name = "rating")
-    public int rating;
-
     @Column(name = "artist")
     public String artist;
 
@@ -135,7 +132,6 @@ public class Release extends Model{
         year=r.year;
         resource_url=r.resource_url;
         thumb=r.thumb;
-        rating=r.rating;
         artist= Discogs.formatArtist(r.artists);
         label= Discogs.formatLabel(r.labels);
         format = Discogs.formatFormat(r.formats);
@@ -166,16 +162,20 @@ public class Release extends Model{
         this.isTransient = isTransient;
         if(isTransient) {
             mImages = new ArrayList<Image>();
-            for (int i = 0; i < r.images.size(); i++) {
-                Image image = new Image(r.images.get(i), this);
-                image.idx = i;
-                mImages.add(image);
+            if(r.images != null) {
+                for (int i = 0; i < r.images.size(); i++) {
+                    Image image = new Image(r.images.get(i), this);
+                    image.idx = i;
+                    mImages.add(image);
+                }
             }
             mTracks = new ArrayList<Track>();
-            for (int i = 0; i < r.tracklist.size(); i++) {
-                Track track = new Track(r.tracklist.get(i), this);
-                track.idx = i;
-                mTracks.add(track);
+            if(r.tracklist!=null) {
+                for (int i = 0; i < r.tracklist.size(); i++) {
+                    Track track = new Track(r.tracklist.get(i), this);
+                    track.idx = i;
+                    mTracks.add(track);
+                }
             }
         } else {
             //create Image descriptors and tracklist, store in db immediatly, but first remove any old linked data
@@ -186,15 +186,19 @@ public class Release extends Model{
             for (Track t : tracklist()) {
                 t.delete();
             }
-            for (int i = 0; i < r.images.size(); i++) {
-                Image image = new Image(r.images.get(i), this);
-                image.idx = i;
-                image.save();
+            if(r.images != null) {
+                for (int i = 0; i < r.images.size(); i++) {
+                    Image image = new Image(r.images.get(i), this);
+                    image.idx = i;
+                    image.save();
+                }
             }
-            for (int i = 0; i < r.tracklist.size(); i++) {
-                Track track = new Track(r.tracklist.get(i), this);
-                track.idx = i;
-                track.save();
+            if(r.tracklist!=null) {
+                for (int i = 0; i < r.tracklist.size(); i++) {
+                    Track track = new Track(r.tracklist.get(i), this);
+                    track.idx = i;
+                    track.save();
+                }
             }
             ActiveAndroid.setTransactionSuccessful();
             ActiveAndroid.endTransaction();

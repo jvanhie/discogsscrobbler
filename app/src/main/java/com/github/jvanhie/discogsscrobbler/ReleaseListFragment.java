@@ -247,7 +247,7 @@ public class ReleaseListFragment extends Fragment {
             @Override
             public boolean onActionItemClicked(final ActionMode mode, MenuItem item) {
                 SparseBooleanArray checkedItems = mList.getCheckedItemPositions();
-                List<Release> releases = new ArrayList<Release>();
+                final List<Release> releases = new ArrayList<Release>();
                 if (checkedItems != null) {
                     for (int i=0; i<checkedItems.size(); i++) {
                         if (checkedItems.valueAt(i)) {
@@ -257,13 +257,11 @@ public class ReleaseListFragment extends Fragment {
                 }
                 switch (item.getItemId()) {
                     case R.id.reload_release:
-                        Toast.makeText(getActivity(), "Reloading selected releases",
-                                Toast.LENGTH_SHORT).show();
                         mDiscogs.refreshReleases(releases, new Discogs.DiscogsWaiter() {
                             @Override
                             public void onResult(boolean success) {
                                 if(success) {
-                                    Toast.makeText(getActivity(), "Successfully reloaded releases!",Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getActivity(), "reloaded releases",Toast.LENGTH_SHORT).show();
                                     loadList();
                                 } else {
                                     Toast.makeText(getActivity(), "Failed to reload requested releases!",
@@ -279,8 +277,18 @@ public class ReleaseListFragment extends Fragment {
                         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 // User clicked OK button
-                                Toast.makeText(getActivity(), "Deletion not implemented yet",
-                                        Toast.LENGTH_SHORT).show();
+                                mDiscogs.removeReleases(releases, new Discogs.DiscogsWaiter() {
+                                    @Override
+                                    public void onResult(boolean success) {
+                                        if(success) {
+                                            Toast.makeText(getActivity(), "Removed selected releases",Toast.LENGTH_SHORT).show();
+                                            loadList();
+                                        } else {
+                                            Toast.makeText(getActivity(), "Failed to remove selected releases!",
+                                                    Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                });
                                 mode.finish();
                             }
                         });

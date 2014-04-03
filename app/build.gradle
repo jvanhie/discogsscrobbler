@@ -44,6 +44,7 @@ dependencies {
     compile 'com.squareup.retrofit:retrofit:1.4.1'
     compile 'com.nostra13.universalimageloader:universal-image-loader:1.7.0'
     compile 'com.android.support:support-v4:19.0.1'
+    compile 'de.u-mass:lastfm-java:+'
 
 
     // You must install or update the Google Repository through the SDK manager to use this dependency.

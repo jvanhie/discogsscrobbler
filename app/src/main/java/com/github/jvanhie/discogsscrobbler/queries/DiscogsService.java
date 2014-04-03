@@ -23,9 +23,11 @@ import java.util.List;
 
 import retrofit.Callback;
 import retrofit.client.Response;
+import retrofit.http.DELETE;
 import retrofit.http.EncodedPath;
 import retrofit.http.GET;
 import retrofit.http.Headers;
+import retrofit.http.POST;
 import retrofit.http.Path;
 import retrofit.http.Query;
 
@@ -57,6 +59,15 @@ public interface DiscogsService {
 
     @GET("/masters/{id}/versions")
     void getMasterReleases(@Path("id") long id, Callback<DiscogsSearch> callback);
+
+    @GET("/users/{username}/collection/folders/0/releases/{id}/instances/1")
+    void getCollectionRelease(@Path("username") String username, @Path("id") long id, Callback<DiscogsRelease> callback);
+
+    @POST("/users/{username}/collection/folders/1/releases/{id}")
+    void addRelease(@Path("username") String username, @Path("id") long id, Callback<Response> callback);
+
+    @DELETE("/users/{username}/collection/folders/0/releases/{id}/instances/1")
+    void removeRelease(@Path("username") String username, @Path("id") long id, Callback<Response> callback);
 
     @GET("/database/search")
     void search(@Query("q") String query, Callback<DiscogsSearch> callback);

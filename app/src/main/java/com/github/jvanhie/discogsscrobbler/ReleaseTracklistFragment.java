@@ -23,6 +23,7 @@ import android.support.v4.app.ListFragment;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +31,7 @@ import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.jvanhie.discogsscrobbler.models.Release;
 import com.github.jvanhie.discogsscrobbler.models.Track;
@@ -73,6 +75,8 @@ public class ReleaseTracklistFragment extends ListFragment {
         if (getArguments().containsKey(ARG_ITEM_ID)) {
             mRelease=mDiscogs.getRelease(getArguments().getLong(ARG_ITEM_ID));
         }
+
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -107,6 +111,32 @@ public class ReleaseTracklistFragment extends ListFragment {
             });
         }
         return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        if(mRelease==null || mRelease.isTransient) {
+            //the release is not in the collection, give the user the opportunity to add it
+            inflater.inflate(R.menu.release_detail_search, menu);
+        }
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.detail_add_to_discogs) {
+            mDiscogs.addRelease(mRelease.releaseid, new Discogs.DiscogsWaiter() {
+                @Override
+                public void onResult(boolean success) {
+                    if(success) {
+                        Toast.makeText(getActivity(), "Added release to Discogs collection", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

@@ -15,13 +15,12 @@
   -->
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.github.jvanhie.discogsscrobbler.DiscogsLoginActivity" >
-    
-    <item android:id="@+id/search_field"
-        android:title="Search"
-        android:icon="@android:drawable/ic_menu_search"
+    tools:context="com.github.jvanhie.discogsscrobbler.ReleaseDetailActivity" >
+
+    <item
+        android:id="@+id/detail_add_to_discogs"
+        android:icon="@android:drawable/ic_menu_save"
         android:showAsAction="collapseActionView|ifRoom"
-        android:actionViewClass="android.widget.SearchView" />
+        android:title="Add to your collection"/>
 </menu>
