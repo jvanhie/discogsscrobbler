@@ -49,6 +49,15 @@ public interface DiscogsService {
     @GET("/releases/{id}")
     void getRelease(@Path("id") long id, Callback<DiscogsRelease> callback);
 
+    @GET("/artists/{id}/releases")
+    void getArtistReleases(@Path("id") long id, Callback<DiscogsSearch> callback);
+
+    @GET("/labels/{id}/releases")
+    void getLabelReleases(@Path("id") long id, Callback<DiscogsSearch> callback);
+
+    @GET("/masters/{id}/versions")
+    void getMasterReleases(@Path("id") long id, Callback<DiscogsSearch> callback);
+
     @GET("/database/search")
     void search(@Query("q") String query, Callback<DiscogsSearch> callback);
 

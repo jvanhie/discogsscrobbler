@@ -104,7 +104,6 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Medium Text"
                 android:id="@+id/detail_label"
                 android:layout_alignTop="@+id/textView"
                 android:layout_toRightOf="@+id/textView"
@@ -172,7 +171,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Medium Text"
                 android:id="@+id/detail_format"
                 android:layout_below="@+id/detail_label"
                 android:layout_toRightOf="@+id/textView" />
@@ -181,7 +179,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Medium Text"
                 android:id="@+id/detail_country"
                 android:layout_toRightOf="@+id/textView3"
                 android:layout_below="@+id/detail_format" />
@@ -190,7 +187,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Medium Text"
                 android:id="@+id/detail_released"
                 android:layout_toRightOf="@+id/textView5"
                 android:layout_below="@+id/detail_country" />
@@ -199,7 +195,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Medium Text"
                 android:id="@+id/detail_genre"
                 android:layout_alignTop="@+id/textView6"
                 android:layout_toRightOf="@+id/textView6" />
@@ -208,7 +203,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Medium Text"
                 android:id="@+id/detail_style"
                 android:layout_toRightOf="@+id/textView7"
                 android:layout_alignTop="@+id/textView7" />
@@ -228,7 +222,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="Small Text"
                 android:id="@+id/detail_notes"
                 android:layout_below="@+id/textView2"
                 android:layout_alignLeft="@+id/textView2"

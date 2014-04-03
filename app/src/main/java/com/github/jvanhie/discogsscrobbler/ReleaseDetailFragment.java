@@ -109,7 +109,7 @@ public class ReleaseDetailFragment extends Fragment {
                 //we don't got extended info on this release yet, get it and display it
                 mDiscogs.refreshRelease(mRelease, new Discogs.DiscogsWaiter() {
                     @Override
-                    public void onResult(Boolean success) {
+                    public void onResult(boolean success) {
                         if (success) {
                             //refresh the info
                             setRelease();
@@ -117,6 +117,17 @@ public class ReleaseDetailFragment extends Fragment {
                     }
                 });
             }
+        } else {
+            //we don't have this release in the local db, fetch is from the web
+            mDiscogs.getRelease(getArguments().getLong(ARG_ITEM_ID,0), new Discogs.DiscogsDataWaiter<Release>() {
+                @Override
+                public void onResult(boolean success, Release data) {
+                    if(success) {
+                        mRelease = data;
+                        setRelease();
+                    }
+                }
+            });
         }
 
         return rootView;
@@ -126,7 +137,7 @@ public class ReleaseDetailFragment extends Fragment {
         ((TextView) mRootView.findViewById(R.id.detail_title)).setText(mRelease.title);
         ((TextView) mRootView.findViewById(R.id.detail_artist)).setText(mRelease.artist);
         ((TextView) mRootView.findViewById(R.id.detail_label)).setText(mRelease.label);
-        ((TextView) mRootView.findViewById(R.id.detail_format)).setText(mRelease.format);
+        ((TextView) mRootView.findViewById(R.id.detail_format)).setText(mRelease.format_extended);
         ((TextView) mRootView.findViewById(R.id.detail_country)).setText(mRelease.country);
         ((TextView) mRootView.findViewById(R.id.detail_released)).setText(mRelease.released_formatted);
         ((TextView) mRootView.findViewById(R.id.detail_genre)).setText(mRelease.genres);

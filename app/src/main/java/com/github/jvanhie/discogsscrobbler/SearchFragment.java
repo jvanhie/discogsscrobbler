@@ -24,6 +24,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -39,7 +40,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.jvanhie.discogsscrobbler.adapters.ReleaseAdapter;
+import com.github.jvanhie.discogsscrobbler.adapters.SearchAdapter;
 import com.github.jvanhie.discogsscrobbler.models.Release;
+import com.github.jvanhie.discogsscrobbler.queries.DiscogsSearchRelease;
+import com.github.jvanhie.discogsscrobbler.queries.DiscogsSearchResult;
 import com.github.jvanhie.discogsscrobbler.util.Discogs;
 
 import java.util.ArrayList;
@@ -75,7 +79,8 @@ public class SearchFragment extends Fragment {
      */
     private int mActivatedPosition = ListView.INVALID_POSITION;
 
-    private AbsListView mList;
+    private ExpandableListView mList;
+    private SearchAdapter mAdapter;
     private Discogs mDiscogs;
 
     /**
@@ -130,20 +135,79 @@ public class SearchFragment extends Fragment {
         mList = new ExpandableListView(getActivity());
         mList.setId(android.R.id.list);
 
-        mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                onListItemClick(view,i,l);
+            public boolean onGroupClick(ExpandableListView expandableListView, View view, final int i, long l) {
+                DiscogsSearchResult result = (DiscogsSearchResult)mAdapter.getGroup(i);
+                if(result.type.equals("release")) {
+                    onItemSelected(result.id);
+                } else {
+                    //this is a group item, fetch it's content and add it dynamically to the list if collapsed and first click, else let the listview do it's magic
+                    if(mList.isGroupExpanded(i) || mAdapter.getChildrenCount(i) != 0) return false;
+
+                    if(result.type.equals("artist")) {
+                        mDiscogs.getArtistReleases(result.id, new Discogs.DiscogsDataWaiter<List<DiscogsSearchRelease>>() {
+                            @Override
+                            public void onResult(boolean success, List<DiscogsSearchRelease> data) {
+                                if(success) {
+                                    mAdapter.addChildren(i,data);
+                                    mList.expandGroup(i);
+                                }
+                            }
+                        });
+                    } else if(result.type.equals("label")) {
+                        mDiscogs.getLabelReleases(result.id, new Discogs.DiscogsDataWaiter<List<DiscogsSearchRelease>>() {
+                            @Override
+                            public void onResult(boolean success, List<DiscogsSearchRelease> data) {
+                                if (success) {
+                                    mAdapter.addChildren(i, data);
+                                    mList.expandGroup(i);
+                                }
+                            }
+                        });
+                    } else if(result.type.equals("master")) {
+                        mDiscogs.getMasterReleases(result.id, new Discogs.DiscogsDataWaiter<List<DiscogsSearchRelease>>() {
+                            @Override
+                            public void onResult(boolean success, List<DiscogsSearchRelease> data) {
+                                if (success) {
+                                    mAdapter.addChildren(i, data);
+                                    mList.expandGroup(i);
+                                }
+                            }
+                        });
+                    }
+
+                }
+                //I handled it
+                return true;
+            }
+        });
+
+        mList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i2, long l) {
+                onItemSelected(l);
+                return false;
             }
         });
 
         if (mDiscogs == null) mDiscogs = Discogs.getInstance(getActivity());
 
+        mList.setGroupIndicator(null);
         return mList;
     }
 
     public void search(String s) {
-        //TODO: perform query and send it up to the search adapter (or let adapter do query?)
+        mDiscogs.search(s,new Discogs.DiscogsDataWaiter<List<DiscogsSearchResult>>() {
+            @Override
+            public void onResult(boolean success, List<DiscogsSearchResult> data) {
+                if(success) {
+                    //show results
+                    mAdapter = new SearchAdapter(getActivity(),data);
+                    mList.setAdapter(mAdapter);
+                }
+            }
+        });
     }
 
     @Override
@@ -166,7 +230,7 @@ public class SearchFragment extends Fragment {
         mCallbacks = sDummyCallbacks;
     }
 
-    public void onListItemClick(View view, int position, long id) {
+    public void onItemSelected(long id) {
         // Notify the active callbacks interface (the activity, if the
         // fragment is attached to one) that an item has been selected.
         mCallbacks.onItemSelected(id);

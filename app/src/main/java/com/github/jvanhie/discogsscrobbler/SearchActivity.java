@@ -59,6 +59,8 @@ public class SearchActivity extends DrawerActivity
 
         setContentView(R.layout.activity_search);
 
+        mSearchFragment = ((SearchFragment) getSupportFragmentManager().findFragmentById(R.id.search_list));
+
         if (findViewById(R.id.release_detail_container) != null) {
             // The detail container view will be present only in the
             // large-screen layouts (res/values-large and
@@ -87,6 +89,7 @@ public class SearchActivity extends DrawerActivity
             public boolean onQueryTextSubmit(String s) {
                 menu.findItem(R.id.search_field).collapseActionView();
                 //pass query to search fragment
+                mSearchFragment.search(s);
                 return true;
             }
 

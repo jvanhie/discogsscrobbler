@@ -26,7 +26,7 @@ public class DiscogsSearchResult {
     public String title;
     public String type;
     public String thumb;
-    public String year;
+    public String year = "";
     public String resource_url;
     public String country;
     public String[] style;

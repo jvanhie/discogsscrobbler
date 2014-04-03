@@ -24,6 +24,7 @@ import com.github.jvanhie.discogsscrobbler.queries.DiscogsCollection.DiscogsBasi
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsRelease;
 import com.github.jvanhie.discogsscrobbler.util.Discogs;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -72,6 +73,9 @@ public class Release extends Model{
     @Column(name = "country")
     public String country;
 
+    @Column(name = "format_extended")
+    public String format_extended;
+
     @Column(name = "released_formatted")
     public String released_formatted;
 
@@ -84,14 +88,25 @@ public class Release extends Model{
     @Column(name = "genres")
     public String genres;
 
-
+    /*transient members*/
+    public boolean isTransient = false;
+    private List<Image> mImages;
+    private List<Track> mTracks;
 
     public List<Image> images() {
-        return getMany(Image.class, "Release");
+        if(isTransient) {
+            return mImages;
+        } else {
+            return getMany(Image.class, "Release");
+        }
     }
 
     public List<Track> tracklist() {
-        return getMany(Track.class, "Release");
+        if(isTransient) {
+            return mTracks;
+        } else {
+            return getMany(Track.class, "Release");
+        }
     }
 
     public Release () {
@@ -105,8 +120,14 @@ public class Release extends Model{
 
     public Release(DiscogsRelease r) {
         this();
-        setValues(r);
+        setValues(r,false);
     }
+
+    public Release(DiscogsRelease r, boolean isTransient) {
+        this();
+        setValues(r,isTransient);
+    }
+
 
     public void setValues(DiscogsBasicRelease r) {
         releaseid=r.id;
@@ -120,8 +141,12 @@ public class Release extends Model{
         format = Discogs.formatFormat(r.formats);
     }
 
-    /*perform a full load/update of the release*/
     public void setValues(DiscogsRelease r) {
+        setValues(r,false);
+    }
+
+    /*perform a full load/update of the release*/
+    public void setValues(DiscogsRelease r, boolean isTransient) {
         releaseid=r.id;
         title=r.title;
         year=r.year;
@@ -135,28 +160,45 @@ public class Release extends Model{
         artist= Discogs.formatArtist(r.artists);
         label= Discogs.formatLabel(r.labels);
         format = Discogs.formatFormat(r.formats);
+        format_extended = Discogs.formatFormatExtended(r.formats);
         genres = Discogs.formatGenres(r.genres);
         styles = Discogs.formatStyles(r.styles);
-        //create Image descriptors and tracklist, store in db immediatly, but first remove any old linked data
-        ActiveAndroid.beginTransaction();
-        for(Image i : images()) {
-            i.delete();
+        this.isTransient = isTransient;
+        if(isTransient) {
+            mImages = new ArrayList<Image>();
+            for (int i = 0; i < r.images.size(); i++) {
+                Image image = new Image(r.images.get(i), this);
+                image.idx = i;
+                mImages.add(image);
+            }
+            mTracks = new ArrayList<Track>();
+            for (int i = 0; i < r.tracklist.size(); i++) {
+                Track track = new Track(r.tracklist.get(i), this);
+                track.idx = i;
+                mTracks.add(track);
+            }
+        } else {
+            //create Image descriptors and tracklist, store in db immediatly, but first remove any old linked data
+            ActiveAndroid.beginTransaction();
+            for (Image i : images()) {
+                i.delete();
+            }
+            for (Track t : tracklist()) {
+                t.delete();
+            }
+            for (int i = 0; i < r.images.size(); i++) {
+                Image image = new Image(r.images.get(i), this);
+                image.idx = i;
+                image.save();
+            }
+            for (int i = 0; i < r.tracklist.size(); i++) {
+                Track track = new Track(r.tracklist.get(i), this);
+                track.idx = i;
+                track.save();
+            }
+            ActiveAndroid.setTransactionSuccessful();
+            ActiveAndroid.endTransaction();
         }
-        for(Track t : tracklist()) {
-            t.delete();
-        }
-        for(int i = 0; i < r.images.size();i++) {
-            Image image = new Image(r.images.get(i),this);
-            image.idx = i;
-            image.save();
-        }
-        for(int i = 0; i < r.tracklist.size();i++) {
-            Track track = new Track(r.tracklist.get(i),this);
-            track.idx = i;
-            track.save();
-        }
-        ActiveAndroid.setTransactionSuccessful();
-        ActiveAndroid.endTransaction();
 
         //indicate that extended info is present
         hasExtendedInfo = true;

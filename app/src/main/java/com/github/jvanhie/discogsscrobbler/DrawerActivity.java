@@ -71,7 +71,23 @@ public class DrawerActivity extends FragmentActivity {
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                System.out.println("printed " + i);
+                switch (i) {
+                    case 0: //collection
+                        startActivity(new Intent(DrawerActivity.this, ReleaseListActivity.class));
+                        break;
+                    case 1: //search
+                        startActivity(new Intent(DrawerActivity.this, SearchActivity.class));
+                        break;
+                    case 2: //now playing
+
+                        break;
+                    case 3: //settings
+                        startActivity(new Intent(DrawerActivity.this, SettingsActivity.class));
+                        break;
+                    case 4: //help
+
+                        break;
+                }
             }
         });
 

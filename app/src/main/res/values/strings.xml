@@ -21,6 +21,7 @@
     <string name="user_agent">DiscogsScrobbler/0.1 +http://github.com/jvanhie/discogsscrobbler</string>
     <string name="title_release_detail">Release Detail</string>
     <string name="title_release_tracklist">Tracklist</string>
+    <string name="title_search">Search Discogs</string>
     <string name="title_activity_discogs_login">Login to Discogs</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>

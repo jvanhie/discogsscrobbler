@@ -180,12 +180,12 @@ public class ReleaseListFragment extends Fragment {
         if (mDiscogs.getUser() != null) {
             mDiscogs.isCollectionChanged(new Discogs.DiscogsWaiter() {
                 @Override
-                public void onResult(Boolean success) {
+                public void onResult(boolean success) {
                     if (success) {
                         //local and online collection are out of sync, fix it
                         mDiscogs.refreshCollection(new Discogs.DiscogsWaiter() {
                             @Override
-                            public void onResult(Boolean success) {
+                            public void onResult(boolean success) {
                                 if (success) {
                                     loadList();
                                 } else {
@@ -261,7 +261,7 @@ public class ReleaseListFragment extends Fragment {
                                 Toast.LENGTH_SHORT).show();
                         mDiscogs.refreshReleases(releases, new Discogs.DiscogsWaiter() {
                             @Override
-                            public void onResult(Boolean success) {
+                            public void onResult(boolean success) {
                                 if(success) {
                                     Toast.makeText(getActivity(), "Successfully reloaded releases!",Toast.LENGTH_SHORT).show();
                                     loadList();

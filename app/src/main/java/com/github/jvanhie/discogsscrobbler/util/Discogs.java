@@ -35,12 +35,17 @@ import com.github.jvanhie.discogsscrobbler.queries.DiscogsCollection.DiscogsBasi
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsCollection;
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsIdentity;
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsRelease;
+import com.github.jvanhie.discogsscrobbler.queries.DiscogsSearch;
+import com.github.jvanhie.discogsscrobbler.queries.DiscogsSearchRelease;
+import com.github.jvanhie.discogsscrobbler.queries.DiscogsSearchResult;
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsService;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.IllegalCharsetNameException;
 import java.util.ArrayList;
+import java.util.IllegalFormatException;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
@@ -152,6 +157,54 @@ public class Discogs extends ContextWrapper {
         return ret;
     }
 
+    public static String formatFormatExtended(List<DiscogsRelease.Format> formats) {
+        String ret = "";
+        if(formats != null) {
+            for (int i = 0; i < formats.size(); i++) {
+                DiscogsRelease.Format format = formats.get(i);
+                try {
+                    if (Integer.parseInt(format.qty) > 1) {
+                        ret += formats.get(i).qty + "x";
+                    }
+                } catch (NumberFormatException e) {}
+                if(format.name != null) {
+                    ret += format.name;
+                }
+                if(format.descriptions != null) {
+                    ret += ", " +formatDescription(format.descriptions);
+                }
+                if(format.text != null) {
+                    ret += ", " + format.text;
+                }
+
+                if (i < formats.size() - 1) ret += ", ";
+            }
+        }
+        return ret;
+    }
+
+    public static String formatDescription(String[] desc) {
+        String ret = "";
+        if(desc != null) {
+            for (int i = 0; i < desc.length; i++) {
+                ret += desc[i];
+                if (i < desc.length - 1) ret += ", ";
+            }
+        }
+        return ret;
+    }
+
+    public static String formatFormat(String[] formats) {
+        String ret = "";
+        if(formats != null) {
+            for (int i = 0; i < formats.length; i++) {
+                ret += formats[i];
+                if (i < formats.length - 1) ret += ", ";
+            }
+        }
+        return ret;
+    }
+
     public static String formatStyles(String[] styles) {
         String ret = "";
         if(styles != null) {
@@ -243,6 +296,82 @@ public class Discogs extends ContextWrapper {
         }
     }
 
+    public void search(String query, final DiscogsDataWaiter<List<DiscogsSearchResult>> waiter) {
+        mDiscogsPublicService.search(query, new Callback<DiscogsSearch>() {
+            @Override
+            public void success(DiscogsSearch discogsSearch, Response response) {
+                waiter.onResult(true,discogsSearch.results);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                waiter.onResult(false,null);
+            }
+        });
+    }
+
+    public void getArtistReleases(long id, final DiscogsDataWaiter<List<DiscogsSearchRelease>> waiter) {
+        mDiscogsPublicService.getArtistReleases(id, new Callback<DiscogsSearch>() {
+            @Override
+            public void success(DiscogsSearch discogsSearch, Response response) {
+                ArrayList<DiscogsSearchRelease> result = new ArrayList<DiscogsSearchRelease>();
+                for(DiscogsSearchRelease r : discogsSearch.releases) {
+                    if (r.type.equals("release")) result.add(r);
+                }
+                waiter.onResult(true, result);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                waiter.onResult(false, null);
+            }
+        });
+    }
+
+    public void getLabelReleases(long id, final DiscogsDataWaiter<List<DiscogsSearchRelease>> waiter) {
+        mDiscogsPublicService.getLabelReleases(id, new Callback<DiscogsSearch>() {
+            @Override
+            public void success(DiscogsSearch discogsSearch, Response response) {
+                waiter.onResult(true, discogsSearch.releases);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                waiter.onResult(false, null);
+            }
+        });
+    }
+
+    public void getMasterReleases(long id, final DiscogsDataWaiter<List<DiscogsSearchRelease>> waiter) {
+        mDiscogsPublicService.getMasterReleases(id, new Callback<DiscogsSearch>() {
+            @Override
+            public void success(DiscogsSearch discogsSearch, Response response) {
+                waiter.onResult(true, discogsSearch.versions);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                waiter.onResult(false, null);
+            }
+        });
+    }
+
+    /*returns a transient release from discogs, cannot be saved to the db unless the flag is set to false before saving*/
+    public void getRelease(long id, final DiscogsDataWaiter<Release> waiter) {
+        mDiscogsPublicService.getRelease(id, new Callback<DiscogsRelease>() {
+            @Override
+            public void success(DiscogsRelease discogsRelease, Response response) {
+                waiter.onResult(true,new Release(discogsRelease,true));
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                waiter.onResult(false,null);
+                parseRetrofitError(error);
+            }
+        });
+    }
+
     public void refreshRelease(final Release release, final DiscogsWaiter waiter) {
         //(re)fetch extended info
         mDiscogsPublicService.getRelease(release.releaseid, new Callback<DiscogsRelease>() {
@@ -269,7 +398,7 @@ public class Discogs extends ContextWrapper {
         for (Release r : releases) {
             refreshRelease(r, new DiscogsWaiter() {
                 @Override
-                public void onResult(Boolean success) {
+                public void onResult(boolean success) {
                     if(!success) allSuccess.set(false);
                     int updates = ctr.incrementAndGet();
                     if(updates == total) {
@@ -486,7 +615,11 @@ public class Discogs extends ContextWrapper {
     }
 
     public interface DiscogsWaiter {
-        public void onResult(Boolean success);
+        public void onResult(boolean success);
+    }
+
+    public interface DiscogsDataWaiter<T> {
+        public void onResult(boolean success, T data);
     }
 
     private class DiscogsOauthProviderListener implements OAuthProviderListener {

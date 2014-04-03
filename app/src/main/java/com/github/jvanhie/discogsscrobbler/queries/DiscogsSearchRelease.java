@@ -16,15 +16,23 @@
 
 package com.github.jvanhie.discogsscrobbler.queries;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * Created by Jono on 20/03/14.
+ * Created by Jono on 27/03/2014.
+ * A broad class that is populated depending on the query
+ * works with artist, label or master release queries
  */
-public class DiscogsSearch {
-    public DiscogsPagination pagination;
-    public List<DiscogsSearchResult> results;
-    public List<DiscogsSearchRelease> releases;
-    public List<DiscogsSearchRelease> versions;
+public class DiscogsSearchRelease {
+    public long id;
+    public String title;
+    public String artist;
+    //default is release (can be master as well)
+    public String type = "release";
+    public String thumb;
+    public String year;
+    public String released;
+    public String resource_url;
+    public String country;
+    public String format;
+    public String label;
+
 }

@@ -82,7 +82,7 @@ public class ReleaseTracklistFragment extends ListFragment {
                 //we don't got extended info on this release yet, get it and display it
                 mDiscogs.refreshRelease(mRelease, new Discogs.DiscogsWaiter() {
                     @Override
-                    public void onResult(Boolean success) {
+                    public void onResult(boolean success) {
                         if (success) {
                             mTracklist = mRelease.tracklist();
                             setListAdapter(new TrackListAdapter());
@@ -93,6 +93,18 @@ public class ReleaseTracklistFragment extends ListFragment {
                 mTracklist = mRelease.tracklist();
                 setListAdapter(new TrackListAdapter());
             }
+        }  else {
+            //we don't have this release in the local db, fetch it from the web
+            mDiscogs.getRelease(getArguments().getLong(ARG_ITEM_ID,0), new Discogs.DiscogsDataWaiter<Release>() {
+                @Override
+                public void onResult(boolean success, Release data) {
+                    if(success) {
+                        mRelease = data;
+                        mTracklist = mRelease.tracklist();
+                        setListAdapter(new TrackListAdapter());
+                    }
+                }
+            });
         }
         return super.onCreateView(inflater, container, savedInstanceState);
     }
