@@ -36,6 +36,7 @@ import android.text.TextUtils;
 
 
 import com.github.jvanhie.discogsscrobbler.util.Discogs;
+import com.github.jvanhie.discogsscrobbler.util.Lastfm;
 
 import java.util.List;
 
@@ -71,6 +72,13 @@ public class SettingsActivity extends PreferenceActivity {
                         Discogs.getInstance(SettingsActivity.this).logOut();
                     }
                 }
+
+                if(s.equals("enable_lastfm")) {
+                    if(!sharedPreferences.getBoolean(s,true)) {
+                        //user has disabled lastfm support, log out!
+                        Lastfm.getInstance(SettingsActivity.this).logOut();
+                    }
+                }
             }
         });
     }
@@ -95,8 +103,11 @@ public class SettingsActivity extends PreferenceActivity {
         // In the simplified UI, fragments are not used at all and we instead
         // use the older PreferenceActivity APIs.
 
+        //add lastfm preference
+        addPreferencesFromResource(R.xml.pref_lastfm);
         // Add 'discogs' preferences.
         addPreferencesFromResource(R.xml.pref_discogs);
+
         /*
         // Add 'notifications' preferences, and a corresponding header.
         PreferenceCategory fakeHeader = new PreferenceCategory(this);
@@ -215,6 +226,25 @@ public class SettingsActivity extends PreferenceActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_discogs);
+
+            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
+            // to their values. When their values change, their summaries are
+            // updated to reflect the new value, per the Android Design
+            // guidelines.
+            //bindPreferenceSummaryToValue(findPreference("discogs_enable"));
+        }
+    }
+
+    /**
+     * This fragment shows general preferences only. It is used when the
+     * activity is showing a two-pane settings UI.
+     */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public static class LastfmPreferenceFragment extends PreferenceFragment {
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            addPreferencesFromResource(R.xml.pref_lastfm);
 
             // Bind the summaries of EditText/List/Dialog/Ringtone preferences
             // to their values. When their values change, their summaries are

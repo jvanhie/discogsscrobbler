@@ -52,6 +52,8 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import oauth.signpost.OAuthConsumer;
 import oauth.signpost.OAuthProvider;
@@ -113,9 +115,9 @@ public class Discogs extends ContextWrapper {
         USER_AGENT = res.getString(R.string.user_agent);
 
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        mAccessToken = mPrefs.getString("access_token", null);
-        mAccessSecret = mPrefs.getString("access_secret", null);
-        mUserName = mPrefs.getString("user_name", null);
+        mAccessToken = mPrefs.getString("discogs_access_token", null);
+        mAccessSecret = mPrefs.getString("discogs_access_secret", null);
+        mUserName = mPrefs.getString("discogs_user_name", null);
 
         mOAuthConsumer = new DefaultOAuthConsumer(API_KEY,API_SECRET);
 
@@ -142,12 +144,14 @@ public class Discogs extends ContextWrapper {
     public static String formatArtist(List<DiscogsRelease.Artist> artists) {
         String ret = "";
         if(artists != null && artists.size()>0) ret = artists.get(0).name;
+        ret = removeNumberFromArtist(ret);
         return ret;
     }
 
     public static String formatLabel(List<DiscogsRelease.Label> labels) {
         String ret = "";
         if(labels != null && labels.size()>0) ret = labels.get(0).name;
+        ret = removeNumberFromLabel(ret);
         return ret;
     }
 
@@ -227,6 +231,50 @@ public class Discogs extends ContextWrapper {
         return ret;
     }
 
+    public static int formatDurationToSeconds(String duration) {
+        int defaultDuration = 180;
+        if(duration != null && !duration.equals("") && duration.contains(":")) {
+            try {
+                String[] tokens = duration.split(":");
+                int minutes = Integer.parseInt(tokens[0]);
+                int seconds = Integer.parseInt(tokens[1]);
+                return (60 * minutes + seconds);
+            } catch (NumberFormatException e) {
+            }
+        }
+        return defaultDuration;
+    }
+
+    //Code reused from Jollybox's VinylScrobbler, thanks!
+    public static String removeNumberFromArtist (String artist) {
+        Pattern numberExp = Pattern.compile("^(.*?)( \\([0-9]+\\))?$");
+        Pattern theExp = Pattern.compile("^(.*?)(, The)$");
+
+        Matcher m = numberExp.matcher(artist);
+        if (m.matches()) {
+            artist = m.group(1);
+        }
+
+        m = theExp.matcher(artist);
+        if (m.matches()) {
+            return "The " + m.group(1);
+        } else {
+            return artist;
+        }
+    }
+
+    public static String removeNumberFromLabel (String label) {
+        Pattern numberExp = Pattern.compile("^(.*?)( \\([0-9]+\\))?$");
+
+        Matcher m = numberExp.matcher(label);
+        if (m.matches()) {
+            label = m.group(1);
+        }
+
+        return label;
+    }
+
+
     /*end of static functions*/
 
     public String getUser() {
@@ -290,7 +338,6 @@ public class Discogs extends ContextWrapper {
         if(!error.isNetworkError()) {
             if(error.getResponse().getStatus()==401) {
                 //we made an unauthorized call, token was invalidated, log in again
-                Toast.makeText(mContext, mContext.getString(R.string.oauth_error), Toast.LENGTH_SHORT).show();
                 logIn();
             }
         }
@@ -361,18 +408,18 @@ public class Discogs extends ContextWrapper {
         mDiscogsPublicService.getRelease(id, new Callback<DiscogsRelease>() {
             @Override
             public void success(DiscogsRelease discogsRelease, Response response) {
-                waiter.onResult(true,new Release(discogsRelease,true));
+                waiter.onResult(true, new Release(discogsRelease, true));
             }
 
             @Override
             public void failure(RetrofitError error) {
-                waiter.onResult(false,null);
+                waiter.onResult(false, null);
             }
         });
     }
 
     public void addRelease(final long id, final DiscogsWaiter waiter) {
-        mDiscogsService.getCollectionRelease(mUserName,id, new Callback<DiscogsRelease>() {
+        mDiscogsService.getCollectionRelease(mUserName, id, new Callback<DiscogsRelease>() {
             @Override
             public void success(DiscogsRelease discogsRelease, Response response) {
                 //release is already in the collection, we won't add it again!
@@ -382,7 +429,7 @@ public class Discogs extends ContextWrapper {
             @Override
             public void failure(RetrofitError error) {
                 //this is actually what we expect -> release not found, we can add it now
-                mDiscogsService.addRelease(mUserName,id,new Callback<Response>() {
+                mDiscogsService.addRelease(mUserName, id, new Callback<Response>() {
                     @Override
                     public void success(Response response, Response response2) {
                         waiter.onResult(true);
@@ -654,21 +701,21 @@ public class Discogs extends ContextWrapper {
         SharedPreferences.Editor prefEdit = mPrefs.edit();
 
         if (mAccessToken != null) {
-            prefEdit.putString("access_token", mAccessToken);
+            prefEdit.putString("discogs_access_token", mAccessToken);
         } else {
-            prefEdit.remove("access_token");
+            prefEdit.remove("discogs_access_token");
         }
 
         if (mAccessSecret != null) {
-            prefEdit.putString("access_secret", mAccessSecret);
+            prefEdit.putString("discogs_access_secret", mAccessSecret);
         } else {
-            prefEdit.remove("access_secret");
+            prefEdit.remove("discogs_access_secret");
         }
 
         if (mUserName != null) {
-            prefEdit.putString("user_name", mUserName);
+            prefEdit.putString("discogs_user_name", mUserName);
         } else {
-            prefEdit.remove("user_name");
+            prefEdit.remove("discogs_user_name");
         }
 
         prefEdit.commit();

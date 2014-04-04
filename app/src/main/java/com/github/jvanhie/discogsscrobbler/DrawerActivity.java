@@ -79,7 +79,10 @@ public class DrawerActivity extends FragmentActivity {
                         startActivity(new Intent(DrawerActivity.this, SearchActivity.class));
                         break;
                     case 2: //now playing
+                        if(!PreferenceManager.getDefaultSharedPreferences(DrawerActivity.this).getBoolean("enable_lastfm",true)) {
+                            //the item only works with lastfm enabled
 
+                        }
                         break;
                     case 3: //settings
                         startActivity(new Intent(DrawerActivity.this, SettingsActivity.class));

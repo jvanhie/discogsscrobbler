@@ -13,23 +13,24 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<android.support.v4.widget.DrawerLayout
+
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/detail_drawer_layout"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <FrameLayout
-        xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="match_parent"
+    tools:context="com.github.jvanhie.discogsscrobbler.ReleaseDetailActivity"
+    tools:ignore="MergeRootFrame" >
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/detail_pager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/release_pager_container"
-        tools:context="com.github.jvanhie.discogsscrobbler.ReleaseDetailActivity"
-        tools:ignore="MergeRootFrame" >
-    </FrameLayout>
-    <ListView android:id="@+id/detail_drawer"
-        android:layout_width="240dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:background="@color/WhiteSmoke"
-        android:choiceMode="singleChoice"/>
-</android.support.v4.widget.DrawerLayout>
+        android:layout_height="wrap_content">
+
+        <android.support.v4.view.PagerTabStrip
+            android:id="@+id/detail_pager_strip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"/>
+    </android.support.v4.view.ViewPager>
+</FrameLayout>

@@ -19,7 +19,9 @@ package com.github.jvanhie.discogsscrobbler;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ListFragment;
+import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -36,7 +38,9 @@ import android.widget.Toast;
 import com.github.jvanhie.discogsscrobbler.models.Release;
 import com.github.jvanhie.discogsscrobbler.models.Track;
 import com.github.jvanhie.discogsscrobbler.util.Discogs;
+import com.github.jvanhie.discogsscrobbler.util.Lastfm;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -120,6 +124,9 @@ public class ReleaseTracklistFragment extends ListFragment {
             //the release is not in the collection, give the user the opportunity to add it
             inflater.inflate(R.menu.release_detail_search, menu);
         }
+        if(PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("enable_lastfm",true)) {
+            inflater.inflate(R.menu.release_detail_scrobble, menu);
+        }
 
     }
 
@@ -135,6 +142,26 @@ public class ReleaseTracklistFragment extends ListFragment {
                     }
                 }
             });
+        }
+        if (id == R.id.detail_scrobble_release) {
+            Lastfm lastfm = Lastfm.getInstance(getActivity());
+            if(lastfm.isLoggedIn()) {
+
+                //get selected tracks
+                final List<Track> tracks = getSelectedTracks();
+
+                lastfm.scrobbleTracks(tracks, new Lastfm.LastfmWaiter() {
+                    @Override
+                    public void onResult(boolean success) {
+                        Toast.makeText(getActivity(), "Scrobbled " + tracks.size() + " tracks", Toast.LENGTH_SHORT).show();
+                        clearSelection();
+                    }
+                });
+
+            } else {
+                //log in first
+                lastfm.logIn();
+            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -162,6 +189,27 @@ public class ReleaseTracklistFragment extends ListFragment {
         }
     }
 
+    public List<Track> getSelectedTracks() {
+        SparseBooleanArray checkedItems = getListView().getCheckedItemPositions();
+        List<Track> tracks = new ArrayList<Track>();
+        if (checkedItems != null) {
+            for (int i=0; i<checkedItems.size(); i++) {
+                if (checkedItems.valueAt(i)) {
+                    tracks.add(mTracklist.get(checkedItems.keyAt(i)));
+                }
+            }
+        }
+        //if no tracks are selected, return all
+        if(tracks.size()==0) tracks = mTracklist;
+        return tracks;
+    }
+
+    public void clearSelection() {
+        for(int i = 0; i < mTracklist.size(); i ++) {
+            getListView().setItemChecked(i, false);
+        }
+    }
+
     private class TrackListAdapter extends BaseAdapter {
 
         @Override
@@ -176,7 +224,8 @@ public class ReleaseTracklistFragment extends ListFragment {
 
         @Override
         public long getItemId(int i) {
-            return mTracklist.get(i).getId();
+            if(mTracklist.get(i).getId()==null) return mTracklist.get(i).idx;
+            else return mTracklist.get(i).getId();
         }
 
         @Override

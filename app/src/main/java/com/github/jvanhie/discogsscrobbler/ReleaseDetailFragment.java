@@ -36,6 +36,7 @@ import com.github.jvanhie.discogsscrobbler.models.Image;
 import com.github.jvanhie.discogsscrobbler.models.Release;
 import com.github.jvanhie.discogsscrobbler.util.Discogs;
 import com.github.jvanhie.discogsscrobbler.util.DiscogsImageDownloader;
+import com.github.jvanhie.discogsscrobbler.util.Lastfm;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -108,6 +109,11 @@ public class ReleaseDetailFragment extends Fragment {
             //the release is not in the collection, give the user the opportunity to add it
             inflater.inflate(R.menu.release_detail_search, menu);
         }
+        //TODO:don't do this in the tripane layout -> tracklist scrobbler button is better!
+        if(PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("enable_lastfm",true)) {
+            inflater.inflate(R.menu.release_detail_scrobble, menu);
+        }
+
 
     }
 
@@ -123,6 +129,24 @@ public class ReleaseDetailFragment extends Fragment {
                     }
                 }
             });
+        }
+        if (id == R.id.detail_scrobble_release) {
+            Lastfm lastfm = Lastfm.getInstance(getActivity());
+            if (lastfm.isLoggedIn()) {
+                //we're in detailview, just scrobble everything
+                final Release release = mRelease;
+                if (release != null) {
+                    lastfm.scrobbleTracks(release.tracklist(), new Lastfm.LastfmWaiter() {
+                        @Override
+                        public void onResult(boolean success) {
+                            Toast.makeText(getActivity(), "Scrobbled " + release.tracklist().size() + " tracks", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            } else {
+                //log in first
+                lastfm.logIn();
+            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -194,4 +218,5 @@ public class ReleaseDetailFragment extends Fragment {
             }
         }
     }
+
 }

@@ -105,14 +105,14 @@ public class DiscogsLoginActivity extends ActionBarActivity {
                 public void onPageFinished(WebView view, String url)
                 {
                     super.onPageFinished(view, url);
-
+                    progressBar.setVisibility(View.INVISIBLE);
 
                 }
 
                 @Override
                 public void onPageStarted(WebView view, String url, Bitmap favicon) {
                     super.onPageStarted(view, url, favicon);
-                    progressBar.setVisibility(View.INVISIBLE);
+
                 }
 
                 @Override

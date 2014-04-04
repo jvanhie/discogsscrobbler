@@ -13,12 +13,12 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+
 <android.support.v4.widget.DrawerLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/list_drawer_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent">
     <FrameLayout
         android:layout_width="match_parent"
         android:orientation="vertical" android:layout_height="match_parent">
@@ -49,18 +49,28 @@
                 android:name="com.github.jvanhie.discogsscrobbler.ReleaseListFragment"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="2"
+                android:layout_weight="1"
                 tools:layout="@android:layout/list_content" />
 
             <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="3" >
+                android:layout_weight="2" >
 
                 <ScrollView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:id="@+id/release_detail_container" />
+            </FrameLayout>
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" >
+
+                <ScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/release_tracklist_container" />
             </FrameLayout>
 
         </LinearLayout>

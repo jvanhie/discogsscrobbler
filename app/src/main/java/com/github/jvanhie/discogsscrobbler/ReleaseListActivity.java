@@ -69,8 +69,8 @@ public class ReleaseListActivity extends DrawerActivity
 
         mReleaseProgressBar = (ProgressBar) findViewById(R.id.release_list_progressBar);
         mReleaseList = ((ReleaseListFragment) getSupportFragmentManager().findFragmentById(R.id.release_list));
-
-        if(mLoaded) mReleaseProgressBar.setVisibility(View.INVISIBLE);
+        //single pane mode
+        if(mReleaseProgressBar != null && mLoaded) mReleaseProgressBar.setVisibility(View.INVISIBLE);
 
         if (findViewById(R.id.release_detail_container) != null) {
             // The detail container view will be present only in the
@@ -82,9 +82,12 @@ public class ReleaseListActivity extends DrawerActivity
             // In two-pane mode, list items should be given the
             // 'activated' state when touched.
             mReleaseList.setActivateOnItemClick(true);
+            //setDrawer(R.id.list_drawer_layout_twopane,R.id.list_drawer_twopane,getTitle().toString(),getTitle().toString(),true);
         }
-        //create navigation drawer
-        setDrawer(R.id.list_drawer_layout,R.id.list_drawer,getTitle().toString(),getTitle().toString(),true);
+
+            //create navigation drawer in single pane layout
+            setDrawer(R.id.list_drawer_layout, R.id.list_drawer, getTitle().toString(), getTitle().toString(), true);
+
 
     }
 

@@ -37,6 +37,9 @@
         <item>grid</item>
     </string-array>
 
+    <string name="pref_title_enable_lastfm">Enable Last.fm</string>
+    <string name="pref_description_enable_lastfm">Enables scrobbling to Last.fm</string>
+
 
     <!--string name="pref_title_add_friends_to_messages">Add friends to messages</string>
     <string-array name="pref_example_list_titles">
