@@ -1,15 +1,16 @@
-discogsscrobbler
-================
+Discogs Scrobbler
+=================
 
 View and manage your Discogs collection, with scrobbling support to Last.fm
 If you want to compile this app yourself, edit and copy the discogs.xml file in the root of this project to the /res/values/ folder with your Discogs API key and secret.
 
 ##Current functionality
-The current version has a fully functional Discogs collection management and allows searching discogs.
+- manage and view your Discogs collection
+- search and browse the Discogs catalog
+- Scrobble releases (or just the tracks you listened to) to Last.fm
 
 ##Coming functionality
-- scrobbling a release to Last.fm
-- now playing mode
+- now playing mode (scrobbling in the future)
 - extra info views
 - search filtering
 - multiple collection folders

@@ -119,6 +119,7 @@ public class ReleaseListActivity extends DrawerActivity
                 return false;
             }
         });
+        searchView.setQueryHint("Filter your releases");
         return true;
     }
 

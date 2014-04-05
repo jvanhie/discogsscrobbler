@@ -19,6 +19,7 @@ package com.github.jvanhie.discogsscrobbler;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -110,7 +111,19 @@ public class SearchActivity extends DrawerActivity
                 return false;
             }
         });
+        searchView.setQueryHint("Search Discogs");
+        searchView.setSubmitButtonEnabled(true);
+        //only expand when the drawer is closed
+        if(!((DrawerLayout)findViewById(R.id.search_drawer_layout)).isDrawerOpen(findViewById(R.id.search_drawer))) {
+            menu.findItem(R.id.search_field).expandActionView();
+        }
         return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
@@ -118,7 +131,6 @@ public class SearchActivity extends DrawerActivity
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
         return super.onOptionsItemSelected(item);
     }
 
