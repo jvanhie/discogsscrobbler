@@ -14,13 +14,14 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/release_tracklist_container"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.github.jvanhie.discogsscrobbler.ReleaseTracklistActivity"
-    tools:ignore="MergeRootFrame" >
+<resources>
+    <!--
+    Layout alias to replace the single-pane version of the layout with a
+    two-pane version on Large screens.
 
-</LinearLayout>
+    For more on layout aliases, see:
+    http://developer.android.com/training/multiscreen/screensizes.html#TaskUseAliasFilters
+    -->
+    <item type="layout" name="activity_release_list">@layout/activity_release_tripane</item>
+    <item type="layout" name="activity_search">@layout/activity_search_tripane</item>
+</resources>

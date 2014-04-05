@@ -22,6 +22,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -30,6 +31,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.GridView;
@@ -78,6 +80,10 @@ public class ReleaseListFragment extends Fragment {
     private AbsListView mList;
     private Discogs mDiscogs;
 
+    //we'll need this to determine our width in dp;
+    private float logicalDensity;
+    private boolean mGrid = false;
+
     /**
      * A callback interface that all activities containing this fragment must
      * implement. This mechanism allows activities to be notified of item
@@ -116,6 +122,9 @@ public class ReleaseListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        DisplayMetrics metrics = new DisplayMetrics();
+        getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        logicalDensity = metrics.density;
     }
 
     @Override
@@ -147,8 +156,7 @@ public class ReleaseListFragment extends Fragment {
         } else {
             mList = new GridView(getActivity());
             mList.setId(android.R.id.list);
-            //change column count depending on horizontal resolution, images look good around 150dp
-            ((GridView) mList).setNumColumns(Math.round((float) getResources().getConfiguration().screenWidthDp / (float) 150));
+            mGrid = true;
         }
 
         mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -158,8 +166,6 @@ public class ReleaseListFragment extends Fragment {
             }
         });
 
-
-
         /*initialize list with local discogs collection*/
         if(mDiscogs==null) mDiscogs = Discogs.getInstance(getActivity());
 
@@ -168,6 +174,24 @@ public class ReleaseListFragment extends Fragment {
         checkOnlineCollection();
 
         return mList;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        //call listener to determine correct width when available or changed
+        getView().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                int fragmentWidth = getView().getWidth();
+                if(fragmentWidth > 0)
+                {
+                    if(mGrid) {
+                        ((GridView) mList).setNumColumns(Math.round((fragmentWidth / logicalDensity) / (float) 150));
+                    }
+                }
+            }
+        });
     }
 
     public void filter(String s) {
@@ -354,6 +378,7 @@ public class ReleaseListFragment extends Fragment {
         if (mActivatedPosition != ListView.INVALID_POSITION) {
             // Serialize and persist the activated item position.
             outState.putInt(STATE_ACTIVATED_POSITION, mActivatedPosition);
+            System.out.println(mActivatedPosition);
         }
     }
 

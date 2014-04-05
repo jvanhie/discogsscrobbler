@@ -22,4 +22,8 @@
         android:fragment="com.github.jvanhie.discogsscrobbler.SettingsActivity$DiscogsPreferenceFragment"
         android:title="@string/pref_header_discogs" />
 
+    <header
+        android:fragment="com.github.jvanhie.discogsscrobbler.SettingsActivity$LastfmPreferenceFragment"
+        android:title="@string/pref_header_lastfm" />
+
 </preference-headers>

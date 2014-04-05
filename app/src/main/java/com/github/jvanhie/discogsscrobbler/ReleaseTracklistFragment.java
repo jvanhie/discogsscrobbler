@@ -62,11 +62,18 @@ public class ReleaseTracklistFragment extends ListFragment {
 
     private List<Track> mTracklist;
 
+    public boolean isScrobble = false;
+
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
     public ReleaseTracklistFragment() {
+    }
+
+    public ReleaseTracklistFragment(boolean isScrobble) {
+        this();
+        this.isScrobble = isScrobble;
     }
 
 
@@ -120,12 +127,14 @@ public class ReleaseTracklistFragment extends ListFragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        if(mRelease==null || mRelease.isTransient) {
+        if((mRelease==null || mRelease.isTransient) && isScrobble) {
             //the release is not in the collection, give the user the opportunity to add it
             inflater.inflate(R.menu.release_detail_search, menu);
         }
-        if(PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("enable_lastfm",true)) {
-            inflater.inflate(R.menu.release_detail_scrobble, menu);
+        if(isScrobble) {
+            if (PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("enable_lastfm", true)) {
+                inflater.inflate(R.menu.release_detail_scrobble, menu);
+            }
         }
 
     }
@@ -133,7 +142,7 @@ public class ReleaseTracklistFragment extends ListFragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.detail_add_to_discogs) {
+        if (id == R.id.detail_add_to_discogs && isScrobble && isVisible()) {
             mDiscogs.addRelease(mRelease.releaseid, new Discogs.DiscogsWaiter() {
                 @Override
                 public void onResult(boolean success) {
@@ -143,12 +152,15 @@ public class ReleaseTracklistFragment extends ListFragment {
                 }
             });
         }
-        if (id == R.id.detail_scrobble_release) {
+        //don't scrobble if you're not a visible fragment! -needed for multi layout
+        if (id == R.id.detail_scrobble_release && isScrobble && isVisible()) {
             Lastfm lastfm = Lastfm.getInstance(getActivity());
+            //make sure we're visible before doing this
             if(lastfm.isLoggedIn()) {
 
                 //get selected tracks
                 final List<Track> tracks = getSelectedTracks();
+                System.out.println("scrobbling tracklist accuracy");
 
                 lastfm.scrobbleTracks(tracks, new Lastfm.LastfmWaiter() {
                     @Override

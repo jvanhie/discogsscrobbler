@@ -253,4 +253,12 @@ public class SettingsActivity extends PreferenceActivity {
             //bindPreferenceSummaryToValue(findPreference("discogs_enable"));
         }
     }
+
+    protected boolean isValidFragment (String fragmentName)
+    {
+        if(LastfmPreferenceFragment.class.getName().equals(fragmentName) || DiscogsPreferenceFragment.class.getName().equals(fragmentName))
+            return true;
+        return false;
+
+    }
 }

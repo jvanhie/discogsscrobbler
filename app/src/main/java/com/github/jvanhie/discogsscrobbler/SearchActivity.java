@@ -49,7 +49,11 @@ public class SearchActivity extends DrawerActivity
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
      * device.
      */
-    private boolean mTwoPane;
+    private int mPanes = 1;
+    private static final String STATE_PANES = "collection_panes";
+
+    private long mSelected;
+    private static final String STATE_RELEASE_SELECTED = "selected_release";
 
     private SearchFragment mSearchFragment;
 
@@ -61,17 +65,25 @@ public class SearchActivity extends DrawerActivity
 
         mSearchFragment = ((SearchFragment) getSupportFragmentManager().findFragmentById(R.id.search_list));
 
-        if (findViewById(R.id.release_detail_container) != null) {
-            // The detail container view will be present only in the
-            // large-screen layouts (res/values-large and
-            // res/values-sw600dp). If this view is present, then the
-            // activity should be in two-pane mode.
-            mTwoPane = true;
 
-            // In two-pane mode, list items should be given the
-            // 'activated' state when touched.
-            mSearchFragment.setActivateOnItemClick(true);
+        //check if we're in tablet mode -> two or tripane layout
+        if (findViewById(R.id.release_pager_container) != null) {
+            mPanes = 2;
+        } else if (findViewById(R.id.release_tracklist_container) != null) {
+            mPanes = 3;
         }
+
+        mSearchFragment.setActivateOnItemClick(true);
+
+        // Restore the previously serialized activated release
+        if (savedInstanceState != null
+                && savedInstanceState.containsKey(STATE_RELEASE_SELECTED)) {
+            if(savedInstanceState.getInt(STATE_PANES) != mPanes) {
+                //if the panelayout has changed, forcibly reload the fragments
+                onItemSelected(savedInstanceState.getLong(STATE_RELEASE_SELECTED));
+            }
+        }
+
         //create navigation drawer
         setDrawer(R.id.search_drawer_layout,R.id.search_drawer,getTitle().toString(),getTitle().toString(),true);
 
@@ -116,26 +128,45 @@ public class SearchActivity extends DrawerActivity
      */
     @Override
     public void onItemSelected(long id) {
-        if (mTwoPane) {
-            // In two-pane mode, show the detail view in this activity by
-            // adding or replacing the detail fragment using a
-            // fragment transaction.
-            Bundle arguments = new Bundle();
-            arguments.putLong(ReleaseDetailFragment.ARG_ITEM_ID, id);
-            ReleaseDetailFragment fragment = new ReleaseDetailFragment();
-            fragment.setArguments(arguments);
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.release_detail_container, fragment)
-                    .commit();
-
-        } else {
-            // In single-pane mode, simply start the detail activity
-            // for the selected item ID.
-
-
-            Intent detailIntent = new Intent(this, ReleaseDetailActivity.class);
-            detailIntent.putExtra(ReleaseDetailFragment.ARG_ITEM_ID, id);
-            startActivity(detailIntent);
+        mSelected = id;
+        switch (mPanes) {
+            case 1: //just start new activity with the details
+                Intent detailIntent = new Intent(this, ReleaseDetailActivity.class);
+                detailIntent.putExtra(ReleaseDetailFragment.ARG_ITEM_ID, id);
+                startActivity(detailIntent);
+                break;
+            case 2: //show the pager fragment next to the list
+                Bundle arguments2 = new Bundle();
+                arguments2.putLong(ReleaseDetailFragment.ARG_ITEM_ID, id);
+                ReleasePagerFragment fragment = new ReleasePagerFragment();
+                fragment.setArguments(arguments2);
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.release_pager_container, fragment)
+                        .commit();
+                break;
+            case 3: //whoa, screen estate! Show detail view _and_ tracklist
+                Bundle arguments3 = new Bundle();
+                arguments3.putLong(ReleaseDetailFragment.ARG_ITEM_ID, id);
+                ReleaseDetailFragment detailFragment = new ReleaseDetailFragment(false);
+                detailFragment.setArguments(arguments3);
+                ReleaseTracklistFragment tracklistFragment = new ReleaseTracklistFragment(true);
+                tracklistFragment.setArguments(arguments3);
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.release_detail_container, detailFragment)
+                        .replace(R.id.release_tracklist_container, tracklistFragment)
+                        .commit();
+                break;
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mSelected > 0) {
+            // Serialize and persist the activated item position.
+            outState.putLong(STATE_RELEASE_SELECTED, mSelected);
+        }
+        outState.putInt(STATE_PANES, mPanes);
+
     }
 }

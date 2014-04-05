@@ -57,7 +57,7 @@ public class ReleaseTracklistActivity extends FragmentActivity {
             Bundle arguments = new Bundle();
             arguments.putLong(ReleaseTracklistFragment.ARG_ITEM_ID,
                     getIntent().getLongExtra(ReleaseTracklistFragment.ARG_ITEM_ID,0));
-            ReleaseTracklistFragment fragment = new ReleaseTracklistFragment();
+            ReleaseTracklistFragment fragment = new ReleaseTracklistFragment(true);
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.release_tracklist_container, fragment)

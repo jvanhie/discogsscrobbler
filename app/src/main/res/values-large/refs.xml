@@ -23,4 +23,5 @@
     http://developer.android.com/training/multiscreen/screensizes.html#TaskUseAliasFilters
     -->
     <item type="layout" name="activity_release_list">@layout/activity_release_twopane</item>
+    <item type="layout" name="activity_search">@layout/activity_search_twopane</item>
 </resources>

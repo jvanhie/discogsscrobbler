@@ -37,6 +37,7 @@
         <item>grid</item>
     </string-array>
 
+    <string name="pref_header_lastfm">Last.fm</string>
     <string name="pref_title_enable_lastfm">Enable Last.fm</string>
     <string name="pref_description_enable_lastfm">Enables scrobbling to Last.fm</string>
 

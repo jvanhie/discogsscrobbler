@@ -65,12 +65,19 @@ public class ReleaseDetailFragment extends Fragment {
 
     private View mRootView;
 
+    public boolean isScrobble = false;
+
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
     public ReleaseDetailFragment() {
+    }
+
+    public ReleaseDetailFragment(boolean isScrobble) {
+        this();
+        this.isScrobble = isScrobble;
     }
 
     @Override
@@ -105,13 +112,14 @@ public class ReleaseDetailFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        if(mRelease==null || mRelease.isTransient) {
+        if((mRelease==null || mRelease.isTransient) && isScrobble) {
             //the release is not in the collection, give the user the opportunity to add it
             inflater.inflate(R.menu.release_detail_search, menu);
         }
-        //TODO:don't do this in the tripane layout -> tracklist scrobbler button is better!
-        if(PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("enable_lastfm",true)) {
-            inflater.inflate(R.menu.release_detail_scrobble, menu);
+        if(isScrobble) {
+            if (PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("enable_lastfm", true)) {
+                inflater.inflate(R.menu.release_detail_scrobble, menu);
+            }
         }
 
 
@@ -120,7 +128,7 @@ public class ReleaseDetailFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.detail_add_to_discogs) {
+        if (id == R.id.detail_add_to_discogs && isScrobble && isVisible()) {
             mDiscogs.addRelease(mRelease.releaseid, new Discogs.DiscogsWaiter() {
                 @Override
                 public void onResult(boolean success) {
@@ -130,7 +138,7 @@ public class ReleaseDetailFragment extends Fragment {
                 }
             });
         }
-        if (id == R.id.detail_scrobble_release) {
+        if (id == R.id.detail_scrobble_release && isScrobble && isVisible()) {
             Lastfm lastfm = Lastfm.getInstance(getActivity());
             if (lastfm.isLoggedIn()) {
                 //we're in detailview, just scrobble everything

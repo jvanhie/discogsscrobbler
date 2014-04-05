@@ -84,11 +84,11 @@ public class ReleasePagerFragment extends Fragment {
             arguments.putLong(ReleaseDetailFragment.ARG_ITEM_ID,mReleaseId);
             switch (position) {
                 case 0:
-                    if(mDetailFragment == null) mDetailFragment = new ReleaseDetailFragment();
+                    if(mDetailFragment == null) mDetailFragment = new ReleaseDetailFragment(true);
                     mDetailFragment.setArguments(arguments);
                     return mDetailFragment;
                 case 1:
-                    if(mTrackListFragment == null) mTrackListFragment = new ReleaseTracklistFragment();
+                    if(mTrackListFragment == null) mTrackListFragment = new ReleaseTracklistFragment(true);
                     mTrackListFragment.setArguments(arguments);
                     return mTrackListFragment;
             }
