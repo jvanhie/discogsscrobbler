@@ -47,6 +47,7 @@ import java.nio.charset.IllegalCharsetNameException;
 import java.util.ArrayList;
 import java.util.IllegalFormatException;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -70,12 +71,15 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 
 public class Discogs extends ContextWrapper {
-    private final String API_KEY;
-    private final String API_SECRET;
     private final String API_ROOT;
     private final String USER_AGENT;
 
     private SharedPreferences mPrefs;
+
+    //presents on of the available appids, but can also support secondary appids or a user created one
+    private String mApiKey;
+    private String mApiSecret;
+    private int mApiId;
 
     private String mAccessToken;
     private String mAccessSecret;
@@ -109,22 +113,29 @@ public class Discogs extends ContextWrapper {
         this.mContext = context;
         Resources res = context.getResources();
 
-        API_KEY = res.getString(R.string.discogs_api_key);
-        API_SECRET = res.getString(R.string.discogs_api_secret);
         API_ROOT = res.getString(R.string.discogs_api_root);
         USER_AGENT = res.getString(R.string.user_agent);
 
+        //discogs auth values
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        mApiKey = mPrefs.getString("discogs_api_key",null);
+        mApiSecret = mPrefs.getString("discogs_api_secret",null);
+        mApiId = mPrefs.getInt("discogs_api_id", 0);
         mAccessToken = mPrefs.getString("discogs_access_token", null);
         mAccessSecret = mPrefs.getString("discogs_access_secret", null);
         mUserName = mPrefs.getString("discogs_user_name", null);
 
-        mOAuthConsumer = new DefaultOAuthConsumer(API_KEY,API_SECRET);
+        if(mApiKey == null || mApiSecret == null) {
+            //we don't have an appid yet, get one randomly from the key/secret pairs
+            String[] apiKeys = res.getStringArray(R.array.discogs_api_keys);
+            String[] apiSecrets = res.getStringArray(R.array.discogs_api_secrets);
+            mApiId = new Random().nextInt(apiKeys.length);
+            mApiKey = apiKeys[mApiId];
+            mApiSecret = apiSecrets[mApiId];
+        }
 
-        mOAuthProvider = new DefaultOAuthProvider(
-                "http://api.discogs.com/oauth/request_token", "http://api.discogs.com/oauth/access_token",
-                "http://www.discogs.com/oauth/authorize");
-        mOAuthProvider.setListener(new DiscogsOauthProviderListener());
+        //create the oauth session (for authenticating the user to the set appid)
+        createOAuthService();
 
         //create API call adapter with oauth support
         createDiscogsService(mAccessToken, mAccessSecret);
@@ -138,6 +149,28 @@ public class Discogs extends ContextWrapper {
         };
         RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(API_ROOT).setRequestInterceptor(requestInterceptor).setLogLevel(RestAdapter.LogLevel.BASIC).build();
         mDiscogsPublicService = restAdapter.create(DiscogsService.class);
+    }
+
+    private void createOAuthService() {
+        mOAuthConsumer = new DefaultOAuthConsumer(mApiKey,mApiSecret);
+
+        mOAuthProvider = new DefaultOAuthProvider(
+                "http://api.discogs.com/oauth/request_token", "http://api.discogs.com/oauth/access_token",
+                "http://www.discogs.com/oauth/authorize");
+        mOAuthProvider.setListener(new DiscogsOauthProviderListener());
+    }
+
+    private void createDiscogsService(String token, String secret) {
+        RetrofitHttpOAuthConsumer oAuthConsumer = new RetrofitHttpOAuthConsumer(mApiKey,mApiSecret);
+        oAuthConsumer.setTokenWithSecret(token, secret);
+        RequestInterceptor requestInterceptor = new RequestInterceptor() {
+            @Override
+            public void intercept(RequestFacade request) {
+                request.addHeader("User-Agent", USER_AGENT);
+            }
+        };
+        RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(API_ROOT).setRequestInterceptor(requestInterceptor).setLogLevel(RestAdapter.LogLevel.BASIC).setClient(new SigningOkClient(oAuthConsumer)).build();
+        mDiscogsService = restAdapter.create(DiscogsService.class);
     }
 
     /*STATIC formatter functions*/
@@ -279,19 +312,6 @@ public class Discogs extends ContextWrapper {
 
     public String getUser() {
         return mUserName;
-    }
-
-    private void createDiscogsService(String token, String secret) {
-        RetrofitHttpOAuthConsumer oAuthConsumer = new RetrofitHttpOAuthConsumer(API_KEY, API_SECRET);
-        oAuthConsumer.setTokenWithSecret(token, secret);
-        RequestInterceptor requestInterceptor = new RequestInterceptor() {
-            @Override
-            public void intercept(RequestFacade request) {
-                request.addHeader("User-Agent", USER_AGENT);
-            }
-        };
-        RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(API_ROOT).setRequestInterceptor(requestInterceptor).setLogLevel(RestAdapter.LogLevel.BASIC).setClient(new SigningOkClient(oAuthConsumer)).build();
-        mDiscogsService = restAdapter.create(DiscogsService.class);
     }
 
     public InputStream getImage(String image) throws IOException {
@@ -631,9 +651,11 @@ public class Discogs extends ContextWrapper {
 
     public void setAccessToken(String verifier) {
         try {
-            mOAuthProvider.retrieveAccessToken(mOAuthConsumer, verifier);
-            System.out.println("OAuth results: " + verifier + " -> " + mOAuthConsumer.getToken() + "/" + mOAuthConsumer.getTokenSecret());
-            setSession(mOAuthConsumer.getToken(), mOAuthConsumer.getTokenSecret());
+            if(verifier!=null) {
+                mOAuthProvider.retrieveAccessToken(mOAuthConsumer, verifier);
+                System.out.println("OAuth results: " + verifier + " -> " + mOAuthConsumer.getToken() + "/" + mOAuthConsumer.getTokenSecret());
+                setSession(mOAuthConsumer.getToken(), mOAuthConsumer.getTokenSecret());
+            }
 
         } catch (OAuthException e) {
             e.printStackTrace();
@@ -674,6 +696,9 @@ public class Discogs extends ContextWrapper {
     }
 
     public void logOut() {
+        mApiKey = null;
+        mApiSecret = null;
+        mApiId = 0;
         mAccessToken = null;
         mAccessSecret = null;
         mUserName = null;
@@ -699,6 +724,24 @@ public class Discogs extends ContextWrapper {
 
     private void saveSession() {
         SharedPreferences.Editor prefEdit = mPrefs.edit();
+
+        if (mApiKey != null) {
+            prefEdit.putString("discogs_api_key", mApiKey);
+        } else {
+            prefEdit.remove("discogs_api_key");
+        }
+
+        if (mApiSecret != null) {
+            prefEdit.putString("discogs_api_secret", mApiSecret);
+        } else {
+            prefEdit.remove("discogs_api_secret");
+        }
+
+        if (mApiId != 0) {
+            prefEdit.putInt("discogs_api_id", mApiId);
+        } else {
+            prefEdit.remove("discogs_api_id");
+        }
 
         if (mAccessToken != null) {
             prefEdit.putString("discogs_access_token", mAccessToken);

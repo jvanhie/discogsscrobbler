@@ -27,7 +27,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,7 +39,6 @@ import com.github.jvanhie.discogsscrobbler.util.Lastfm;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.assist.ImageLoadingListener;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 
@@ -65,7 +63,7 @@ public class ReleaseDetailFragment extends Fragment {
 
     private View mRootView;
 
-    public boolean isScrobble = false;
+    public boolean hasMenu = false;
 
 
     /**
@@ -75,9 +73,9 @@ public class ReleaseDetailFragment extends Fragment {
     public ReleaseDetailFragment() {
     }
 
-    public ReleaseDetailFragment(boolean isScrobble) {
+    public ReleaseDetailFragment(boolean hasMenu) {
         this();
-        this.isScrobble = isScrobble;
+        this.hasMenu = hasMenu;
     }
 
     @Override
@@ -106,54 +104,61 @@ public class ReleaseDetailFragment extends Fragment {
             mRelease = mDiscogs.getRelease(getArguments().getLong(ARG_ITEM_ID,0));
         }
 
-        setHasOptionsMenu(true);
+        if(hasMenu) {
+            setHasOptionsMenu(true);
+        }
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        if((mRelease==null || mRelease.isTransient) && isScrobble) {
-            //the release is not in the collection, give the user the opportunity to add it
-            inflater.inflate(R.menu.release_detail_search, menu);
-        }
-        if(isScrobble) {
-            if (PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("enable_lastfm", true)) {
-                inflater.inflate(R.menu.release_detail_scrobble, menu);
+        if(PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("enable_discogs", true)) {
+            if (mRelease == null || mRelease.isTransient) {
+                //the release is not in the collection, give the user the opportunity to add it
+                inflater.inflate(R.menu.release_detail_search, menu);
             }
         }
+
+        if (PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("enable_lastfm", true)) {
+            inflater.inflate(R.menu.release_detail_scrobble, menu);
+        }
+
 
 
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.detail_add_to_discogs && isScrobble && isVisible()) {
-            mDiscogs.addRelease(mRelease.releaseid, new Discogs.DiscogsWaiter() {
-                @Override
-                public void onResult(boolean success) {
-                    if(success) {
-                        Toast.makeText(getActivity(), "Added release to Discogs collection", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
-        }
-        if (id == R.id.detail_scrobble_release && isScrobble && isVisible()) {
-            Lastfm lastfm = Lastfm.getInstance(getActivity());
-            if (lastfm.isLoggedIn()) {
-                //we're in detailview, just scrobble everything
-                final Release release = mRelease;
-                if (release != null) {
-                    lastfm.scrobbleTracks(release.tracklist(), new Lastfm.LastfmWaiter() {
-                        @Override
-                        public void onResult(boolean success) {
-                            Toast.makeText(getActivity(), "Scrobbled " + release.tracklist().size() + " tracks", Toast.LENGTH_SHORT).show();
+        //only handle options when visible and instantiated with menu power
+        if(hasMenu && isVisible()) {
+            int id = item.getItemId();
+            if (id == R.id.detail_add_to_discogs) {
+                mDiscogs.addRelease(mRelease.releaseid, new Discogs.DiscogsWaiter() {
+                    @Override
+                    public void onResult(boolean success) {
+                        if (success) {
+                            Toast.makeText(getActivity(), "Added release to Discogs collection", Toast.LENGTH_SHORT).show();
                         }
-                    });
+                    }
+                });
+            }
+            if (id == R.id.detail_scrobble_release) {
+                Lastfm lastfm = Lastfm.getInstance(getActivity());
+                if (lastfm.isLoggedIn()) {
+                    //we're in detailview, just scrobble everything
+                    final Release release = mRelease;
+                    if (release != null) {
+                        lastfm.scrobbleTracks(release.tracklist(), new Lastfm.LastfmWaiter() {
+                            @Override
+                            public void onResult(boolean success) {
+                                Toast.makeText(getActivity(), "Scrobbled " + release.tracklist().size() + " tracks", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                } else {
+                    //log in first
+                    lastfm.logIn();
                 }
-            } else {
-                //log in first
-                lastfm.logIn();
             }
         }
         return super.onOptionsItemSelected(item);

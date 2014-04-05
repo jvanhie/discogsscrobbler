@@ -131,7 +131,10 @@ public class DiscogsLoginActivity extends ActionBarActivity {
                                     e.printStackTrace();
                                 }
                                 Uri uri = Uri.parse(decodedUrl);
-
+                                if(uri.getQueryParameter("denied") != null) {
+                                    //user has cancelled the auth, finish activity
+                                    finish();
+                                }
                                 String verifier = uri.getQueryParameter("oauth_verifier");
                                 mDiscogs.setAccessToken(verifier);
 

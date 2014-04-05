@@ -18,10 +18,14 @@
 <!--
 	Template file for res/values/discogs.xml
 
-	Enter a discogs API key and secret here to make discogs collection browsing work.
+	Enter your discogs API key and secret here, or use multiple to load balance your users (and allow access from multiple devices)
  -->
 <resources>
     <string name="discogs_api_root">http://api.discogs.com</string>
-    <string name="discogs_api_key">YOUR API KEY</string>
-    <string name="discogs_api_secret">YOUR API SECRET</string>
+    <string-array name="discogs_api_keys">
+        <item>YOUR API KEY</item>
+    </string-array>
+    <string-array name="discogs_api_secrets">
+        <item>YOUR API SECRET</item>
+    </string-array>
 </resources>

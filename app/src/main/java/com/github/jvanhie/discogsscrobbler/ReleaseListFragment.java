@@ -195,7 +195,8 @@ public class ReleaseListFragment extends Fragment {
     }
 
     public void filter(String s) {
-        ((ReleaseAdapter)mList.getAdapter()).getFilter().filter(s.toString());
+        if(mList != null && mList.getAdapter() != null)
+            ((ReleaseAdapter)mList.getAdapter()).getFilter().filter(s.toString());
     }
 
 
