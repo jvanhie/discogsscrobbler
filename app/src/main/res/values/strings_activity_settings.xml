@@ -36,10 +36,15 @@
         <item>list</item>
         <item>grid</item>
     </string-array>
+    <string name="pref_title_api_id">Api instance</string>
+    <string name="pref_description_api_id">Select a different instance on each device you own</string>
+    <string name="pref_api_id_default">0</string>
 
     <string name="pref_header_lastfm">Last.fm</string>
     <string name="pref_title_enable_lastfm">Enable Last.fm</string>
     <string name="pref_description_enable_lastfm">Enables scrobbling to Last.fm</string>
+    <string name="pref_title_create_api">Create your own api id</string>
+    <string name="pref_description_create_api">Not fond of sharing an image limit with other users? Create your own api id!</string>
 
 
     <!--string name="pref_title_add_friends_to_messages">Add friends to messages</string>

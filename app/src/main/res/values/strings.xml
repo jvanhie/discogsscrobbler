@@ -34,6 +34,7 @@
     <string name="delete_releases_title">Delete releases?</string>
     <string name="delete_releases_message">This will remove the selected releases from your Discogs collection, both online and on your device.</string>
 
+
     <!-- Nav Drawer Menu Items -->
     <string-array name="nav_drawer_items">
         <item >Collection</item>

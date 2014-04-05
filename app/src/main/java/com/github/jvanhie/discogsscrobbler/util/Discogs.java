@@ -79,7 +79,7 @@ public class Discogs extends ContextWrapper {
     //presents on of the available appids, but can also support secondary appids or a user created one
     private String mApiKey;
     private String mApiSecret;
-    private int mApiId;
+    private String mApiId;
 
     private String mAccessToken;
     private String mAccessSecret;
@@ -120,7 +120,7 @@ public class Discogs extends ContextWrapper {
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         mApiKey = mPrefs.getString("discogs_api_key",null);
         mApiSecret = mPrefs.getString("discogs_api_secret",null);
-        mApiId = mPrefs.getInt("discogs_api_id", 0);
+        mApiId = mPrefs.getString("discogs_api_id", null);
         mAccessToken = mPrefs.getString("discogs_access_token", null);
         mAccessSecret = mPrefs.getString("discogs_access_secret", null);
         mUserName = mPrefs.getString("discogs_user_name", null);
@@ -129,9 +129,11 @@ public class Discogs extends ContextWrapper {
             //we don't have an appid yet, get one randomly from the key/secret pairs
             String[] apiKeys = res.getStringArray(R.array.discogs_api_keys);
             String[] apiSecrets = res.getStringArray(R.array.discogs_api_secrets);
-            mApiId = new Random().nextInt(apiKeys.length);
-            mApiKey = apiKeys[mApiId];
-            mApiSecret = apiSecrets[mApiId];
+            int id = new Random().nextInt(apiKeys.length);
+            mApiKey = apiKeys[id];
+            mApiSecret = apiSecrets[id];
+            //store the id as string for the android settingsactivity
+            mApiId = "" + id;
         }
 
         //create the oauth session (for authenticating the user to the set appid)
@@ -691,14 +693,36 @@ public class Discogs extends ContextWrapper {
         });
     }
 
+    public void setCustomApi(String key, String secret) {
+        logOut();
+        mApiKey = key;
+        mApiSecret = secret;
+        mApiId = "-1";
+        createOAuthService();
+        saveSession();
+    }
+
+    public void setApiId(int id) {
+        logOut();
+        String[] apiKeys = getResources().getStringArray(R.array.discogs_api_keys);
+        String[] apiSecrets = getResources().getStringArray(R.array.discogs_api_secrets);
+        mApiKey = apiKeys[id];
+        mApiSecret = apiSecrets[id];
+        //store the id as string for the android settingsactivity
+        mApiId = "" + id;
+        createOAuthService();
+        saveSession();
+    }
+
+    public int getApiId() {
+        return Integer.parseInt(mApiId);
+    }
+
     public void logIn() {
         startActivity(new Intent(mContext, DiscogsLoginActivity.class));
     }
 
     public void logOut() {
-        mApiKey = null;
-        mApiSecret = null;
-        mApiId = 0;
         mAccessToken = null;
         mAccessSecret = null;
         mUserName = null;
@@ -722,6 +746,7 @@ public class Discogs extends ContextWrapper {
 
     }
 
+
     private void saveSession() {
         SharedPreferences.Editor prefEdit = mPrefs.edit();
 
@@ -737,8 +762,8 @@ public class Discogs extends ContextWrapper {
             prefEdit.remove("discogs_api_secret");
         }
 
-        if (mApiId != 0) {
-            prefEdit.putInt("discogs_api_id", mApiId);
+        if (mApiId != null) {
+            prefEdit.putString("discogs_api_id", mApiId);
         } else {
             prefEdit.remove("discogs_api_id");
         }

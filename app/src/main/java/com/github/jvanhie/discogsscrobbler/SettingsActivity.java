@@ -18,6 +18,7 @@ package com.github.jvanhie.discogsscrobbler;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.media.Ringtone;
@@ -79,8 +80,23 @@ public class SettingsActivity extends PreferenceActivity {
                         Lastfm.getInstance(SettingsActivity.this).logOut();
                     }
                 }
+
+                if(s.equals("discogs_api_id")) {
+                    int choice = Integer.parseInt(sharedPreferences.getString(s,"0"));
+                    int current = Discogs.getInstance(SettingsActivity.this).getApiId();
+                    if(choice!=current) {
+                        if (choice == -1) {
+                            startActivity(new Intent(SettingsActivity.this, DiscogsApiActivity.class));
+                        } else {
+                            Discogs.getInstance(SettingsActivity.this).setApiId(choice);
+                        }
+                    }
+                }
             }
         });
+
+
+
     }
 
     @Override
@@ -108,23 +124,30 @@ public class SettingsActivity extends PreferenceActivity {
         // Add 'discogs' preferences.
         addPreferencesFromResource(R.xml.pref_discogs);
 
-        /*
-        // Add 'notifications' preferences, and a corresponding header.
-        PreferenceCategory fakeHeader = new PreferenceCategory(this);
-        fakeHeader.setTitle(R.string.pref_header_notifications);
-        getPreferenceScreen().addPreference(fakeHeader);
-        addPreferencesFromResource(R.xml.pref_notification);
 
-        // Add 'data and sync' preferences, and a corresponding header.
-        fakeHeader = new PreferenceCategory(this);
-        fakeHeader.setTitle(R.string.pref_header_data_sync);
-        getPreferenceScreen().addPreference(fakeHeader);
-        addPreferencesFromResource(R.xml.pref_data_sync);
-*/
-        // Bind the summaries of EditText/List/Dialog/Ringtone preferences to
-        // their values. When their values change, their summaries are updated
-        // to reflect the new value, per the Android Design guidelines.
-        //bindPreferenceSummaryToValue(findPreference("enable_discogs"));
+        ListPreference api = (ListPreference) findPreference("discogs_api_id");
+        int size = getResources().getStringArray(R.array.discogs_api_keys).length;
+        String[] entries = new String[size+1];
+        String[] values = new String[size+1];
+        for (int i = 0; i <= size; i++) {
+            if(i==0) entries[0] = "custom";
+            else entries[i] = "" + (i);
+            values[i] = "" + (i-1);
+        }
+        api.setEntries(entries);
+        api.setEntryValues(values);
+
+
+        Preference button = findPreference("discogs_create_api_button");
+        button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference arg0) {
+                Intent apiIntent = new Intent(SettingsActivity.this, DiscogsApiActivity.class);
+                apiIntent.putExtra(DiscogsApiActivity.ARG_API_MODE, "create");
+                startActivity(apiIntent);
+                return true;
+            }
+        });
 
     }
 
@@ -166,57 +189,6 @@ public class SettingsActivity extends PreferenceActivity {
     }
 
     /**
-     * A preference value change listener that updates the preference's summary
-     * to reflect its new value.
-     */
-    private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
-        @Override
-        public boolean onPreferenceChange(Preference preference, Object value) {
-            String stringValue = value.toString();
-
-            if (preference instanceof ListPreference) {
-                // For list preferences, look up the correct display value in
-                // the preference's 'entries' list.
-                ListPreference listPreference = (ListPreference) preference;
-                int index = listPreference.findIndexOfValue(stringValue);
-
-                // Set the summary to reflect the new value.
-                preference.setSummary(
-                        index >= 0
-                                ? listPreference.getEntries()[index]
-                                : null);
-
-            } else {
-                // For all other preferences, set the summary to the value's
-                // simple string representation.
-                preference.setSummary(stringValue);
-            }
-            return true;
-        }
-    };
-
-    /**
-     * Binds a preference's summary to its value. More specifically, when the
-     * preference's value is changed, its summary (line of text below the
-     * preference title) is updated to reflect the value. The summary is also
-     * immediately updated upon calling this method. The exact display format is
-     * dependent on the type of preference.
-     *
-     * @see #sBindPreferenceSummaryToValueListener
-     */
-    private static void bindPreferenceSummaryToValue(Preference preference) {
-        // Set the listener to watch for value changes.
-        preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
-
-        // Trigger the listener immediately with the preference's
-        // current value.
-        sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
-                PreferenceManager
-                        .getDefaultSharedPreferences(preference.getContext())
-                        .getString(preference.getKey(), ""));
-    }
-
-    /**
      * This fragment shows general preferences only. It is used when the
      * activity is showing a two-pane settings UI.
      */
@@ -227,11 +199,18 @@ public class SettingsActivity extends PreferenceActivity {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_discogs);
 
-            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
-            // to their values. When their values change, their summaries are
-            // updated to reflect the new value, per the Android Design
-            // guidelines.
-            //bindPreferenceSummaryToValue(findPreference("discogs_enable"));
+            ListPreference api = (ListPreference) findPreference("discogs_api_id");
+            int size = getResources().getStringArray(R.array.discogs_api_keys).length;
+            String[] entries = new String[size+1];
+            String[] values = new String[size+1];
+            for (int i = 0; i <= size; i++) {
+                if(i==0) entries[0] = "custom";
+                else entries[i] = "" + (i);
+                values[i] = "" + (i-1);
+            }
+            api.setEntries(entries);
+            api.setEntryValues(values);
+
         }
     }
 
@@ -245,12 +224,6 @@ public class SettingsActivity extends PreferenceActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_lastfm);
-
-            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
-            // to their values. When their values change, their summaries are
-            // updated to reflect the new value, per the Android Design
-            // guidelines.
-            //bindPreferenceSummaryToValue(findPreference("discogs_enable"));
         }
     }
 
