@@ -61,6 +61,7 @@ public class ReleaseListActivity extends DrawerActivity
     private ReleaseListFragment mReleaseList;
 
     private ProgressBar mReleaseProgressBar;
+    private ProgressBar mRefreshProgressBar;
 
     private boolean mLoaded = false;
 
@@ -73,6 +74,7 @@ public class ReleaseListActivity extends DrawerActivity
         setContentView(R.layout.activity_release_list);
 
         mReleaseProgressBar = (ProgressBar) findViewById(R.id.release_list_progressBar);
+        mRefreshProgressBar = (ProgressBar) findViewById(R.id.release_list_refresh);
         mReleaseList = ((ReleaseListFragment) getSupportFragmentManager().findFragmentById(R.id.release_list));
         //single pane mode
         if(mReleaseProgressBar != null && mLoaded) mReleaseProgressBar.setVisibility(View.INVISIBLE);
@@ -175,6 +177,18 @@ public class ReleaseListActivity extends DrawerActivity
         mLoaded = true;
         if(mReleaseProgressBar!=null) mReleaseProgressBar.setVisibility(View.INVISIBLE);
     }
+
+    public void setRefreshVisible(boolean visible) {
+        if(mRefreshProgressBar!=null) {
+            if(visible) {
+                mRefreshProgressBar.setVisibility(View.VISIBLE);
+            } else {
+                mRefreshProgressBar.setVisibility(View.GONE);
+            }
+        }
+    }
+
+
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {

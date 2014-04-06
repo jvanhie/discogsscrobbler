@@ -95,6 +95,7 @@ public class ReleaseListFragment extends Fragment {
          */
         public void onItemSelected(long id);
         public void onAdapterSet();
+        public void setRefreshVisible(boolean visible) ;
     }
 
     /**
@@ -108,6 +109,11 @@ public class ReleaseListFragment extends Fragment {
 
         @Override
         public void onAdapterSet() {
+
+        }
+
+        @Override
+        public void setRefreshVisible(boolean visible) {
 
         }
     };
@@ -203,6 +209,7 @@ public class ReleaseListFragment extends Fragment {
     private void checkOnlineCollection() {
         if(mDiscogs==null) mDiscogs = Discogs.getInstance(getActivity());
         if (mDiscogs.getUser() != null) {
+            mCallbacks.setRefreshVisible(true);
             mDiscogs.isCollectionChanged(new Discogs.DiscogsWaiter() {
                 @Override
                 public void onResult(boolean success) {
@@ -216,8 +223,11 @@ public class ReleaseListFragment extends Fragment {
                                 } else {
                                     //something went wrong refreshing the collection
                                 }
+                                mCallbacks.setRefreshVisible(false);
                             }
                         });
+                    } else {
+                        mCallbacks.setRefreshVisible(false);
                     }
                 }
             });
@@ -227,17 +237,6 @@ public class ReleaseListFragment extends Fragment {
             mDiscogs.logIn();
         }
     }
-
-    /*
-    @Override
-    public void onResume() {
-        super.onResume();
-        //this test is mostly for the flow where a user has just logged in
-        if(mList.getCount()==0) {
-            checkOnlineCollection();
-        }
-    }
-    **/
 
     public void loadList() {
         List<Release> releases = mDiscogs.getCollection();
@@ -282,6 +281,7 @@ public class ReleaseListFragment extends Fragment {
                 }
                 switch (item.getItemId()) {
                     case R.id.reload_release:
+                        mCallbacks.setRefreshVisible(true);
                         mDiscogs.refreshReleases(releases, new Discogs.DiscogsWaiter() {
                             @Override
                             public void onResult(boolean success) {
@@ -292,6 +292,7 @@ public class ReleaseListFragment extends Fragment {
                                     Toast.makeText(getActivity(), "Failed to reload requested releases!",
                                             Toast.LENGTH_SHORT).show();
                                 }
+                                mCallbacks.setRefreshVisible(false);
                             }
                         });
                         mode.finish();
@@ -302,6 +303,7 @@ public class ReleaseListFragment extends Fragment {
                         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 // User clicked OK button
+                                mCallbacks.setRefreshVisible(true);
                                 mDiscogs.removeReleases(releases, new Discogs.DiscogsWaiter() {
                                     @Override
                                     public void onResult(boolean success) {
@@ -312,6 +314,7 @@ public class ReleaseListFragment extends Fragment {
                                             Toast.makeText(getActivity(), "Failed to remove selected releases!",
                                                     Toast.LENGTH_SHORT).show();
                                         }
+                                        mCallbacks.setRefreshVisible(false);
                                     }
                                 });
                                 mode.finish();
