@@ -34,6 +34,7 @@ import com.github.jvanhie.discogsscrobbler.models.Release;
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsCollection.DiscogsBasicRelease;
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsCollection;
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsIdentity;
+import com.github.jvanhie.discogsscrobbler.queries.DiscogsPriceSuggestion;
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsRelease;
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsSearch;
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsSearchRelease;
@@ -171,7 +172,7 @@ public class Discogs extends ContextWrapper {
                 request.addHeader("User-Agent", USER_AGENT);
             }
         };
-        RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(API_ROOT).setRequestInterceptor(requestInterceptor).setLogLevel(RestAdapter.LogLevel.BASIC).setClient(new SigningOkClient(oAuthConsumer)).build();
+        RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(API_ROOT).setRequestInterceptor(requestInterceptor).setLogLevel(RestAdapter.LogLevel.FULL).setClient(new SigningOkClient(oAuthConsumer)).build();
         mDiscogsService = restAdapter.create(DiscogsService.class);
     }
 
@@ -468,6 +469,20 @@ public class Discogs extends ContextWrapper {
                         waiter.onResult(false);
                     }
                 });
+            }
+        });
+    }
+
+    public void getPriceSuggestions(final long id, final DiscogsDataWaiter<DiscogsPriceSuggestion> waiter) {
+        mDiscogsService.getPriceSuggestions(id, new Callback<DiscogsPriceSuggestion>() {
+            @Override
+            public void success(DiscogsPriceSuggestion s, Response response) {
+                waiter.onResult(true,s);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                waiter.onResult(false,null);
             }
         });
     }

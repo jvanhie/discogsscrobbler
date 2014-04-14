@@ -33,6 +33,7 @@ import android.widget.Toast;
 
 import com.github.jvanhie.discogsscrobbler.models.Image;
 import com.github.jvanhie.discogsscrobbler.models.Release;
+import com.github.jvanhie.discogsscrobbler.queries.DiscogsPriceSuggestion;
 import com.github.jvanhie.discogsscrobbler.util.Discogs;
 import com.github.jvanhie.discogsscrobbler.util.DiscogsImageDownloader;
 import com.github.jvanhie.discogsscrobbler.util.Lastfm;
@@ -102,6 +103,15 @@ public class ReleaseDetailFragment extends Fragment {
         //get id from arguments
         if (getArguments().containsKey(ARG_ITEM_ID)) {
             mRelease = mDiscogs.getRelease(getArguments().getLong(ARG_ITEM_ID,0));
+            //get price suggestions
+            mDiscogs.getPriceSuggestions(getArguments().getLong(ARG_ITEM_ID,0),new Discogs.DiscogsDataWaiter<DiscogsPriceSuggestion>() {
+                @Override
+                public void onResult(boolean success, DiscogsPriceSuggestion data) {
+                    for (DiscogsPriceSuggestion.Quality quality : data.getSuggestion()) {
+                        System.out.println(quality.type + ": " + quality.value + " " + quality.currency);
+                    }
+                }
+            });
         }
 
         if(hasMenu) {

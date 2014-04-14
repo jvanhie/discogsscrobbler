@@ -75,4 +75,7 @@ public interface DiscogsService {
     @GET("/database/search")
     void searchBarcode(@Query("barcode") String barcode, Callback<DiscogsSearch> callback);
 
+    @GET("/marketplace/price_suggestions/{id}")
+    void getPriceSuggestions(@Path("id") long id, Callback<DiscogsPriceSuggestion> callback);
+
 }
