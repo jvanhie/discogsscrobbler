@@ -49,7 +49,7 @@
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_marginTop="-7dp"
-                android:visibility="visible" />
+                android:visibility="invisible" />
         </RelativeLayout>
 
         <ProgressBar

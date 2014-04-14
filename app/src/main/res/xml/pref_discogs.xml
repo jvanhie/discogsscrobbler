@@ -45,6 +45,7 @@
 
         <Preference android:title="@string/pref_title_create_api"
             android:key="discogs_create_api_button"
+            android:dependency="enable_discogs"
             android:summary="@string/pref_description_create_api"/>
 
     </PreferenceCategory>

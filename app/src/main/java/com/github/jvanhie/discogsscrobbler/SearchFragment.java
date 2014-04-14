@@ -93,6 +93,7 @@ public class SearchFragment extends Fragment {
          * Callback for when an item has been selected.
          */
         public void onItemSelected(long id);
+        public void setRefreshVisible(boolean visible) ;
     }
 
     /**
@@ -102,6 +103,10 @@ public class SearchFragment extends Fragment {
     private static Callbacks sDummyCallbacks = new Callbacks() {
         @Override
         public void onItemSelected(long id) {
+        }
+
+        public void setRefreshVisible(boolean visible) {
+
         }
     };
 
@@ -153,6 +158,7 @@ public class SearchFragment extends Fragment {
     }
 
     public void search(String s) {
+        mCallbacks.setRefreshVisible(true);
         mDiscogs.search(s,new Discogs.DiscogsDataWaiter<List<DiscogsSearchResult>>() {
             @Override
             public void onResult(boolean success, List<DiscogsSearchResult> data) {
@@ -161,6 +167,7 @@ public class SearchFragment extends Fragment {
                     mAdapter = new SearchAdapter(getActivity(),data);
                     mList.setAdapter(mAdapter);
                 }
+                mCallbacks.setRefreshVisible(false);
             }
         });
     }
@@ -231,7 +238,7 @@ public class SearchFragment extends Fragment {
             } else {
                 //this is a group item, fetch it's content and add it dynamically to the list if collapsed and first click, else let the listview do it's magic
                 if(mList.isGroupExpanded(i) || mAdapter.getChildrenCount(i) != 0) return false;
-
+                mCallbacks.setRefreshVisible(true);
                 if(result.type.equals("artist")) {
                     mDiscogs.getArtistReleases(result.id, new Discogs.DiscogsDataWaiter<List<DiscogsSearchRelease>>() {
                         @Override
@@ -240,6 +247,7 @@ public class SearchFragment extends Fragment {
                                 mAdapter.addChildren(i,data);
                                 mList.expandGroup(i);
                             }
+                            mCallbacks.setRefreshVisible(false);
                         }
                     });
                 } else if(result.type.equals("label")) {
@@ -250,6 +258,7 @@ public class SearchFragment extends Fragment {
                                 mAdapter.addChildren(i, data);
                                 mList.expandGroup(i);
                             }
+                            mCallbacks.setRefreshVisible(false);
                         }
                     });
                 } else if(result.type.equals("master")) {
@@ -260,6 +269,7 @@ public class SearchFragment extends Fragment {
                                 mAdapter.addChildren(i, data);
                                 mList.expandGroup(i);
                             }
+                            mCallbacks.setRefreshVisible(false);
                         }
                     });
                 }

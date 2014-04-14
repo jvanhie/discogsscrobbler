@@ -131,6 +131,10 @@ public class ReleaseListActivity extends DrawerActivity
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
+        if(id == R.id.list_refresh) {
+            //refresh the list
+            mReleaseList.refreshCollection();
+        }
         return super.onOptionsItemSelected(item);
     }
 

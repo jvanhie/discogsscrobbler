@@ -42,6 +42,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import de.umass.lastfm.Authenticator;
 import de.umass.lastfm.Caller;
 import de.umass.lastfm.Session;
+import de.umass.lastfm.scrobble.ScrobbleData;
 import de.umass.lastfm.scrobble.ScrobbleResult;
 
 /**
@@ -108,8 +109,18 @@ public class Lastfm extends ContextWrapper {
             @Override
             protected Boolean doInBackground(Void... voids) {
                 String artist = track.release.artist;
+                //track has artist data, use this instead (Collections and splits)
+                if(!track.artist.equals("")) {
+                    artist = track.artist;
+                }
                 String title = track.title;
-                ScrobbleResult result = de.umass.lastfm.Track.scrobble(artist, title, time, mSession);
+                String album = track.release.title;
+                ScrobbleData data = new ScrobbleData();
+                data.setArtist(artist);
+                data.setTrack(title);
+                data.setAlbum(album);
+                data.setTimestamp(time);
+                ScrobbleResult result = de.umass.lastfm.Track.scrobble(data, mSession);
                 boolean success = (result.isSuccessful() && !result.isIgnored());
                 System.out.println("scrobbled: "+ artist +":"+title + " -> "+ success);
                 return success;
@@ -172,14 +183,18 @@ public class Lastfm extends ContextWrapper {
         AsyncTask t = new AsyncTask() {
             @Override
             protected Object doInBackground(Object[] objects) {
-                mSession = Authenticator.getMobileSession(username,password,API_KEY,API_SECRET);
-                if(mSession!=null) {
-                    mAccessKey = mSession.getKey();
-                    mUserName = mSession.getUsername();
-                    saveSession();
+                try {
+                    mSession = Authenticator.getMobileSession(username, password, API_KEY, API_SECRET);
+                    if (mSession != null) {
+                        mAccessKey = mSession.getKey();
+                        mUserName = mSession.getUsername();
+                        saveSession();
 
-                } else {
+                    } else {
 
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
                 return true;
             }

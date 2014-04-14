@@ -24,4 +24,10 @@
         android:icon="@android:drawable/ic_menu_search"
         android:showAsAction="collapseActionView|ifRoom"
         android:actionViewClass="android.widget.SearchView" />
+
+    <item
+        android:id="@+id/list_refresh"
+        android:icon="@android:drawable/ic_popup_sync"
+        android:showAsAction="collapseActionView|ifRoom"
+        android:title="Refresh list"/>
 </menu>

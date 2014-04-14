@@ -20,6 +20,7 @@ import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsRelease;
+import com.github.jvanhie.discogsscrobbler.util.Discogs;
 
 /**
  * Created by Jono on 22/03/2014.
@@ -45,6 +46,9 @@ public class Track extends Model{
     @Column(name = "type")
     public String type;
 
+    @Column(name = "artist")
+    public String artist;
+
     public Track() {
         super();
     }
@@ -54,6 +58,7 @@ public class Track extends Model{
         position = track.position;
         title = track.title;
         type = track.type_;
+        artist = Discogs.formatArtist(track.artists);
         this.release = release;
     }
 

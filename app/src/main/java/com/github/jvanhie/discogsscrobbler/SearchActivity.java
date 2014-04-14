@@ -57,6 +57,8 @@ public class SearchActivity extends DrawerActivity
     private static final String STATE_RELEASE_SELECTED = "selected_release";
 
     private SearchFragment mSearchFragment;
+    private ProgressBar mRefreshProgressBar;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +67,7 @@ public class SearchActivity extends DrawerActivity
         setContentView(R.layout.activity_search);
 
         mSearchFragment = ((SearchFragment) getSupportFragmentManager().findFragmentById(R.id.search_list));
-
+        mRefreshProgressBar = (ProgressBar) findViewById(R.id.search_refresh);
 
         //check if we're in tablet mode -> two or tripane layout
         if (findViewById(R.id.release_pager_container) != null) {
@@ -118,6 +120,16 @@ public class SearchActivity extends DrawerActivity
             menu.findItem(R.id.search_field).expandActionView();
         }
         return true;
+    }
+
+    public void setRefreshVisible(boolean visible) {
+        if(mRefreshProgressBar!=null) {
+            if(visible) {
+                mRefreshProgressBar.setVisibility(View.VISIBLE);
+            } else {
+                mRefreshProgressBar.setVisibility(View.GONE);
+            }
+        }
     }
 
     @Override

@@ -255,7 +255,12 @@ public class ReleaseTracklistFragment extends ListFragment {
             Track track = mTracklist.get(i);
             pos.setText(track.position);
             duration.setText(track.duration);
-            name.setText(track.title);
+            if(!track.artist.equals("")) {
+                name.setText(track.artist + " - " + track.title);
+            } else {
+                name.setText(track.title);
+            }
+
 
             if(track.type.equals("heading")) {
                 name.setTextColor(Color.LTGRAY);

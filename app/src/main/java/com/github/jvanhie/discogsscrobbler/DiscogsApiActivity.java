@@ -68,6 +68,9 @@ public class DiscogsApiActivity extends ActionBarActivity {
 
             @Override
             public void onPageFinished(WebView view, String url) {
+                mWebView.loadUrl("javascript:(function() { " +
+                        "document.getElementById('site_headers_super_wrap').style.display='none'; " +
+                        "})()");
                 progressBar.setVisibility(View.INVISIBLE);
                 super.onPageFinished(view, url);
                 //autofill data

@@ -23,15 +23,32 @@
         android:layout_width="match_parent"
         android:orientation="vertical" android:layout_height="match_parent">
 
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
             <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:id="@+id/search_list"
+                    xmlns:tools="http://schemas.android.com/tools"
+                    android:id="@+id/search_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:name="com.github.jvanhie.discogsscrobbler.SearchFragment"
+                    tools:context="com.github.jvanhie.discogsscrobbler.SearchActivity"
+                    tools:layout="@android:layout/list_content"
+                    android:layout_gravity="center"/>
+
+            <ProgressBar
+                style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:name="com.github.jvanhie.discogsscrobbler.SearchFragment"
-                tools:context="com.github.jvanhie.discogsscrobbler.SearchActivity"
-                tools:layout="@android:layout/list_content"
-                android:layout_gravity="center"/>
+                android:layout_height="15dp"
+                android:id="@+id/search_refresh"
+                android:indeterminate="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginTop="-7dp"
+                android:visibility="invisible" />
+        </RelativeLayout>
 
 
         <ProgressBar

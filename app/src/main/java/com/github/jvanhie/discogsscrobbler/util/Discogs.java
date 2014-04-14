@@ -178,8 +178,14 @@ public class Discogs extends ContextWrapper {
     /*STATIC formatter functions*/
     public static String formatArtist(List<DiscogsRelease.Artist> artists) {
         String ret = "";
-        if(artists != null && artists.size()>0) ret = artists.get(0).name;
-        ret = removeNumberFromArtist(ret);
+        if(artists != null) {
+            for (DiscogsRelease.Artist artist : artists) {
+                ret += removeNumberFromArtist(artist.name);
+                if(!artist.join.equals("")) {
+                    ret += " " + artist.join + " ";
+                }
+            }
+        }
         return ret;
     }
 

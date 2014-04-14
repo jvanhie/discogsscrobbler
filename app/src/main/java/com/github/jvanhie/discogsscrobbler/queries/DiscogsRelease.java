@@ -42,6 +42,7 @@ public class DiscogsRelease {
     public List<Track> tracklist;
 
     public class Artist {
+        public String join="";
         public String name;
     }
 
@@ -69,6 +70,7 @@ public class DiscogsRelease {
         public String position;
         public String title;
         public String type_;
+        public List<Artist> artists;
     }
 
 }

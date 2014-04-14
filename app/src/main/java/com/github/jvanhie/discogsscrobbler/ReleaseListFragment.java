@@ -238,6 +238,21 @@ public class ReleaseListFragment extends Fragment {
         }
     }
 
+    public void refreshCollection() {
+        mCallbacks.setRefreshVisible(true);
+        mDiscogs.refreshCollection(new Discogs.DiscogsWaiter() {
+            @Override
+            public void onResult(boolean success) {
+                if (success) {
+                    loadList();
+                } else {
+                    //something went wrong refreshing the collection
+                }
+                mCallbacks.setRefreshVisible(false);
+            }
+        });
+    }
+
     public void loadList() {
         List<Release> releases = mDiscogs.getCollection();
         if(releases.size()!=0) {
