@@ -31,6 +31,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.echo.holographlibrary.Bar;
+import com.echo.holographlibrary.BarGraph;
 import com.github.jvanhie.discogsscrobbler.models.Image;
 import com.github.jvanhie.discogsscrobbler.models.Release;
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsPriceSuggestion;
@@ -42,6 +44,8 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
+
+import java.util.ArrayList;
 
 /**
  * A fragment representing a single Release detail screen.
@@ -103,15 +107,7 @@ public class ReleaseDetailFragment extends Fragment {
         //get id from arguments
         if (getArguments().containsKey(ARG_ITEM_ID)) {
             mRelease = mDiscogs.getRelease(getArguments().getLong(ARG_ITEM_ID,0));
-            //get price suggestions
-            mDiscogs.getPriceSuggestions(getArguments().getLong(ARG_ITEM_ID,0),new Discogs.DiscogsDataWaiter<DiscogsPriceSuggestion>() {
-                @Override
-                public void onResult(boolean success, DiscogsPriceSuggestion data) {
-                    for (DiscogsPriceSuggestion.Quality quality : data.getSuggestion()) {
-                        System.out.println(quality.type + ": " + quality.value + " " + quality.currency);
-                    }
-                }
-            });
+
         }
 
         if(hasMenu) {
@@ -205,6 +201,31 @@ public class ReleaseDetailFragment extends Fragment {
                 }
             });
         }
+
+        //pricesuggestions
+        //get price suggestions
+        mDiscogs.getPriceSuggestions(getArguments().getLong(ARG_ITEM_ID,0),new Discogs.DiscogsDataWaiter<DiscogsPriceSuggestion>() {
+            @Override
+            public void onResult(boolean success, DiscogsPriceSuggestion data) {
+                if(success) {
+                    BarGraph g = (BarGraph) mRootView.findViewById(R.id.detail_price_graph);
+                    ArrayList<Bar> bars = new ArrayList<Bar>();
+                    for (DiscogsPriceSuggestion.Quality quality : data.getSuggestion()) {
+                        Bar b = new Bar();
+                        b.setName(quality.type);
+                        b.setValue(quality.value);
+                        b.setValueString(Math.round(quality.value)+"");
+                        bars.add(b);
+                    }
+
+                    if(bars.size()>0) {
+                        String currency = data.getSuggestion().get(0).currency;
+                        g.setBars(bars);
+                        g.setVisibility(View.VISIBLE);
+                    }
+                }
+            }
+        });
 
         return rootView;
     }

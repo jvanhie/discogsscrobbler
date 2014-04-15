@@ -218,6 +218,24 @@
                 android:layout_alignStart="@+id/textView2"
                 android:layout_marginRight="5dp" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="Marketplace"
+                android:id="@+id/textView8"
+                android:layout_below="@+id/detail_notes"
+                android:layout_alignParentLeft="false"
+                android:layout_alignParentStart="false"
+                android:layout_alignLeft="@+id/textView2" />
+
+            <com.echo.holographlibrary.BarGraph
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:visibility="invisible"
+                android:layout_below="@+id/textView8"
+                android:id="@+id/detail_price_graph"/>
+
         </RelativeLayout>
     </ScrollView>
 </LinearLayout>

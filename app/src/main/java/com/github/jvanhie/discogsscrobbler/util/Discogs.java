@@ -172,7 +172,7 @@ public class Discogs extends ContextWrapper {
                 request.addHeader("User-Agent", USER_AGENT);
             }
         };
-        RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(API_ROOT).setRequestInterceptor(requestInterceptor).setLogLevel(RestAdapter.LogLevel.FULL).setClient(new SigningOkClient(oAuthConsumer)).build();
+        RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(API_ROOT).setRequestInterceptor(requestInterceptor).setLogLevel(RestAdapter.LogLevel.BASIC).setClient(new SigningOkClient(oAuthConsumer)).build();
         mDiscogsService = restAdapter.create(DiscogsService.class);
     }
 

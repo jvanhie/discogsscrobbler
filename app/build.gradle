@@ -36,8 +36,13 @@ android {
     }
 }
 
+repositories {
+    flatDir {
+        dirs 'libs'
+    }
+}
+
 dependencies {
-    compile 'com.android.support:gridlayout-v7:19.0.1'
     compile 'com.android.support:appcompat-v7:+'
     compile 'oauth.signpost:signpost-core:1.2.1.2'
     compile 'com.squareup.okhttp:okhttp:1.5.2'
@@ -45,16 +50,8 @@ dependencies {
     compile 'com.nostra13.universalimageloader:universal-image-loader:1.7.0'
     compile 'com.android.support:support-v4:19.0.1'
     compile 'de.u-mass:lastfm-java:+'
+    compile 'com.echo.holographlibrary:holographlibrary:1.0.0@aar'
 
-
-    // You must install or update the Google Repository through the SDK manager to use this dependency.
-    // The Google Repository (separate from the corresponding library) can be found in the Extras category.
-    // compile 'com.google.android.gms:play-services:4.0.30'
-    // You must install or update the Google Repository through the SDK manager to use this dependency.
-    // The Google Repository (separate from the corresponding library) can be found in the Extras category.
-    // 
-    // You must install or update the Google Repository through the SDK manager to use this dependency.
-    // The Google Repository (separate from the corresponding library) can be found in the Extras category.
-    // 
     compile fileTree(dir: 'libs', include: ['*.jar'])
+
 }
