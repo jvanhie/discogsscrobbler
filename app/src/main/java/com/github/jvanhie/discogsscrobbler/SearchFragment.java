@@ -172,6 +172,21 @@ public class SearchFragment extends Fragment {
         });
     }
 
+    public void searchBarcode(String barcode) {
+        mCallbacks.setRefreshVisible(true);
+        mDiscogs.searchBarcode(barcode,new Discogs.DiscogsDataWaiter<List<DiscogsSearchResult>>() {
+            @Override
+            public void onResult(boolean success, List<DiscogsSearchResult> data) {
+                if(success) {
+                    //show results
+                    mAdapter = new SearchAdapter(getActivity(),data);
+                    mList.setAdapter(mAdapter);
+                }
+                mCallbacks.setRefreshVisible(false);
+            }
+        });
+    }
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);

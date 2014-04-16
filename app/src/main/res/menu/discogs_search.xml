@@ -24,4 +24,10 @@
         android:icon="@android:drawable/ic_menu_search"
         android:showAsAction="collapseActionView|ifRoom"
         android:actionViewClass="android.widget.SearchView" />
+
+    <item android:id="@+id/search_barcode"
+        android:title="Scan Barcode"
+        android:icon="@android:drawable/ic_menu_camera"
+        android:showAsAction="always"
+     />
 </menu>

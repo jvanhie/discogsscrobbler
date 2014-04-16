@@ -386,6 +386,20 @@ public class Discogs extends ContextWrapper {
         });
     }
 
+    public void searchBarcode(String query, final DiscogsDataWaiter<List<DiscogsSearchResult>> waiter) {
+        mDiscogsPublicService.searchBarcode(query, new Callback<DiscogsSearch>() {
+            @Override
+            public void success(DiscogsSearch discogsSearch, Response response) {
+                waiter.onResult(true,discogsSearch.results);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                waiter.onResult(false,null);
+            }
+        });
+    }
+
     public void getArtistReleases(long id, final DiscogsDataWaiter<List<DiscogsSearchRelease>> waiter) {
         mDiscogsPublicService.getArtistReleases(id, new Callback<DiscogsSearch>() {
             @Override

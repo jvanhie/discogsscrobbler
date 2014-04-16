@@ -16,6 +16,7 @@
 
 package com.github.jvanhie.discogsscrobbler;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -50,6 +51,7 @@ public class SearchActivity extends DrawerActivity
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
      * device.
      */
+    private int BARCODE_REQUEST_CODE = 666;
     private int mPanes = 1;
     private static final String STATE_PANES = "collection_panes";
 
@@ -57,6 +59,7 @@ public class SearchActivity extends DrawerActivity
     private static final String STATE_RELEASE_SELECTED = "selected_release";
 
     private SearchFragment mSearchFragment;
+    private SearchView mSearchView;
     private ProgressBar mRefreshProgressBar;
 
 
@@ -98,8 +101,8 @@ public class SearchActivity extends DrawerActivity
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.discogs_search, menu);
         //configure search box
-        SearchView searchView = (SearchView)menu.findItem(R.id.search_field).getActionView();
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        mSearchView = (SearchView)menu.findItem(R.id.search_field).getActionView();
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
                 menu.findItem(R.id.search_field).collapseActionView();
@@ -113,8 +116,7 @@ public class SearchActivity extends DrawerActivity
                 return false;
             }
         });
-        searchView.setQueryHint("Search Discogs");
-        searchView.setSubmitButtonEnabled(true);
+        mSearchView.setQueryHint("Search Discogs");
         //only expand when the drawer is closed
         if(!((DrawerLayout)findViewById(R.id.search_drawer_layout)).isDrawerOpen(findViewById(R.id.search_drawer))) {
             menu.findItem(R.id.search_field).expandActionView();
@@ -140,9 +142,18 @@ public class SearchActivity extends DrawerActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        if(id == R.id.search_barcode) {
+            //start external barcode scanner intent
+            try {
+                Intent intent = new Intent("com.google.zxing.client.android.SCAN");
+                intent.setPackage("com.google.zxing.client.android");
+                intent.putExtra("SCAN_MODE", "PRODUCT_MODE");
+                startActivityForResult(intent, BARCODE_REQUEST_CODE);
+            } catch (ActivityNotFoundException exc) {
+                //TODO: give users the option to download it
+            }
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -193,4 +204,17 @@ public class SearchActivity extends DrawerActivity
         outState.putInt(STATE_PANES, mPanes);
 
     }
+
+
+    @Override //is called when the barcode scan activity returns
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (data != null && requestCode == BARCODE_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                String barcode = data.getStringExtra("SCAN_RESULT");
+                mSearchView.setQuery(barcode,false);
+                mSearchFragment.searchBarcode(barcode);
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    };
 }
