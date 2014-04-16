@@ -227,13 +227,47 @@
                 android:layout_below="@+id/detail_notes"
                 android:layout_alignParentLeft="false"
                 android:layout_alignParentStart="false"
-                android:layout_alignLeft="@+id/textView2" />
+                android:layout_alignLeft="@+id/textView2"
+                android:layout_marginTop="5dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Check for copies for sale"
+                android:id="@+id/detail_marketplace"
+                android:layout_below="@+id/textView8"
+                android:layout_alignLeft="@+id/textView8"
+                android:linksClickable="true"
+                android:autoLink="web" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="Check for copies of all releases"
+                android:id="@+id/detail_marketplace_master"
+                android:layout_below="@+id/detail_marketplace"
+                android:layout_alignLeft="@+id/detail_marketplace"
+                android:linksClickable="true"
+                android:autoLink="web" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Discogs price suggestions"
+                android:id="@+id/detail_price_header"
+                android:layout_below="@+id/detail_marketplace_master"
+                android:layout_alignLeft="@+id/detail_marketplace_master"
+                android:visibility="gone"
+                android:layout_marginTop="5dp" />
 
             <com.echo.holographlibrary.BarGraph
                 android:layout_width="match_parent"
                 android:layout_height="150dp"
-                android:visibility="invisible"
-                android:layout_below="@+id/textView8"
+                android:visibility="gone"
+                android:layout_below="@+id/detail_price_header"
                 android:id="@+id/detail_price_graph"/>
 
         </RelativeLayout>

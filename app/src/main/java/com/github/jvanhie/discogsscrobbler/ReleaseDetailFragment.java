@@ -208,20 +208,23 @@ public class ReleaseDetailFragment extends Fragment {
             @Override
             public void onResult(boolean success, DiscogsPriceSuggestion data) {
                 if(success) {
-                    BarGraph g = (BarGraph) mRootView.findViewById(R.id.detail_price_graph);
+
                     ArrayList<Bar> bars = new ArrayList<Bar>();
                     for (DiscogsPriceSuggestion.Quality quality : data.getSuggestion()) {
                         Bar b = new Bar();
                         b.setName(quality.type);
                         b.setValue(quality.value);
-                        b.setValueString(Math.round(quality.value)+"");
+                        b.setValueString(Math.round(quality.value*10)/10f+"");
                         bars.add(b);
                     }
 
                     if(bars.size()>0) {
-                        String currency = data.getSuggestion().get(0).currency;
-                        g.setBars(bars);
-                        g.setVisibility(View.VISIBLE);
+                        TextView heading = (TextView) mRootView.findViewById(R.id.detail_price_header);
+                        BarGraph graph = (BarGraph) mRootView.findViewById(R.id.detail_price_graph);
+                        heading.setText(heading.getText() + " in " + data.getSuggestion().get(0).currency);
+                        graph.setBars(bars);
+                        heading.setVisibility(View.VISIBLE);
+                        graph.setVisibility(View.VISIBLE);
                     }
                 }
             }
@@ -240,6 +243,12 @@ public class ReleaseDetailFragment extends Fragment {
         ((TextView) mRootView.findViewById(R.id.detail_genre)).setText(mRelease.genres);
         ((TextView) mRootView.findViewById(R.id.detail_style)).setText(mRelease.styles);
         ((TextView) mRootView.findViewById(R.id.detail_notes)).setText(mRelease.notes);
+        ((TextView) mRootView.findViewById(R.id.detail_marketplace)).setText("http://www.discogs.com/marketplace?release_id="+mRelease.releaseid);
+        if(mRelease.master_id!=0) {
+            ((TextView) mRootView.findViewById(R.id.detail_marketplace_master)).setText("http://www.discogs.com/marketplace?master_id=" + mRelease.master_id);
+        } else {
+            mRootView.findViewById(R.id.detail_marketplace_master).setVisibility(View.GONE);
+        }
         //decide to load big or small image
         if(!mRelease.hasExtendedInfo) {
             //we don't got extended info on this release yet, only display thumbnail
