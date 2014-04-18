@@ -28,6 +28,11 @@
     <item android:id="@+id/search_barcode"
         android:title="Scan Barcode"
         android:icon="@android:drawable/ic_menu_camera"
-        android:showAsAction="always"
-     />
+        android:showAsAction="ifRoom" />
+
+    <item android:id="@+id/search_filter"
+        android:title="Filter results"
+        android:icon="@android:drawable/ic_menu_sort_by_size"
+        android:showAsAction="collapseActionView|ifRoom"
+        android:actionViewClass="android.widget.Spinner"/>
 </menu>

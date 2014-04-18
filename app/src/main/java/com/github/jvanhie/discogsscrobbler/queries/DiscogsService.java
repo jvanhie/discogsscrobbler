@@ -73,6 +73,9 @@ public interface DiscogsService {
     void search(@Query("q") String query, Callback<DiscogsSearch> callback);
 
     @GET("/database/search")
+    void search(@Query("q") String query,@Query("type") String type, Callback<DiscogsSearch> callback);
+
+    @GET("/database/search")
     void searchBarcode(@Query("barcode") String barcode, Callback<DiscogsSearch> callback);
 
     @GET("/marketplace/price_suggestions/{id}")

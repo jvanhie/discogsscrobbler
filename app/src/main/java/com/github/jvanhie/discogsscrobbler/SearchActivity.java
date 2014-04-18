@@ -24,8 +24,12 @@ import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 
 
 /**
@@ -62,6 +66,10 @@ public class SearchActivity extends DrawerActivity
     private SearchView mSearchView;
     private ProgressBar mRefreshProgressBar;
 
+    private int mSearchType;
+    private String[] mSearchTypes;
+    private static final String STATE_SEARCH_TYPE = "search_type";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +98,13 @@ public class SearchActivity extends DrawerActivity
             }
         }
 
+        // restore search type if changed
+        if (savedInstanceState != null
+                && savedInstanceState.containsKey(STATE_SEARCH_TYPE)) {
+            mSearchType = savedInstanceState.getInt(STATE_SEARCH_TYPE);
+        }
+        mSearchTypes = getResources().getStringArray(R.array.search_filter_items);
+
         //create navigation drawer
         setDrawer(R.id.search_drawer_layout,R.id.search_drawer,getTitle().toString(),getTitle().toString(),true);
 
@@ -101,13 +116,18 @@ public class SearchActivity extends DrawerActivity
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.discogs_search, menu);
         //configure search box
-        mSearchView = (SearchView)menu.findItem(R.id.search_field).getActionView();
+        final MenuItem search = menu.findItem(R.id.search_field);
+        mSearchView = (SearchView)search.getActionView();
         mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
                 menu.findItem(R.id.search_field).collapseActionView();
                 //pass query to search fragment
-                mSearchFragment.search(s);
+                if(mSearchType>0) {
+                    mSearchFragment.search(s,mSearchTypes[mSearchType]);
+                } else {
+                    mSearchFragment.search(s);
+                }
                 return false;
             }
 
@@ -117,10 +137,65 @@ public class SearchActivity extends DrawerActivity
             }
         });
         mSearchView.setQueryHint("Search Discogs");
+        //config filter spinner
+        final MenuItem filter = menu.findItem(R.id.search_filter);
+        Spinner s = (Spinner) filter.getActionView(); // find the spinner
+        SpinnerAdapter mSpinnerAdapter = ArrayAdapter.createFromResource(getActionBar()
+                .getThemedContext(), R.array.search_filter_items, android.R.layout.simple_spinner_dropdown_item); //  create the adapter from a StringArray
+        s.setAdapter(mSpinnerAdapter); // set the adapter
+        s.setSelection(mSearchType,false);
+
+        s.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                mSearchType = i;
+                if(i>0) {
+                    mSearchView.setQueryHint("Search Discogs (" + mSearchTypes[i] + ")");
+                } else {
+                    mSearchView.setQueryHint("Search Discogs");
+                }
+                filter.collapseActionView();
+                search.expandActionView();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                //filter.collapseActionView();
+            }
+        });
+        //make sure only one actionview is expanded
+        filter.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem menuItem) {
+                //collapse search
+                search.collapseActionView();
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem menuItem) {
+                return true;
+            }
+        });
+        search.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem menuItem) {
+                //collapse search
+                filter.collapseActionView();
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem menuItem) {
+                return true;
+            }
+        });
+
         //only expand when the drawer is closed
         if(!((DrawerLayout)findViewById(R.id.search_drawer_layout)).isDrawerOpen(findViewById(R.id.search_drawer))) {
-            menu.findItem(R.id.search_field).expandActionView();
+            search.expandActionView();
         }
+
         return true;
     }
 
@@ -200,6 +275,9 @@ public class SearchActivity extends DrawerActivity
         if (mSelected > 0) {
             // Serialize and persist the activated item position.
             outState.putLong(STATE_RELEASE_SELECTED, mSelected);
+        }
+        if(mSearchType > 0) {
+            outState.putInt(STATE_SEARCH_TYPE,mSearchType);
         }
         outState.putInt(STATE_PANES, mPanes);
 

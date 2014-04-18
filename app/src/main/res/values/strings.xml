@@ -53,4 +53,12 @@
         <item>@android:drawable/ic_menu_help</item>
     </array>
 
+    <string-array name="search_filter_items">
+        <item >any</item>
+        <item >release</item>
+        <item >master</item>
+        <item >artist</item>
+        <item >label</item>
+    </string-array>
+
 </resources>
