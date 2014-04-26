@@ -18,23 +18,22 @@
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
-        android:title="@string/pref_header_discogs"
+        android:title="@string/pref_header_advanced"
         >
 
-        <SwitchPreference
-            android:key="enable_discogs"
-            android:title="@string/pref_title_enable_discogs"
-            android:summary="@string/pref_description_enable_discogs"
-            android:defaultValue="true" />
-
         <ListPreference
-            android:key="collection_view"
-            android:dependency="enable_discogs"
-            android:title="@string/pref_title_collection_view"
-            android:summary="@string/pref_description_collection_view"
-            android:entries="@array/pref_collection_view_entries"
-            android:entryValues="@array/pref_collection_view_values"
-            android:defaultValue="@string/pref_collection_view_default" />
+            android:key="discogs_api_id"
+            android:title="@string/pref_title_api_id"
+            android:summary="@string/pref_description_api_id"
+            android:defaultValue="@string/pref_api_id_default" />
+
+        <Preference android:title="@string/pref_title_create_api"
+            android:key="discogs_create_api_button"
+            android:summary="@string/pref_description_create_api"/>
+
+        <Preference android:title="@string/pref_title_seller_settings"
+            android:key="discogs_seller_settings_button"
+            android:summary="@string/pref_description_seller_settings"/>
 
     </PreferenceCategory>
 

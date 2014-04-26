@@ -19,7 +19,10 @@
 
     <!-- Strings related to Settings -->
 
-    <!-- Discogs settings -->
+    <string name="pref_header_lastfm">Last.fm</string>
+    <string name="pref_title_enable_lastfm">Enable Last.fm</string>
+    <string name="pref_description_enable_lastfm">Enables scrobbling to Last.fm</string>
+
     <string name="pref_header_discogs">Discogs</string>
 
     <string name="pref_title_enable_discogs">Enable Discogs</string>
@@ -36,49 +39,19 @@
         <item>list</item>
         <item>grid</item>
     </string-array>
+
+
+    <string name="pref_header_advanced">Advanced</string>
+
     <string name="pref_title_api_id">Api instance</string>
     <string name="pref_description_api_id">Select a different instance on each device you own</string>
     <string name="pref_api_id_default">0</string>
 
-    <string name="pref_header_lastfm">Last.fm</string>
-    <string name="pref_title_enable_lastfm">Enable Last.fm</string>
-    <string name="pref_description_enable_lastfm">Enables scrobbling to Last.fm</string>
     <string name="pref_title_create_api">Create your own api id</string>
     <string name="pref_description_create_api">Not fond of sharing an image limit with other users? Create your own api id!</string>
 
 
-    <!--string name="pref_title_add_friends_to_messages">Add friends to messages</string>
-    <string-array name="pref_example_list_titles">
-        <item>Always</item>
-        <item>When possible</item>
-        <item>Never</item>
-    </string-array>
-    <string-array name="pref_example_list_values">
-        <item>1</item>
-        <item>0</item>
-        <item>-1</item>
-    </string-array>
-
-    <string name="pref_header_data_sync">Data &amp; sync</string>
-
-    <string name="pref_title_sync_frequency">Sync frequency</string>
-    <string-array name="pref_sync_frequency_titles">
-        <item>15 minutes</item>
-        <item>30 minutes</item>
-        <item>1 hour</item>
-        <item>3 hours</item>
-        <item>6 hours</item>
-        <item>Never</item>
-    </string-array>
-    <string-array name="pref_sync_frequency_values">
-        <item>15</item>
-        <item>30</item>
-        <item>60</item>
-        <item>180</item>
-        <item>360</item>
-        <item>-1</item>
-    </string-array>
-
-    <string name="pref_title_system_sync_settings">System sync settings</string-->
+    <string name="pref_title_seller_settings">Enable price suggestions</string>
+    <string name="pref_description_seller_settings">To get price suggestions, you must complete your Discogs seller info</string>
 
 </resources>

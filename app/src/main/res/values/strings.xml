@@ -33,6 +33,8 @@
     <string name="password">Password</string>
     <string name="delete_releases_title">Delete releases?</string>
     <string name="delete_releases_message">This will remove the selected releases from your Discogs collection, both online and on your device.</string>
+    <string name="discogs_seller_dialog_message">To enable price suggestions, you need to set your seller preferences. Minimum required info is:\n\"Items Ships From\"\n\"Shipping Policy\"\n\"Payment Methods\"</string>
+    <string name="discogs_seller_dialog_title">Open Discogs seller settings in browser?</string>
 
 
     <!-- Nav Drawer Menu Items -->

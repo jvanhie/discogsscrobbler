@@ -17,7 +17,9 @@
 package com.github.jvanhie.discogsscrobbler;
 
 import android.annotation.TargetApi;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -123,7 +125,8 @@ public class SettingsActivity extends PreferenceActivity {
         addPreferencesFromResource(R.xml.pref_lastfm);
         // Add 'discogs' preferences.
         addPreferencesFromResource(R.xml.pref_discogs);
-
+        // Add 'advanced' preferences.
+        addPreferencesFromResource(R.xml.pref_advanced);
 
         ListPreference api = (ListPreference) findPreference("discogs_api_id");
         int size = getResources().getStringArray(R.array.discogs_api_keys).length;
@@ -149,7 +152,30 @@ public class SettingsActivity extends PreferenceActivity {
             }
         });
 
+        Preference sellerButton = findPreference("discogs_seller_settings_button");
+        sellerButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference arg0) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
+                builder.setMessage(getString(R.string.discogs_seller_dialog_message)).setTitle(getString(R.string.discogs_seller_dialog_title));
+                builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.discogs.com/settings/seller")));
+                    }
+                });
+                builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // User cancelled the dialog don't do anything
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+                return true;
+            }
+        });
+
     }
+
 
     /** {@inheritDoc} */
     @Override
@@ -224,6 +250,19 @@ public class SettingsActivity extends PreferenceActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_lastfm);
+        }
+    }
+
+    /**
+     * This fragment shows general preferences only. It is used when the
+     * activity is showing a two-pane settings UI.
+     */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public static class AdvancedPreferenceFragment extends PreferenceFragment {
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            addPreferencesFromResource(R.xml.pref_advanced);
         }
     }
 

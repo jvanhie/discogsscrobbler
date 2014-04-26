@@ -19,11 +19,15 @@
     <!-- These settings headers are only used on tablets. -->
 
     <header
+        android:fragment="com.github.jvanhie.discogsscrobbler.SettingsActivity$LastfmPreferenceFragment"
+        android:title="@string/pref_header_lastfm" />
+
+    <header
         android:fragment="com.github.jvanhie.discogsscrobbler.SettingsActivity$DiscogsPreferenceFragment"
         android:title="@string/pref_header_discogs" />
 
     <header
-        android:fragment="com.github.jvanhie.discogsscrobbler.SettingsActivity$LastfmPreferenceFragment"
-        android:title="@string/pref_header_lastfm" />
+        android:fragment="com.github.jvanhie.discogsscrobbler.SettingsActivity$AdvancedPreferenceFragment"
+        android:title="@string/pref_header_advanced" />
 
 </preference-headers>
