@@ -182,7 +182,7 @@ public class Discogs extends ContextWrapper {
         if(artists != null) {
             for (DiscogsRelease.Artist artist : artists) {
                 ret += removeNumberFromArtist(artist.name);
-                if(!artist.join.equals("")) {
+                if(!artist.join.equals("") && artists.size()>1) {
                     ret += " " + artist.join + " ";
                 }
             }
