@@ -207,7 +207,7 @@ public class ReleaseDetailFragment extends Fragment {
         mDiscogs.getPriceSuggestions(getArguments().getLong(ARG_ITEM_ID,0),new Discogs.DiscogsDataWaiter<DiscogsPriceSuggestion>() {
             @Override
             public void onResult(boolean success, DiscogsPriceSuggestion data) {
-                if(success) {
+                if(success && data != null) {
 
                     ArrayList<Bar> bars = new ArrayList<Bar>();
                     for (DiscogsPriceSuggestion.Quality quality : data.getSuggestion()) {

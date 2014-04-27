@@ -531,8 +531,8 @@ public class Discogs extends ContextWrapper {
     }
 
     public void refreshRelease(final Release release, final DiscogsWaiter waiter) {
-        //(re)fetch extended info
-        mDiscogsPublicService.getRelease(release.releaseid, new Callback<DiscogsRelease>() {
+        //(re)fetch extended info via authenticated call so we always get a fresh result
+        mDiscogsService.getRelease(release.releaseid, new Callback<DiscogsRelease>() {
             @Override
             public void success(DiscogsRelease discogsRelease, Response response) {
                 release.setValues(discogsRelease);

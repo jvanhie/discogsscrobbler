@@ -138,7 +138,7 @@ public class Release extends Model{
     }
 
     public void setValues(DiscogsRelease r) {
-        setValues(r,false);
+        if(r!=null) setValues(r,false);
     }
 
     /*perform a full load/update of the release*/
