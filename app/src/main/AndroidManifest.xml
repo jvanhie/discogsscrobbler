@@ -72,6 +72,7 @@
             android:parentActivityName="com.github.jvanhie.discogsscrobbler.ReleaseListActivity"
             android:label="@string/title_activity_settings" >
         </activity>
+        <service android:name="com.github.jvanhie.discogsscrobbler.util.NowPlayingService" android:exported="false"/>
         <meta-data android:name="AA_DB_NAME" android:value="discogs.db" />
         <meta-data android:name="AA_DB_VERSION" android:value="1" />
     </application>

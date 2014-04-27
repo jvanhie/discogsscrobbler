@@ -108,13 +108,9 @@ public class Lastfm extends ContextWrapper {
         AsyncTask<Void,Void,Boolean> t = new AsyncTask<Void, Void, Boolean>() {
             @Override
             protected Boolean doInBackground(Void... voids) {
-                String artist = track.release.artist;
-                //track has artist data, use this instead (Collections and splits)
-                if(!track.artist.equals("")) {
-                    artist = track.artist;
-                }
                 String title = track.title;
-                String album = track.release.title;
+                String album = track.album;
+                String artist = track.artist;
                 ScrobbleData data = new ScrobbleData();
                 data.setArtist(artist);
                 data.setTrack(title);

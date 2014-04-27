@@ -16,6 +16,9 @@
 
 package com.github.jvanhie.discogsscrobbler.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
@@ -26,7 +29,7 @@ import com.github.jvanhie.discogsscrobbler.util.Discogs;
  * Created by Jono on 22/03/2014.
  */
 @Table(name = "tracks")
-public class Track extends Model{
+public class Track extends Model implements Parcelable{
 
     @Column(name = "release", onDelete = Column.ForeignKeyAction.CASCADE)
     public Release release;
@@ -34,14 +37,8 @@ public class Track extends Model{
     @Column(name = "idx")
     public int idx;
 
-    @Column(name = "duration")
-    public String duration;
-
     @Column(name = "position")
     public String position;
-
-    @Column(name = "title")
-    public String title;
 
     @Column(name = "type")
     public String type;
@@ -49,8 +46,21 @@ public class Track extends Model{
     @Column(name = "artist")
     public String artist;
 
+    @Column(name = "album")
+    public String album;
+
+    @Column(name = "title")
+    public String title;
+
+    @Column(name = "duration")
+    public String duration;
+
     public Track() {
         super();
+    }
+
+    public Track(Parcel in) {
+        readFromParcel(in);
     }
 
     public Track(DiscogsRelease.Track track, Release release) {
@@ -59,7 +69,48 @@ public class Track extends Model{
         title = track.title;
         type = track.type_;
         artist = Discogs.formatArtist(track.artists);
+        //if the track info does not have an artist set, fetch it from the release
+        if(artist.equals("")) artist = release.artist;
+        album = release.title;
         this.release = release;
     }
 
+    /*parcelable implementation*/
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeInt(idx);
+        parcel.writeString(position);
+        parcel.writeString(type);
+        parcel.writeString(artist);
+        parcel.writeString(album);
+        parcel.writeString(title);
+        parcel.writeString(duration);
+    }
+
+    private void readFromParcel(Parcel in) {
+        idx = in.readInt();
+        position = in.readString();
+        type = in.readString();
+        artist = in.readString();
+        album = in.readString();
+        title = in.readString();
+        duration = in.readString();
+    }
+
+    public static final Parcelable.Creator CREATOR = new Creator() {
+        @Override
+        public Track createFromParcel(Parcel parcel) {
+            return new Track(parcel);
+        }
+
+        @Override
+        public Track[] newArray(int i) {
+            return new Track[i];
+        }
+    };
 }

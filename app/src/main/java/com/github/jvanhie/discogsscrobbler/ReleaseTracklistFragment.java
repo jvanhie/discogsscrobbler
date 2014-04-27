@@ -17,8 +17,10 @@
 package com.github.jvanhie.discogsscrobbler;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ListFragment;
 import android.util.SparseBooleanArray;
@@ -37,6 +39,7 @@ import com.github.jvanhie.discogsscrobbler.models.Release;
 import com.github.jvanhie.discogsscrobbler.models.Track;
 import com.github.jvanhie.discogsscrobbler.util.Discogs;
 import com.github.jvanhie.discogsscrobbler.util.Lastfm;
+import com.github.jvanhie.discogsscrobbler.util.NowPlayingService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -163,6 +166,12 @@ public class ReleaseTracklistFragment extends ListFragment {
                     final List<Track> tracks = getSelectedTracks();
                     System.out.println("scrobbling tracklist accuracy");
 
+                    /*Scrobble service test case
+                    Intent i=new Intent(getActivity(), NowPlayingService.class);
+                    i.putParcelableArrayListExtra(NowPlayingService.TRACK_LIST, new ArrayList<Track>(tracks));
+                    if(mRelease!=null) i.putExtra(NowPlayingService.ALBUM_ART_URL,mRelease.thumb);
+                    getActivity().startService(i);
+                    */
                     lastfm.scrobbleTracks(tracks, new Lastfm.LastfmWaiter() {
                         @Override
                         public void onResult(boolean success) {
