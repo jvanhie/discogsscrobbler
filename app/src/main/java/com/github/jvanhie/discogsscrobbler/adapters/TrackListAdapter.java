@@ -36,10 +36,21 @@ public class TrackListAdapter extends BaseAdapter {
     private List<Track> mTracklist;
     private Context mContext;
     private int mNowPlaying = -1;
+    private boolean mIsMultiArtist = false;
 
     public TrackListAdapter(Context context, List<Track> trackList) {
         mContext = context;
         mTracklist = trackList;
+        //see if it's a multi artist tracklist
+        if(trackList.size()>1) {
+            String artist = trackList.get(0).artist;
+            for (Track t : trackList) {
+                if (!t.artist.equals(artist)) {
+                    mIsMultiArtist = true;
+                    break;
+                }
+            }
+        }
     }
 
     public void setNowPlaying(int nowPlaying) {
@@ -75,7 +86,7 @@ public class TrackListAdapter extends BaseAdapter {
         Track track = mTracklist.get(i);
         pos.setText(track.position);
         duration.setText(track.duration);
-        if(!track.artist.equals("")) {
+        if(mIsMultiArtist) {
             name.setText(track.artist + " - " + track.title);
         } else {
             name.setText(track.title);

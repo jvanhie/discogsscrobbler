@@ -182,7 +182,11 @@ public class SearchAdapter extends BaseExpandableListAdapter {
                 info1.setText(release.artist);
             }
 
-            info2.setText(release.format + " by " + release.label);
+            if(release.label != null) {
+                info2.setText(release.format + " by " + release.label);
+            } else {
+                info2.setText(release.format);
+            }
 
             mImageLoader.displayImage(release.thumb, img);
         }
