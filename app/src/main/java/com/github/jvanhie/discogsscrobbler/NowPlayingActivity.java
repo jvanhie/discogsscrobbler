@@ -21,7 +21,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
+import android.view.View;
 
 
 /**
@@ -45,15 +47,6 @@ public class NowPlayingActivity extends DrawerActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_now_playing);
 
-        // Show the Up button in the action bar.
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-
-        /*add detail and tracklist fragment in a pager
-        mReleaseId = getIntent().getLongExtra(ReleaseDetailFragment.ARG_ITEM_ID,0);
-        mPager = (ViewPager) findViewById(R.id.detail_pager);
-        mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
-        mPager.setAdapter(mPagerAdapter);
-        */
         /*
         if (savedInstanceState == null) {
             // Create the release pager fragment and add it to the activity
@@ -72,8 +65,10 @@ public class NowPlayingActivity extends DrawerActivity {
         mPager = (ViewPager) findViewById(R.id.now_playing_pager);
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
+        //hide de page tab as long as we don't have more to show than 1 fragment
+        findViewById(R.id.now_playing_pager_strip).setVisibility(View.GONE);
         //set navigation drawer
-        setDrawer(R.id.now_playing_drawer_layout,R.id.now_playing_drawer,getTitle().toString(),getTitle().toString(),false);
+        setDrawer(R.id.now_playing_drawer_layout, R.id.now_playing_drawer, getTitle().toString(), getTitle().toString(), true);
     }
 
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {

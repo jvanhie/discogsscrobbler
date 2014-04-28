@@ -16,9 +16,11 @@
 
 package com.github.jvanhie.discogsscrobbler;
 
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -63,12 +65,14 @@ import java.util.ArrayList;
 public class NowPlayingFragment extends Fragment {
 
     private Discogs mDiscogs;
-
     private ImageLoader mImageLoader;
-
 
     private NowPlayingService mService;
     private boolean mBound;
+    private TrackChangeReceiver mTrackChangeReceiver;
+
+    private View mRootView;
+    private TrackListAdapter mTrackListAdapter;
 
 
     /**
@@ -103,10 +107,7 @@ public class NowPlayingFragment extends Fragment {
         /*bind to the now playing service*/
         Intent intent = new Intent(getActivity(), NowPlayingService.class);
         getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-
-
         //setHasOptionsMenu(true);
-
     }
 
     @Override
@@ -123,21 +124,33 @@ public class NowPlayingFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_now_playing, container, false);
+        mRootView = inflater.inflate(R.layout.fragment_now_playing, container, false);
 
         if(mBound) {
-            /*set general album details*/
-            ((TextView) rootView.findViewById(R.id.now_playing_artist)).setText(mService.artist);
-            ((TextView) rootView.findViewById(R.id.now_playing_album)).setText(mService.album);
-            ImageView albumArt = (ImageView) rootView.findViewById(R.id.now_playing_image);
-            mImageLoader.displayImage(mService.albumArtURL,albumArt);
-
-            /*initiate list with tracklist*/
-            ((ListView) rootView.findViewById(R.id.now_playing_tracklist)).setAdapter(new TrackListAdapter(getActivity(),mService.trackList));
+            setNowPlaying();
         }
 
+        return mRootView;
+    }
 
-        return rootView;
+    private void setNowPlaying() {
+        /*set general album details*/
+        ((TextView) mRootView.findViewById(R.id.now_playing_artist)).setText(mService.artist);
+        ((TextView) mRootView.findViewById(R.id.now_playing_album)).setText(mService.album);
+        ImageView albumArt = (ImageView) mRootView.findViewById(R.id.now_playing_image);
+        mImageLoader.displayImage(mService.albumArtURL,albumArt);
+
+        /*initiate list with tracklist*/
+        if(mService.trackList != null && mTrackListAdapter == null) {
+            mTrackListAdapter = new TrackListAdapter(getActivity(),mService.trackList);
+            ((ListView) mRootView.findViewById(R.id.now_playing_tracklist)).setAdapter(mTrackListAdapter);
+        }
+
+        //set the currently playing track
+        if(mTrackListAdapter != null) {
+            mTrackListAdapter.setNowPlaying(mService.currentTrack);
+            mTrackListAdapter.notifyDataSetChanged();
+        }
     }
 
     /** Defines callbacks for service binding, passed to bindService() */
@@ -149,6 +162,7 @@ public class NowPlayingFragment extends Fragment {
             NowPlayingService.LocalBinder binder = (NowPlayingService.LocalBinder) service;
             mService = binder.getService();
             mBound = true;
+            setNowPlaying();
         }
 
         @Override
@@ -157,4 +171,37 @@ public class NowPlayingFragment extends Fragment {
         }
     };
 
+    /*for receiving updates from the now playing service*/
+    private class TrackChangeReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(NowPlayingService.TRACK_CHANGE)) {
+                setNowPlaying();
+            }
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mTrackChangeReceiver == null) mTrackChangeReceiver = new TrackChangeReceiver();
+        IntentFilter intentFilter = new IntentFilter(NowPlayingService.TRACK_CHANGE);
+        getActivity().registerReceiver(mTrackChangeReceiver, intentFilter);
+
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mTrackChangeReceiver != null) getActivity().unregisterReceiver(mTrackChangeReceiver);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mBound) {
+            getActivity().unbindService(mConnection);
+            mBound = false;
+        }
+    }
 }

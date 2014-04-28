@@ -62,11 +62,7 @@
         </activity>
         <activity
             android:name="com.github.jvanhie.discogsscrobbler.NowPlayingActivity"
-            android:label="@string/title_now_playing"
-            android:parentActivityName="com.github.jvanhie.discogsscrobbler.ReleaseListActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.github.jvanhie.discogsscrobbler.ReleaseListActivity" />
+            android:label="@string/title_now_playing">
         </activity>
         <activity
             android:name="com.github.jvanhie.discogsscrobbler.DiscogsLoginActivity"

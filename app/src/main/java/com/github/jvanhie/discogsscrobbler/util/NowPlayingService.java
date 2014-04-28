@@ -46,6 +46,7 @@ import java.util.List;
 public class NowPlayingService extends Service {
 
     private static int NOTIFICATION_ID = 666;
+    public static String TRACK_CHANGE = "track_change" ;
     public static String TRACK_LIST = "tracklist";
     public static String ALBUM_ART_URL = "albumart";
     public static String THUMB_URL = "thumb";
@@ -119,12 +120,14 @@ public class NowPlayingService extends Service {
             int pos = intent.getIntExtra(NEXT_TRACK_ID,0);
             String title = intent.getStringExtra(NEXT_TRACK_TITLE);
             System.out.println(title + ":" + pos);
-            if(pos == -1 && trackList.get(0).title.equals(title)) {
-                //stop requested
-                stop();
-            } else if(pos < trackList.size() && trackList.get(pos).title.equals(title)) {
-                //ok, this is a valid request, make it happen
-                play(pos);
+            if(trackList != null && trackList.size()>0) {
+                if (pos == -1 && trackList.get(0).title.equals(title)) {
+                    //stop requested
+                    stop();
+                } else if (pos < trackList.size() && trackList.get(pos).title.equals(title)) {
+                    //ok, this is a valid request, make it happen
+                    play(pos);
+                }
             }
             /*release the wakelock if it was called via the now playing alarm*/
             NowPlayingAlarm.completeWakefulIntent(intent);
@@ -176,6 +179,8 @@ public class NowPlayingService extends Service {
         currentTrack = trackNumber;
         mNotificationBuilder.setContentTitle(t.title).setContentText(t.album + "\n" + t.artist).setWhen(System.currentTimeMillis());
         startForeground(NOTIFICATION_ID, mNotificationBuilder.build());
+        //update listeners to track change
+        sendBroadcast(new Intent(TRACK_CHANGE));
 
         Intent intent = new Intent(this, NowPlayingAlarm.class);
         if(trackNumber < trackList.size()-1) {

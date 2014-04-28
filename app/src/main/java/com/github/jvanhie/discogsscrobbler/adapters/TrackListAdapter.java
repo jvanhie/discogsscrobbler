@@ -35,10 +35,15 @@ import java.util.List;
 public class TrackListAdapter extends BaseAdapter {
     private List<Track> mTracklist;
     private Context mContext;
+    private int mNowPlaying = -1;
 
     public TrackListAdapter(Context context, List<Track> trackList) {
         mContext = context;
         mTracklist = trackList;
+    }
+
+    public void setNowPlaying(int nowPlaying) {
+        mNowPlaying = nowPlaying;
     }
 
     @Override
@@ -81,6 +86,18 @@ public class TrackListAdapter extends BaseAdapter {
             name.setTextColor(Color.LTGRAY);
         } else {
             name.setTextColor(Color.BLACK);
+        }
+
+        //songs that have already been played are gray
+        if(i<mNowPlaying) {
+            pos.setTextColor(Color.LTGRAY);
+            name.setTextColor(Color.LTGRAY);
+            duration.setTextColor(Color.LTGRAY);
+        } else if (i==mNowPlaying) {
+            //we're the currently played song, do something fun!
+            pos.setTextColor(Color.BLUE);
+            name.setTextColor(Color.BLUE);
+            duration.setTextColor(Color.BLUE);
         }
 
         return view;
