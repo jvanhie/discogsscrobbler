@@ -17,12 +17,16 @@
 package com.github.jvanhie.discogsscrobbler.util;
 
 
+import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 
 import com.github.jvanhie.discogsscrobbler.R;
@@ -44,17 +48,19 @@ public class NowPlayingService extends Service {
     private static int NOTIFICATION_ID = 666;
     public static String TRACK_LIST = "tracklist";
     public static String ALBUM_ART_URL = "albumart";
+    public static String NEXT_TRACK_MODE = "next_track";
+    public static String NEXT_TRACK_ID = "next_track_id";
+    public static String NEXT_TRACK_TITLE = "next_track_title";
 
     private boolean mIsPlaying = false;
     private List<Track> mTrackList;
     private int mCurrentTrack;
-    private Bitmap mAlbumArt;
 
     private ImageLoader mImageLoader;
     private Discogs mDiscogs;
     private Lastfm mLastfm;
     private NotificationCompat.Builder mNotificationBuilder;
-    private Handler mNowPlayingHandler = new Handler();
+    private AlarmManager mAlarmManager;
 
     @Override
     public void onCreate() {
@@ -78,33 +84,54 @@ public class NowPlayingService extends Service {
         mNotificationBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(android.R.drawable.ic_media_play)
                 .setContentIntent(PendingIntent.getActivity(this, 0, new Intent(this, ReleaseListActivity.class), 0));
+
+        mAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
-        mTrackList = intent.getParcelableArrayListExtra("tracklist");
-        String albumArt = intent.getStringExtra("albumart");
-        mCurrentTrack = 0;
-        /*first try to load the album art, then start playing*/
-        mImageLoader.loadImage(this,albumArt,new ImageLoadingListener() {
-            @Override
-            public void onLoadingStarted() {}
-            @Override
-            public void onLoadingCancelled() {}
-
-            @Override
-            public void onLoadingFailed(FailReason failReason) {
-                mNotificationBuilder.setLargeIcon(null);
-                play(mCurrentTrack);
+        if(intent.getBooleanExtra(NEXT_TRACK_MODE,false)) {
+            /*request to start scrobbling the next track, check if it is sound*/
+            int pos = intent.getIntExtra(NEXT_TRACK_ID,0);
+            String title = intent.getStringExtra(NEXT_TRACK_TITLE);
+            System.out.println(title + ":" + pos);
+            if(pos == -1 && mTrackList.get(0).title.equals(title)) {
+                //stop requested
+                stop();
+            } else if(pos < mTrackList.size() && mTrackList.get(pos).title.equals(title)) {
+                //ok, this is a valid request, make it happen
+                play(pos);
             }
+            /*release the wakelock if it was called via the now playing alarm*/
+            NowPlayingAlarm.completeWakefulIntent(intent);
+        } else {
+            /*we have received a playlist, start playing*/
+            mTrackList = intent.getParcelableArrayListExtra("tracklist");
+            String albumArt = intent.getStringExtra("albumart");
+            mCurrentTrack = 0;
+            /*first try to load the album art, then start playing*/
+            mImageLoader.loadImage(this, albumArt, new ImageLoadingListener() {
+                @Override
+                public void onLoadingStarted() {
+                }
 
-            @Override
-            public void onLoadingComplete(Bitmap loadedImage) {
-                if(mAlbumArt != null) mNotificationBuilder.setLargeIcon(loadedImage);
-                play(mCurrentTrack);
-            }
-        });
+                @Override
+                public void onLoadingCancelled() {
+                }
+
+                @Override
+                public void onLoadingFailed(FailReason failReason) {
+                    mNotificationBuilder.setLargeIcon(null);
+                    play(mCurrentTrack);
+                }
+
+                @Override
+                public void onLoadingComplete(Bitmap loadedImage) {
+                    mNotificationBuilder.setLargeIcon(loadedImage);
+                    play(mCurrentTrack);
+                }
+            });
+        }
 
         return(START_NOT_STICKY);
     }
@@ -125,31 +152,30 @@ public class NowPlayingService extends Service {
         mCurrentTrack = trackNumber;
         mNotificationBuilder.setContentTitle(t.title).setContentText(t.album + "\n" + t.artist).setWhen(System.currentTimeMillis());
         startForeground(NOTIFICATION_ID, mNotificationBuilder.build());
-        //start handler to start the next song
-        Runnable nextSong = new Runnable() {
-            public void run() {
-                //ok, the song should be done by now, next or stop when finished!
-                if(trackNumber < mTrackList.size()-1) {
-                    System.out.println("track " + (trackNumber+1) + " " +(System.currentTimeMillis()/1000));
-                    play(trackNumber+1);
-                } else {
-                    //finished the tracklist, stop foreground process
-                    mIsPlaying = false;
-                    stopForeground(true);
-                }
-            }
-        };
-        mNowPlayingHandler.postDelayed(nextSong,mDiscogs.formatDurationToSeconds(t.duration) * 1000);
 
+        Intent intent = new Intent(this, NowPlayingAlarm.class);
+        if(trackNumber < mTrackList.size()-1) {
+            intent.putExtra(NEXT_TRACK_ID, (trackNumber + 1));
+            intent.putExtra(NEXT_TRACK_TITLE, mTrackList.get(trackNumber + 1).title);
+        } else {
+            //this is the last track, alarm will be used to stop the service (by issuing pos = -1 and title = first song title)
+            intent.putExtra(NEXT_TRACK_ID, -1);
+            intent.putExtra(NEXT_TRACK_TITLE, mTrackList.get(0).title);
+        }
+        PendingIntent alarmIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        System.out.println("setting alarm");
+        mAlarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                SystemClock.elapsedRealtime() +
+                        mDiscogs.formatDurationToSeconds(t.duration) * 1000, alarmIntent
+        );
     }
 
     private void stop() {
         if (mIsPlaying) {
-            //remove next song callback
-            mNowPlayingHandler.removeCallbacks(null);
+            //mNowPlayingHandler.removeCallbacks(null);
             mIsPlaying=false;
             stopForeground(true);
         }
-
     }
+
 }

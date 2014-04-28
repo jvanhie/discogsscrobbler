@@ -169,7 +169,12 @@ public class ReleaseTracklistFragment extends ListFragment {
                     /*Scrobble service test case
                     Intent i=new Intent(getActivity(), NowPlayingService.class);
                     i.putParcelableArrayListExtra(NowPlayingService.TRACK_LIST, new ArrayList<Track>(tracks));
-                    if(mRelease!=null) i.putExtra(NowPlayingService.ALBUM_ART_URL,mRelease.thumb);
+                    if(mRelease!=null) {
+                        System.out.println("thumb " + mRelease.thumb);
+                        i.putExtra(NowPlayingService.ALBUM_ART_URL,mRelease.thumb);
+                    } else {
+                        System.out.println("release is null");
+                    }
                     getActivity().startService(i);
                     */
                     lastfm.scrobbleTracks(tracks, new Lastfm.LastfmWaiter() {
