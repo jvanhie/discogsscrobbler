@@ -35,6 +35,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.jvanhie.discogsscrobbler.adapters.TrackListAdapter;
 import com.github.jvanhie.discogsscrobbler.models.Release;
 import com.github.jvanhie.discogsscrobbler.models.Track;
 import com.github.jvanhie.discogsscrobbler.util.Discogs;
@@ -102,13 +103,13 @@ public class ReleaseTracklistFragment extends ListFragment {
                     public void onResult(boolean success) {
                         if (success) {
                             mTracklist = mRelease.tracklist();
-                            setListAdapter(new TrackListAdapter());
+                            setListAdapter(new TrackListAdapter(getActivity(),mTracklist));
                         }
                     }
                 });
             } else {
                 mTracklist = mRelease.tracklist();
-                setListAdapter(new TrackListAdapter());
+                setListAdapter(new TrackListAdapter(getActivity(),mTracklist));
             }
         }  else {
             //we don't have this release in the local db, fetch it from the web
@@ -118,7 +119,7 @@ public class ReleaseTracklistFragment extends ListFragment {
                     if(success) {
                         mRelease = data;
                         mTracklist = mRelease.tracklist();
-                        setListAdapter(new TrackListAdapter());
+                        setListAdapter(new TrackListAdapter(getActivity(),mTracklist));
                     }
                 }
             });
@@ -235,54 +236,6 @@ public class ReleaseTracklistFragment extends ListFragment {
     public void clearSelection() {
         for(int i = 0; i < mTracklist.size(); i ++) {
             getListView().setItemChecked(i, false);
-        }
-    }
-
-    private class TrackListAdapter extends BaseAdapter {
-
-        @Override
-        public int getCount() {
-            return mTracklist.size();
-        }
-
-        @Override
-        public Object getItem(int i) {
-            return mTracklist.get(i);
-        }
-
-        @Override
-        public long getItemId(int i) {
-            if(mTracklist.get(i).getId()==null) return mTracklist.get(i).idx;
-            else return mTracklist.get(i).getId();
-        }
-
-        @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
-            if (view == null) {
-                LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                view = inflater.inflate(R.layout.discogs_track, viewGroup, false);
-            }
-            TextView pos = (TextView) view.findViewById(R.id.track_pos);
-            TextView duration = (TextView) view.findViewById(R.id.track_duration);
-            TextView name = (TextView) view.findViewById(R.id.track_name);
-
-            Track track = mTracklist.get(i);
-            pos.setText(track.position);
-            duration.setText(track.duration);
-            if(!track.artist.equals("")) {
-                name.setText(track.artist + " - " + track.title);
-            } else {
-                name.setText(track.title);
-            }
-
-
-            if(track.type.equals("heading")) {
-                name.setTextColor(Color.LTGRAY);
-            } else {
-                name.setTextColor(Color.BLACK);
-            }
-
-            return view;
         }
     }
 }

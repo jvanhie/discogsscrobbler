@@ -20,15 +20,15 @@ package com.github.jvanhie.discogsscrobbler.util;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.os.Handler;
+import android.os.Binder;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 
+import com.github.jvanhie.discogsscrobbler.NowPlayingActivity;
 import com.github.jvanhie.discogsscrobbler.R;
 import com.github.jvanhie.discogsscrobbler.ReleaseListActivity;
 import com.github.jvanhie.discogsscrobbler.models.Track;
@@ -48,19 +48,43 @@ public class NowPlayingService extends Service {
     private static int NOTIFICATION_ID = 666;
     public static String TRACK_LIST = "tracklist";
     public static String ALBUM_ART_URL = "albumart";
+    public static String THUMB_URL = "thumb";
     public static String NEXT_TRACK_MODE = "next_track";
     public static String NEXT_TRACK_ID = "next_track_id";
     public static String NEXT_TRACK_TITLE = "next_track_title";
 
-    private boolean mIsPlaying = false;
-    private List<Track> mTrackList;
-    private int mCurrentTrack;
+    /*public variables that can be queried by a bound activity*/
+    public boolean isPlaying = false;
+    public List<Track> trackList;
+    public int currentTrack;
+    public String albumArtURL;
+    public String artist;
+    public String album;
 
     private ImageLoader mImageLoader;
     private Discogs mDiscogs;
     private Lastfm mLastfm;
     private NotificationCompat.Builder mNotificationBuilder;
     private AlarmManager mAlarmManager;
+
+    // Binder given to clients
+    private final IBinder mBinder = new LocalBinder();
+
+    /**
+     * Class used for the client Binder.  Because we know this service always
+     * runs in the same process as its clients, we don't need to deal with IPC.
+     */
+    public class LocalBinder extends Binder {
+        public NowPlayingService getService() {
+            // Return this instance of LocalService so clients can call public methods
+            return NowPlayingService.this;
+        }
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        return mBinder;
+    }
 
     @Override
     public void onCreate() {
@@ -83,7 +107,7 @@ public class NowPlayingService extends Service {
 
         mNotificationBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(android.R.drawable.ic_media_play)
-                .setContentIntent(PendingIntent.getActivity(this, 0, new Intent(this, ReleaseListActivity.class), 0));
+                .setContentIntent(PendingIntent.getActivity(this, 0, new Intent(this, NowPlayingActivity.class), 0));
 
         mAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
     }
@@ -95,10 +119,10 @@ public class NowPlayingService extends Service {
             int pos = intent.getIntExtra(NEXT_TRACK_ID,0);
             String title = intent.getStringExtra(NEXT_TRACK_TITLE);
             System.out.println(title + ":" + pos);
-            if(pos == -1 && mTrackList.get(0).title.equals(title)) {
+            if(pos == -1 && trackList.get(0).title.equals(title)) {
                 //stop requested
                 stop();
-            } else if(pos < mTrackList.size() && mTrackList.get(pos).title.equals(title)) {
+            } else if(pos < trackList.size() && trackList.get(pos).title.equals(title)) {
                 //ok, this is a valid request, make it happen
                 play(pos);
             }
@@ -106,11 +130,12 @@ public class NowPlayingService extends Service {
             NowPlayingAlarm.completeWakefulIntent(intent);
         } else {
             /*we have received a playlist, start playing*/
-            mTrackList = intent.getParcelableArrayListExtra("tracklist");
-            String albumArt = intent.getStringExtra("albumart");
-            mCurrentTrack = 0;
+            trackList = intent.getParcelableArrayListExtra(TRACK_LIST);
+            String thumb = intent.getStringExtra(THUMB_URL);
+            albumArtURL = intent.getStringExtra(ALBUM_ART_URL);
+            currentTrack = 0;
             /*first try to load the album art, then start playing*/
-            mImageLoader.loadImage(this, albumArt, new ImageLoadingListener() {
+            mImageLoader.loadImage(this, thumb, new ImageLoadingListener() {
                 @Override
                 public void onLoadingStarted() {
                 }
@@ -122,13 +147,13 @@ public class NowPlayingService extends Service {
                 @Override
                 public void onLoadingFailed(FailReason failReason) {
                     mNotificationBuilder.setLargeIcon(null);
-                    play(mCurrentTrack);
+                    play(currentTrack);
                 }
 
                 @Override
                 public void onLoadingComplete(Bitmap loadedImage) {
                     mNotificationBuilder.setLargeIcon(loadedImage);
-                    play(mCurrentTrack);
+                    play(currentTrack);
                 }
             });
         }
@@ -141,26 +166,25 @@ public class NowPlayingService extends Service {
         stop();
     }
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
+
 
     private void play(final int trackNumber) {
-        mIsPlaying = true;
-        Track t = mTrackList.get(trackNumber);
-        mCurrentTrack = trackNumber;
+        isPlaying = true;
+        Track t = trackList.get(trackNumber);
+        artist = t.artist;
+        album = t.album;
+        currentTrack = trackNumber;
         mNotificationBuilder.setContentTitle(t.title).setContentText(t.album + "\n" + t.artist).setWhen(System.currentTimeMillis());
         startForeground(NOTIFICATION_ID, mNotificationBuilder.build());
 
         Intent intent = new Intent(this, NowPlayingAlarm.class);
-        if(trackNumber < mTrackList.size()-1) {
+        if(trackNumber < trackList.size()-1) {
             intent.putExtra(NEXT_TRACK_ID, (trackNumber + 1));
-            intent.putExtra(NEXT_TRACK_TITLE, mTrackList.get(trackNumber + 1).title);
+            intent.putExtra(NEXT_TRACK_TITLE, trackList.get(trackNumber + 1).title);
         } else {
             //this is the last track, alarm will be used to stop the service (by issuing pos = -1 and title = first song title)
             intent.putExtra(NEXT_TRACK_ID, -1);
-            intent.putExtra(NEXT_TRACK_TITLE, mTrackList.get(0).title);
+            intent.putExtra(NEXT_TRACK_TITLE, trackList.get(0).title);
         }
         PendingIntent alarmIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
         System.out.println("setting alarm");
@@ -171,9 +195,9 @@ public class NowPlayingService extends Service {
     }
 
     private void stop() {
-        if (mIsPlaying) {
+        if (isPlaying) {
             //mNowPlayingHandler.removeCallbacks(null);
-            mIsPlaying=false;
+            isPlaying =false;
             stopForeground(true);
         }
     }

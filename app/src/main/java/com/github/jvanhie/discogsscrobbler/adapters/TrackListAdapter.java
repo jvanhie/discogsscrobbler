@@ -1,0 +1,89 @@
+/*
+ * Copyright (c) 2014 Jono Vanhie-Van Gerwen
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.github.jvanhie.discogsscrobbler.adapters;
+
+import android.content.Context;
+import android.graphics.Color;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.TextView;
+
+import com.github.jvanhie.discogsscrobbler.R;
+import com.github.jvanhie.discogsscrobbler.models.Track;
+
+import java.util.List;
+
+/**
+ * Created by Jono on 28/04/2014.
+ */
+public class TrackListAdapter extends BaseAdapter {
+    private List<Track> mTracklist;
+    private Context mContext;
+
+    public TrackListAdapter(Context context, List<Track> trackList) {
+        mContext = context;
+        mTracklist = trackList;
+    }
+
+    @Override
+    public int getCount() {
+        return mTracklist.size();
+    }
+
+    @Override
+    public Object getItem(int i) {
+        return mTracklist.get(i);
+    }
+
+    @Override
+    public long getItemId(int i) {
+        if(mTracklist.get(i).getId()==null) return mTracklist.get(i).idx;
+        else return mTracklist.get(i).getId();
+    }
+
+    @Override
+    public View getView(int i, View view, ViewGroup viewGroup) {
+        if (view == null) {
+            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            view = inflater.inflate(R.layout.discogs_track, viewGroup, false);
+        }
+        TextView pos = (TextView) view.findViewById(R.id.track_pos);
+        TextView duration = (TextView) view.findViewById(R.id.track_duration);
+        TextView name = (TextView) view.findViewById(R.id.track_name);
+
+        Track track = mTracklist.get(i);
+        pos.setText(track.position);
+        duration.setText(track.duration);
+        if(!track.artist.equals("")) {
+            name.setText(track.artist + " - " + track.title);
+        } else {
+            name.setText(track.title);
+        }
+
+
+        if(track.type.equals("heading")) {
+            name.setTextColor(Color.LTGRAY);
+        } else {
+            name.setTextColor(Color.BLACK);
+        }
+
+        return view;
+    }
+
+}
