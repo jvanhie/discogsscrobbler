@@ -67,6 +67,7 @@ public class NowPlayingService extends Service {
     private Lastfm mLastfm;
     private NotificationCompat.Builder mNotificationBuilder;
     private AlarmManager mAlarmManager;
+    private PendingIntent mAlarmIntent;
 
     // Binder given to clients
     private final IBinder mBinder = new LocalBinder();
@@ -106,9 +107,7 @@ public class NowPlayingService extends Service {
                 .build();
         mImageLoader.init(config);
 
-        mNotificationBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(android.R.drawable.ic_media_play)
-                .setContentIntent(PendingIntent.getActivity(this, 0, new Intent(this, NowPlayingActivity.class), 0));
+        mNotificationBuilder = new NotificationCompat.Builder(this).setContentIntent(PendingIntent.getActivity(this, 0, new Intent(this, NowPlayingActivity.class), 0));
 
         mAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
     }
@@ -172,12 +171,13 @@ public class NowPlayingService extends Service {
 
 
     private void play(final int trackNumber) {
+        if(trackList==null || trackList.size()==0) return;
         isPlaying = true;
         Track t = trackList.get(trackNumber);
         artist = t.artist;
         album = t.album;
         currentTrack = trackNumber;
-        mNotificationBuilder.setContentTitle(t.title).setContentText(t.album + "\n" + t.artist).setWhen(System.currentTimeMillis());
+        mNotificationBuilder.setContentTitle(t.title).setContentText(t.artist + " - " + t.album).setWhen(System.currentTimeMillis()).setSmallIcon(android.R.drawable.ic_media_play);
         startForeground(NOTIFICATION_ID, mNotificationBuilder.build());
         //update listeners to track change
         sendBroadcast(new Intent(TRACK_CHANGE));
@@ -191,20 +191,43 @@ public class NowPlayingService extends Service {
             intent.putExtra(NEXT_TRACK_ID, -1);
             intent.putExtra(NEXT_TRACK_TITLE, trackList.get(0).title);
         }
-        PendingIntent alarmIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-        System.out.println("setting alarm");
-        mAlarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                SystemClock.elapsedRealtime() +
-                        mDiscogs.formatDurationToSeconds(t.duration) * 1000, alarmIntent
-        );
+        mAlarmIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        mAlarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + mDiscogs.formatDurationToSeconds(t.duration) * 1000, mAlarmIntent);
     }
 
-    private void stop() {
-        if (isPlaying) {
-            //mNowPlayingHandler.removeCallbacks(null);
-            isPlaying =false;
-            stopForeground(true);
+    public void resume() {
+        if(!isPlaying) {
+            play(currentTrack);
         }
+    }
+
+    public void pause() {
+        if(isPlaying) {
+            //clear pending next track alarm
+            if (mAlarmIntent != null) {
+                mAlarmManager.cancel(mAlarmIntent);
+                mAlarmIntent.cancel();
+            }
+            isPlaying=false;
+            //change notifaction
+            mNotificationBuilder.setWhen(System.currentTimeMillis()).setSmallIcon(android.R.drawable.ic_media_pause);
+            startForeground(NOTIFICATION_ID, mNotificationBuilder.build());
+        }
+    }
+
+    public void stop() {
+
+            //clear outstanding callbacks
+            if(mAlarmIntent!=null) {
+                mAlarmManager.cancel(mAlarmIntent);
+                mAlarmIntent.cancel();
+            }
+
+            if(trackList!=null) trackList.clear();
+            isPlaying = false;
+
+            stopForeground(true);
+
     }
 
 }

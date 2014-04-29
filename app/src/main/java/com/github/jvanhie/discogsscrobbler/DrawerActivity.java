@@ -79,7 +79,6 @@ public class DrawerActivity extends FragmentActivity {
                         startActivity(new Intent(DrawerActivity.this, SearchActivity.class));
                         break;
                     case 2: //now playing
-                        //the item only works with lastfm enabled
                         startActivity(new Intent(DrawerActivity.this, NowPlayingActivity.class));
                         break;
                     case 3: //settings

@@ -96,7 +96,9 @@ public class TrackListAdapter extends BaseAdapter {
         if(track.type.equals("heading")) {
             name.setTextColor(Color.LTGRAY);
         } else {
+            pos.setTextColor(Color.BLACK);
             name.setTextColor(Color.BLACK);
+            duration.setTextColor(Color.BLACK);
         }
 
         //songs that have already been played are gray

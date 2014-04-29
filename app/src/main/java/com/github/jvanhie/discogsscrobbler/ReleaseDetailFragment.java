@@ -16,7 +16,11 @@
 
 package com.github.jvanhie.discogsscrobbler;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -35,10 +39,12 @@ import com.echo.holographlibrary.Bar;
 import com.echo.holographlibrary.BarGraph;
 import com.github.jvanhie.discogsscrobbler.models.Image;
 import com.github.jvanhie.discogsscrobbler.models.Release;
+import com.github.jvanhie.discogsscrobbler.models.Track;
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsPriceSuggestion;
 import com.github.jvanhie.discogsscrobbler.util.Discogs;
 import com.github.jvanhie.discogsscrobbler.util.DiscogsImageDownloader;
 import com.github.jvanhie.discogsscrobbler.util.Lastfm;
+import com.github.jvanhie.discogsscrobbler.util.NowPlayingService;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -123,6 +129,10 @@ public class ReleaseDetailFragment extends Fragment {
                 //the release is not in the collection, give the user the opportunity to add it
                 inflater.inflate(R.menu.release_detail_search, menu);
             }
+            if (mRelease != null && !mRelease.isTransient) {
+                //release is in the collection
+                inflater.inflate(R.menu.release_detail_refresh, menu);
+            }
         }
 
         if (PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("enable_lastfm", true)) {
@@ -148,18 +158,61 @@ public class ReleaseDetailFragment extends Fragment {
                     }
                 });
             }
+            if (id == R.id.detail_reload_release) {
+                mDiscogs.refreshRelease(mRelease, new Discogs.DiscogsWaiter() {
+                    @Override
+                    public void onResult(boolean success) {
+                        if(success) {
+                            Toast.makeText(getActivity(), "reloaded release",Toast.LENGTH_SHORT).show();
+                            setRelease();
+                        } else {
+                            Toast.makeText(getActivity(), "Failed to reload requested release",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
             if (id == R.id.detail_scrobble_release) {
-                Lastfm lastfm = Lastfm.getInstance(getActivity());
+                final Lastfm lastfm = Lastfm.getInstance(getActivity());
                 if (lastfm.isLoggedIn()) {
                     //we're in detailview, just scrobble everything
                     final Release release = mRelease;
                     if (release != null) {
-                        lastfm.scrobbleTracks(release.tracklist(), new Lastfm.LastfmWaiter() {
-                            @Override
-                            public void onResult(boolean success) {
-                                Toast.makeText(getActivity(), "Scrobbled " + release.tracklist().size() + " tracks", Toast.LENGTH_SHORT).show();
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                        builder.setMessage("Did you just finished listening to " + release.title + " or are you about to?").setTitle("Scrobble this album?");
+                        builder.setPositiveButton("About to", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                //start now playing service
+                                Intent i=new Intent(getActivity(), NowPlayingService.class);
+                                i.putParcelableArrayListExtra(NowPlayingService.TRACK_LIST, new ArrayList<Track>(release.tracklist()));
+                                i.putExtra(NowPlayingService.THUMB_URL,release.thumb);
+                                if(release.images().size()>0)
+                                    i.putExtra(NowPlayingService.ALBUM_ART_URL,release.images().get(0).uri);
+                                getActivity().startService(i);
+                                //go to the now playing activity
+                                startActivity(new Intent(getActivity(), NowPlayingActivity.class));
                             }
                         });
+                        builder.setNeutralButton("Just finished", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                //scrobble the tracks now
+                                lastfm.scrobbleTracks(release.tracklist(), new Lastfm.LastfmWaiter() {
+                                    @Override
+                                    public void onResult(boolean success) {
+                                        Toast.makeText(getActivity(), "Scrobbled " + release.tracklist().size() + " tracks", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                        });
+                        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                // User cancelled the dialog don't do anything
+                            }
+                        });
+                        AlertDialog dialog = builder.create();
+                        dialog.show();
+
                     }
                 } else {
                     //log in first

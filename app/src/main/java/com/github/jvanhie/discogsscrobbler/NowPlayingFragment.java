@@ -107,18 +107,34 @@ public class NowPlayingFragment extends Fragment {
         /*bind to the now playing service*/
         Intent intent = new Intent(getActivity(), NowPlayingService.class);
         getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-        //setHasOptionsMenu(true);
+        setHasOptionsMenu(true);
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-
+        inflater.inflate(R.menu.now_playing, menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
+        if(mBound) {
+            switch (item.getItemId()) {
+                case R.id.now_playing_play:
+                    //start playing again
+                    mService.resume();
+                    break;
+                case R.id.now_playing_pause:
+                    //pause playing
+                    mService.pause();
+                    break;
+                case R.id.now_playing_stop:
+                    //clear playlist
+                    mService.stop();
+                    setNowPlaying();
+                    break;
+            }
+        }
         return super.onOptionsItemSelected(item);
     }
 
