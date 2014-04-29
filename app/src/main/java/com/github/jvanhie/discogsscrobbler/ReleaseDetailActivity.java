@@ -59,7 +59,7 @@ public class ReleaseDetailActivity extends DrawerActivity {
         setContentView(R.layout.activity_release_detail);
 
         // Show the Up button in the action bar.
-        getActionBar().setDisplayHomeAsUpEnabled(true);
+        //getActionBar().setDisplayHomeAsUpEnabled(true);
 
         /*add detail and tracklist fragment in a pager
         mReleaseId = getIntent().getLongExtra(ReleaseDetailFragment.ARG_ITEM_ID,0);
@@ -81,5 +81,15 @@ public class ReleaseDetailActivity extends DrawerActivity {
         }
         //set navigation drawer
         setDrawer(R.id.detail_drawer_layout,R.id.detail_drawer,getTitle().toString(),getTitle().toString(),false);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == android.R.id.home) {
+            //up button pressed, in the detailview we want this implemented as back (goes to certain selected item in release or search list)
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

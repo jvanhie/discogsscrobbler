@@ -46,11 +46,7 @@
         </activity>
         <activity
             android:name="com.github.jvanhie.discogsscrobbler.ReleaseDetailActivity"
-            android:label="@string/title_release_detail"
-            android:parentActivityName="com.github.jvanhie.discogsscrobbler.ReleaseListActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.github.jvanhie.discogsscrobbler.ReleaseListActivity" />
+            android:label="@string/title_release_detail">
         </activity>
         <activity
             android:name="com.github.jvanhie.discogsscrobbler.ReleaseTracklistActivity"
