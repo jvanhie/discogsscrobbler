@@ -22,12 +22,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.AlphabetIndexer;
 import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.SectionIndexer;
 import android.widget.TextView;
 
 import com.github.jvanhie.discogsscrobbler.R;
@@ -40,25 +42,54 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Jono on 20/03/14.
  */
-public class ReleaseAdapter extends BaseAdapter implements Filterable {
+public class ReleaseAdapter extends BaseAdapter implements Filterable, SectionIndexer {
     private List<Release> mReleases = new ArrayList<Release>();
     private List<Release> mUnfilteredReleases;
     private final Context mContext;
     private ImageLoader mImageLoader;
-    private DisplayImageOptions mImageOptions;
+    private HashMap<String, Integer> mAlphaIndexer;
+    private String[] mSections;
+    private Integer[] mSectionValues;
+
 
     public ReleaseAdapter(Context context, List<Release> releases) {
         mContext = context;
         mReleases = releases;
         mUnfilteredReleases = new ArrayList<Release>(releases);
-
+        updateAlphaIndex();
         //create universal image loader
         initImageLoader();
+    }
+
+    private void updateAlphaIndex() {
+        ArrayList<String> sections = new ArrayList<String>();
+        ArrayList<Integer> sectionValues = new ArrayList<Integer>();
+        String currSection = "";
+
+        for (int i = 0; i < mReleases.size(); i++) {
+            String ch = mReleases.get(i).artist.substring(0, 1).toUpperCase();
+            if (!ch.equals(currSection)) {
+                sections.add(ch);
+                sectionValues.add(i);
+                currSection=ch;
+            }
+        }
+
+        mSections=new String[sections.size()];
+        sections.toArray(mSections);
+
+        mSectionValues=new Integer[sectionValues.size()];
+        sectionValues.toArray(mSectionValues);
+
     }
 
     private void initImageLoader() {
@@ -151,6 +182,7 @@ public class ReleaseAdapter extends BaseAdapter implements Filterable {
             @Override
             protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
                 mReleases = (List<Release>) filterResults.values;
+                updateAlphaIndex();
                 notifyDataSetChanged();
             }
         };
@@ -159,6 +191,7 @@ public class ReleaseAdapter extends BaseAdapter implements Filterable {
     public void updateReleases(List<Release> releases) {
         mReleases = releases;
         mUnfilteredReleases = new ArrayList<Release>(mReleases);
+        updateAlphaIndex();
         //TODO: DO we really need to reinit imageloader?
         initImageLoader();
         notifyDataSetChanged();
@@ -167,5 +200,25 @@ public class ReleaseAdapter extends BaseAdapter implements Filterable {
     @Override
     public boolean hasStableIds() {
         return true;
+    }
+
+    @Override
+    public Object[] getSections() {
+        return mSections;
+    }
+
+    @Override
+    public int getPositionForSection(int section) {
+        return mSectionValues[section];
+    }
+
+    @Override
+    public int getSectionForPosition(int pos) {
+        for(int i = 0 ; i < mSectionValues.length ; i++) {
+            if(pos < mSectionValues[i]) {
+                return i-1;
+            }
+        }
+        return 0;
     }
 }
