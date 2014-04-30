@@ -68,7 +68,7 @@ public class SearchActivity extends DrawerActivity
 
     private int mSearchType;
     private String[] mSearchTypes;
-    private static final String STATE_SEARCH_TYPE = "search_type";
+    private static final String SEARCH_TYPE = "search_type";
 
 
     @Override
@@ -98,11 +98,8 @@ public class SearchActivity extends DrawerActivity
             }
         }
 
-        // restore search type if changed
-        if (savedInstanceState != null
-                && savedInstanceState.containsKey(STATE_SEARCH_TYPE)) {
-            mSearchType = savedInstanceState.getInt(STATE_SEARCH_TYPE);
-        }
+        // set search type
+        mSearchType = PreferenceManager.getDefaultSharedPreferences(this).getInt(SEARCH_TYPE,0);
         mSearchTypes = getResources().getStringArray(R.array.search_filter_items);
 
         //create navigation drawer
@@ -149,6 +146,7 @@ public class SearchActivity extends DrawerActivity
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 mSearchType = i;
+                PreferenceManager.getDefaultSharedPreferences(SearchActivity.this).edit().putInt(SEARCH_TYPE,mSearchType).apply();
                 if(i>0) {
                     mSearchView.setQueryHint("Search Discogs (" + mSearchTypes[i] + ")");
                 } else {
@@ -275,9 +273,6 @@ public class SearchActivity extends DrawerActivity
         if (mSelected > 0) {
             // Serialize and persist the activated item position.
             outState.putLong(STATE_RELEASE_SELECTED, mSelected);
-        }
-        if(mSearchType > 0) {
-            outState.putInt(STATE_SEARCH_TYPE,mSearchType);
         }
         outState.putInt(STATE_PANES, mPanes);
 
