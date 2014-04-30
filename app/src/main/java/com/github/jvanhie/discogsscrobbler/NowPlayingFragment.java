@@ -74,6 +74,10 @@ public class NowPlayingFragment extends Fragment {
     private View mRootView;
     private TrackListAdapter mTrackListAdapter;
 
+    /*menuitems to enable or disable depending on now playing state*/
+    private MenuItem mPlayMenu;
+    private MenuItem mPauseMenu;
+    private MenuItem mStopMenu;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -107,7 +111,18 @@ public class NowPlayingFragment extends Fragment {
         /*bind to the now playing service*/
         Intent intent = new Intent(getActivity(), NowPlayingService.class);
         getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+
         setHasOptionsMenu(true);
+
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        mPlayMenu = menu.findItem(R.id.now_playing_play);
+        mPauseMenu = menu.findItem(R.id.now_playing_pause);
+        mStopMenu = menu.findItem(R.id.now_playing_stop);
+        setMenuVisibility();
     }
 
     @Override
@@ -135,6 +150,7 @@ public class NowPlayingFragment extends Fragment {
                     break;
             }
         }
+        setMenuVisibility();
         return super.onOptionsItemSelected(item);
     }
 
@@ -167,6 +183,34 @@ public class NowPlayingFragment extends Fragment {
             mTrackListAdapter.setNowPlaying(mService.currentTrack);
             mTrackListAdapter.notifyDataSetChanged();
         }
+
+        setMenuVisibility();
+    }
+
+    private void setMenuVisibility() {
+        //only execute if the menu items have been initialized
+        if (mPlayMenu!=null) {
+            //by default, all menu items are hidden
+            mPlayMenu.setVisible(false);
+            mPauseMenu.setVisible(false);
+            mStopMenu.setVisible(false);
+            if (mBound) {
+
+                //if there's a playlist -> allow to clear it
+                if (mService.trackList != null && mService.trackList.size() > 0) {
+                    mStopMenu.setVisible(true);
+                }
+
+                //is there something playing? allow to pause, else, allow to play
+                if (mService.isPlaying) {
+                    mPauseMenu.setVisible(true);
+                } else if (mService.trackList != null && mService.trackList.size() > 0) {
+                    //paused
+                    mPlayMenu.setVisible(true);
+                }
+            }
+        }
+
     }
 
     /** Defines callbacks for service binding, passed to bindService() */
@@ -203,7 +247,6 @@ public class NowPlayingFragment extends Fragment {
         if (mTrackChangeReceiver == null) mTrackChangeReceiver = new TrackChangeReceiver();
         IntentFilter intentFilter = new IntentFilter(NowPlayingService.TRACK_CHANGE);
         getActivity().registerReceiver(mTrackChangeReceiver, intentFilter);
-
     }
 
     @Override

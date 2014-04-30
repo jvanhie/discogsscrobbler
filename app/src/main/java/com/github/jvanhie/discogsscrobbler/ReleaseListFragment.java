@@ -172,6 +172,8 @@ public class ReleaseListFragment extends Fragment {
             }
         });
 
+        mList.setFastScrollEnabled(true);
+
         /*initialize list with local discogs collection*/
         if(mDiscogs==null) mDiscogs = Discogs.getInstance(getActivity());
 

@@ -118,7 +118,6 @@ public class NowPlayingService extends Service {
             /*request to start scrobbling the next track, check if it is sound*/
             int pos = intent.getIntExtra(NEXT_TRACK_ID,0);
             String title = intent.getStringExtra(NEXT_TRACK_TITLE);
-            System.out.println(title + ":" + pos);
             if(trackList != null && trackList.size()>0) {
                 if (pos == -1 && trackList.get(0).title.equals(title)) {
                     //stop requested
@@ -171,9 +170,22 @@ public class NowPlayingService extends Service {
 
 
     private void play(final int trackNumber) {
+        //do we even have something to play?
         if(trackList==null || trackList.size()==0) return;
-        isPlaying = true;
+
         Track t = trackList.get(trackNumber);
+
+        //don't play headings, on to the next! (if there is a next)
+        if(t.type.equals("heading")) {
+            if(trackNumber+1 < trackList.size()) {
+                play(trackNumber+1);
+            } else {
+                stop();
+            }
+            return;
+        }
+
+        isPlaying = true;
         artist = t.artist;
         album = t.album;
         currentTrack = trackNumber;
@@ -225,6 +237,9 @@ public class NowPlayingService extends Service {
 
             if(trackList!=null) trackList.clear();
             isPlaying = false;
+
+            //update listeners to track change
+            sendBroadcast(new Intent(TRACK_CHANGE));
 
             stopForeground(true);
 

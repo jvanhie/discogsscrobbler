@@ -189,7 +189,7 @@ public class ReleaseTracklistFragment extends ListFragment {
 
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                    builder.setMessage("Did you just finished listening to " + mRelease.title + " or are you about to?").setTitle("Scrobble this album?");
+                    builder.setMessage("Did you just finished listening to " + mRelease.title + " or are you about to listen to it?").setTitle("Scrobble this album?");
                     builder.setPositiveButton("About to", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             //start now playing service
