@@ -97,7 +97,6 @@ public class NowPlayingFragment extends Fragment {
             DisplayImageOptions options = new DisplayImageOptions.Builder()
                     .showStubImage(R.drawable.default_release)
                     .cacheInMemory()
-                    .cacheOnDisc()
                     .displayer(new FadeInBitmapDisplayer(500))
                     .build();
             ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getActivity())
@@ -247,6 +246,7 @@ public class NowPlayingFragment extends Fragment {
         if (mTrackChangeReceiver == null) mTrackChangeReceiver = new TrackChangeReceiver();
         IntentFilter intentFilter = new IntentFilter(NowPlayingService.TRACK_CHANGE);
         getActivity().registerReceiver(mTrackChangeReceiver, intentFilter);
+        if(mService != null) setNowPlaying();
     }
 
     @Override

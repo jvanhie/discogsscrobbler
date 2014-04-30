@@ -61,7 +61,8 @@ public class NowPlayingService extends Service {
     public String albumArtURL;
     public String artist;
     public String album;
-
+    public Track track;
+    
     private ImageLoader mImageLoader;
     private Discogs mDiscogs;
     private Lastfm mLastfm;
@@ -119,6 +120,15 @@ public class NowPlayingService extends Service {
             int pos = intent.getIntExtra(NEXT_TRACK_ID,0);
             String title = intent.getStringExtra(NEXT_TRACK_TITLE);
             if(trackList != null && trackList.size()>0) {
+                //done listening to the previous track -> scrobble the previous track
+                int now = (int)(System.currentTimeMillis()/1000);
+                mLastfm.scrobbleTrack(track,now,new Lastfm.LastfmWaiter() {
+                    @Override
+                    public void onResult(boolean success) {
+                        //the user already sees the notification, no need for extras notifications atm.
+                    }
+                });
+
                 if (pos == -1 && trackList.get(0).title.equals(title)) {
                     //stop requested
                     stop();
@@ -173,10 +183,10 @@ public class NowPlayingService extends Service {
         //do we even have something to play?
         if(trackList==null || trackList.size()==0) return;
 
-        Track t = trackList.get(trackNumber);
+        track = trackList.get(trackNumber);
 
         //don't play headings, on to the next! (if there is a next)
-        if(t.type.equals("heading")) {
+        if(track.type.equals("heading")) {
             if(trackNumber+1 < trackList.size()) {
                 play(trackNumber+1);
             } else {
@@ -186,10 +196,19 @@ public class NowPlayingService extends Service {
         }
 
         isPlaying = true;
-        artist = t.artist;
-        album = t.album;
+        artist = track.artist;
+        album = track.album;
         currentTrack = trackNumber;
-        mNotificationBuilder.setContentTitle(t.title).setContentText(t.artist + " - " + t.album).setWhen(System.currentTimeMillis()).setSmallIcon(android.R.drawable.ic_media_play);
+        mNotificationBuilder.setContentTitle(track.title).setContentText(track.artist + " - " + track.album).setWhen(System.currentTimeMillis()).setSmallIcon(android.R.drawable.ic_media_play);
+        //set nowplaying, scrobbling happens on the alarm callback
+        mLastfm.updateNowPlaying(track,new Lastfm.LastfmWaiter() {
+            @Override
+            public void onResult(boolean success) {
+                //the user already sees the notification, no need for extras notifications atm.
+            }
+        });
+
+        //notify user
         startForeground(NOTIFICATION_ID, mNotificationBuilder.build());
         //update listeners to track change
         sendBroadcast(new Intent(TRACK_CHANGE));
@@ -204,7 +223,7 @@ public class NowPlayingService extends Service {
             intent.putExtra(NEXT_TRACK_TITLE, trackList.get(0).title);
         }
         mAlarmIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-        mAlarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + mDiscogs.formatDurationToSeconds(t.duration) * 1000, mAlarmIntent);
+        mAlarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + mDiscogs.formatDurationToSeconds(track.duration) * 1000, mAlarmIntent);
     }
 
     public void resume() {
