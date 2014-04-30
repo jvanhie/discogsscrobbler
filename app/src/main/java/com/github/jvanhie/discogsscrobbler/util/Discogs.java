@@ -16,8 +16,10 @@
 
 package com.github.jvanhie.discogsscrobbler.util;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -566,6 +568,67 @@ public class Discogs extends ContextWrapper {
                 }
             });
         }
+    }
+
+    public void preloadCollection() {
+        final ProgressDialog refreshDialog = new ProgressDialog(mContext);
+        refreshDialog.setTitle("Refreshing your Discogs collection");
+        refreshDialog.setMessage("Fetching your current collection state");
+        refreshDialog.setProgressStyle(refreshDialog.STYLE_SPINNER);
+        refreshDialog.show();
+
+        refreshCollection(new DiscogsWaiter() {
+            @Override
+            public void onResult(boolean success) {
+                refreshDialog.dismiss();
+                if(success) {
+                    final int total = collection.size();
+                    final ProgressDialog progressDialog = new ProgressDialog(mContext);
+
+                    final Thread downloader = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            for (Release r : collection) {
+                                try {
+                                    refreshRelease(r, new DiscogsWaiter() {
+                                        @Override
+                                        public void onResult(boolean success) {
+                                            System.out.println(success);
+                                            progressDialog.incrementProgressBy(1);
+                                            if(progressDialog.getProgress() == total) {
+                                                //all updates done, return total result
+                                                progressDialog.dismiss();
+                                            }
+                                        }
+                                    });
+                                    //Discogs requests a local rate limit of 1 request per second
+                                    Thread.sleep(1000);
+                                } catch(InterruptedException e) {
+                                    //stop the task on interrupt (thrown when user dismisses the dialog)
+                                    break;
+                                }
+                            }
+                        }
+                    });
+
+                    progressDialog.setTitle("Preloading your Discogs collection");
+                    progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                    progressDialog.setMessage("Downloading release data");
+                    progressDialog.setMax(total);
+                    progressDialog.setProgress(0);
+                    progressDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialogInterface) {
+                            downloader.interrupt();
+                        }
+                    });
+                    progressDialog.show();
+
+                    downloader.start();
+                }
+            }
+        });
+
     }
 
     public void removeReleases(List<Release> releases, final DiscogsWaiter waiter) {

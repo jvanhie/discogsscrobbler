@@ -21,6 +21,7 @@
         android:title="@string/pref_header_advanced"
         >
 
+
         <ListPreference
             android:key="discogs_api_id"
             android:title="@string/pref_title_api_id"

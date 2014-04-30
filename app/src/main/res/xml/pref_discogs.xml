@@ -36,6 +36,11 @@
             android:entryValues="@array/pref_collection_view_values"
             android:defaultValue="@string/pref_collection_view_default" />
 
+        <Preference android:key="discogs_preload_collection"
+            android:dependency="enable_discogs"
+            android:title="@string/pref_title_preload_collection"
+            android:summary="@string/pref_description_preload_collection"/>
+
     </PreferenceCategory>
 
 </PreferenceScreen>

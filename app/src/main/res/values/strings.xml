@@ -36,6 +36,8 @@
     <string name="discogs_seller_dialog_message">To enable price suggestions, you need to set your seller preferences. Minimum required info is:\n\"Items Ships From\"\n\"Shipping Policy\"\n\"Payment Methods\"</string>
     <string name="discogs_seller_dialog_title">Open Discogs seller settings in browser?</string>
     <string name="title_now_playing">Now Playing</string>
+    <string name="pref_title_preload_collection">Preload your collection</string>
+    <string name="pref_description_preload_collection">Download detailled information on all your releases. This can take a while with big collections!</string>
 
 
     <!-- Nav Drawer Menu Items -->

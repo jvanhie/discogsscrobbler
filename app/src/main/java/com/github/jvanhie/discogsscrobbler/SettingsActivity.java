@@ -152,6 +152,15 @@ public class SettingsActivity extends PreferenceActivity {
             }
         });
 
+        Preference preloadButton = findPreference("discogs_preload_collection");
+        preloadButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference arg0) {
+                Discogs.getInstance(SettingsActivity.this).preloadCollection();
+                return true;
+            }
+        });
+
         Preference sellerButton = findPreference("discogs_seller_settings_button");
         sellerButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
