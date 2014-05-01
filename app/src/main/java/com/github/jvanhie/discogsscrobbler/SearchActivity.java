@@ -284,7 +284,7 @@ public class SearchActivity extends DrawerActivity
         if (data != null && requestCode == BARCODE_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 String barcode = data.getStringExtra("SCAN_RESULT");
-                mSearchView.setQuery(barcode,false);
+                if(mSearchView!=null)mSearchView.setQuery(barcode,false);
                 mSearchFragment.searchBarcode(barcode);
             }
         }

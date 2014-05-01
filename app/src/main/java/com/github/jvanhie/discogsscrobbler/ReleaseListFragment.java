@@ -34,6 +34,7 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -83,6 +84,9 @@ public class ReleaseListFragment extends Fragment {
     //we'll need this to determine our width in dp;
     private float logicalDensity;
     private boolean mGrid = false;
+
+    private TextView mEmptyHeading;
+    private TextView mEmptyText;
 
     /**
      * A callback interface that all activities containing this fragment must
@@ -148,10 +152,11 @@ public class ReleaseListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         //check if the user wants to enable discogs support, if not, stop here
         if(!PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("enable_discogs",true)) {
-            TextView msg = new TextView(getActivity());
-            msg.setText("Enable Discogs support in the settings screen to view and manage your Discogs releases");
+            View emptyView = inflater.inflate(R.layout.fragment_empty, container, false);
+            ((TextView)emptyView.findViewById(R.id.empty_heading)).setText("Discogs not enabled");
+            ((TextView)emptyView.findViewById(R.id.empty_text)).setText("Cannot display your collection without Discogs support, enable Discogs in the settings menu if you'd like to use this feature");
             mCallbacks.onAdapterSet();
-            return msg;
+            return emptyView;
         }
 
         String layout = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("collection_view","");
@@ -174,6 +179,16 @@ public class ReleaseListFragment extends Fragment {
 
         mList.setFastScrollEnabled(true);
 
+        //create superframe for adding list and empty view
+        FrameLayout superFrame = new FrameLayout(getActivity());
+        FrameLayout.LayoutParams layoutparams=new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT);
+        superFrame.setLayoutParams(layoutparams);
+        View emptyView = inflater.inflate(R.layout.fragment_empty, container, false);
+        mEmptyHeading = ((TextView)emptyView.findViewById(R.id.empty_heading));
+        mEmptyHeading.setText("Empty collection");
+        mEmptyText =((TextView)emptyView.findViewById(R.id.empty_text));
+        mEmptyText.setText("Your collection appears to be empty, if this isn't an error, start by adding some releases via the search function or online");
+
         /*initialize list with local discogs collection*/
         if(mDiscogs==null) mDiscogs = Discogs.getInstance(getActivity());
 
@@ -181,7 +196,11 @@ public class ReleaseListFragment extends Fragment {
         //do a background call to update the discogs collection if necessary
         checkOnlineCollection();
 
-        return mList;
+        superFrame.addView(emptyView);
+        mList.setEmptyView(emptyView);
+        superFrame.addView(mList);
+
+        return superFrame;
     }
 
     @Override
@@ -203,8 +222,12 @@ public class ReleaseListFragment extends Fragment {
     }
 
     public void filter(String s) {
-        if(mList != null && mList.getAdapter() != null)
-            ((ReleaseAdapter)mList.getAdapter()).getFilter().filter(s.toString());
+        if(mList != null && mList.getAdapter() != null) {
+            //we need a different empty msg for empty filter results
+            mEmptyHeading.setText("No matches");
+            mEmptyText.setText("clear or edit your query");
+            ((ReleaseAdapter) mList.getAdapter()).getFilter().filter(s.toString());
+        }
     }
 
 

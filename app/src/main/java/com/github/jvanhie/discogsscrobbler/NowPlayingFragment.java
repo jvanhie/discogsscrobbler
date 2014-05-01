@@ -22,10 +22,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -33,28 +31,19 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.echo.holographlibrary.Bar;
-import com.echo.holographlibrary.BarGraph;
 import com.github.jvanhie.discogsscrobbler.adapters.TrackListAdapter;
-import com.github.jvanhie.discogsscrobbler.models.Image;
-import com.github.jvanhie.discogsscrobbler.models.Release;
-import com.github.jvanhie.discogsscrobbler.queries.DiscogsPriceSuggestion;
 import com.github.jvanhie.discogsscrobbler.util.Discogs;
 import com.github.jvanhie.discogsscrobbler.util.DiscogsImageDownloader;
-import com.github.jvanhie.discogsscrobbler.util.Lastfm;
 import com.github.jvanhie.discogsscrobbler.util.NowPlayingService;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
-
-import java.util.ArrayList;
 
 /**
  * A fragment representing a single Release detail screen.
@@ -71,7 +60,10 @@ public class NowPlayingFragment extends Fragment {
     private boolean mBound;
     private TrackChangeReceiver mTrackChangeReceiver;
 
+    private FrameLayout mSuperFrame;
     private View mRootView;
+    private View mEmptyView;
+    private boolean isEmpty=true;
     private TrackListAdapter mTrackListAdapter;
 
     /*menuitems to enable or disable depending on now playing state*/
@@ -156,15 +148,46 @@ public class NowPlayingFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mRootView = inflater.inflate(R.layout.fragment_now_playing, container, false);
+        mEmptyView = inflater.inflate(R.layout.fragment_empty, container, false);
+        ((TextView)mEmptyView.findViewById(R.id.empty_heading)).setText("Nothing is playing");
+        ((TextView)mEmptyView.findViewById(R.id.empty_text)).setText("Start playing something by going to your Collection or search something to play on Discogs");
+
+        //create superframe for switching between recently playing and empty view
+        mSuperFrame = new FrameLayout(getActivity());
+        FrameLayout.LayoutParams layoutparams=new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT);
+        mSuperFrame.setLayoutParams(layoutparams);
+        mSuperFrame.addView(mEmptyView);
 
         if(mBound) {
             setNowPlaying();
         }
 
-        return mRootView;
+        return mSuperFrame;
+    }
+
+    private void setEmptyView(boolean empty) {
+        //only change views when state changed
+        if(isEmpty != empty) {
+            if(empty) {
+                mSuperFrame.removeView(mRootView);
+                mSuperFrame.addView(mEmptyView);
+            } else {
+                mSuperFrame.removeView(mEmptyView);
+                mSuperFrame.addView(mRootView);
+            }
+            isEmpty=empty;
+            //mSuperFrame.invalidate();
+        }
     }
 
     private void setNowPlaying() {
+        if(mService == null || mService.trackList == null || mService.trackList.size()==0) {
+            setEmptyView(true);
+            return;
+        } else {
+            setEmptyView(false);
+        }
+
         /*set general album details*/
         ((TextView) mRootView.findViewById(R.id.now_playing_artist)).setText(mService.artist);
         ((TextView) mRootView.findViewById(R.id.now_playing_album)).setText(mService.album);

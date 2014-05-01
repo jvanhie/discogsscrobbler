@@ -34,6 +34,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ExpandableListView;
+import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -45,6 +46,8 @@ import com.github.jvanhie.discogsscrobbler.models.Release;
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsSearchRelease;
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsSearchResult;
 import com.github.jvanhie.discogsscrobbler.util.Discogs;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,6 +85,9 @@ public class SearchFragment extends Fragment {
     private ExpandableListView mList;
     private SearchAdapter mAdapter;
     private Discogs mDiscogs;
+
+    private TextView mEmptyHeading;
+    private TextView mEmptyText;
 
     /**
      * A callback interface that all activities containing this fragment must
@@ -150,11 +156,25 @@ public class SearchFragment extends Fragment {
             }
         });
 
+        //create superframe for adding list and empty view
+        FrameLayout superFrame = new FrameLayout(getActivity());
+        FrameLayout.LayoutParams layoutparams=new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT);
+        superFrame.setLayoutParams(layoutparams);
+        View emptyView = inflater.inflate(R.layout.fragment_empty, container, false);
+        mEmptyHeading = ((TextView)emptyView.findViewById(R.id.empty_heading));
+        mEmptyHeading.setText("Start searching Discogs");
+        mEmptyText = ((TextView)emptyView.findViewById(R.id.empty_text));
+        mEmptyText.setText("Enter a query or scan a barcode");
+
         if (mDiscogs == null) mDiscogs = Discogs.getInstance(getActivity());
 
         mList.setGroupIndicator(null);
 
-        return mList;
+        superFrame.addView(emptyView);
+        mList.setEmptyView(emptyView);
+        superFrame.addView(mList);
+
+        return superFrame;
     }
 
     public void search(String s) {
@@ -164,6 +184,8 @@ public class SearchFragment extends Fragment {
             public void onResult(boolean success, List<DiscogsSearchResult> data) {
                 if(success) {
                     //show results
+                    mEmptyHeading.setText("No results");
+                    mEmptyText.setText("Discogs didn't return any matches, try a different query");
                     mAdapter = new SearchAdapter(getActivity(),data);
                     mList.setAdapter(mAdapter);
                 }
@@ -179,6 +201,8 @@ public class SearchFragment extends Fragment {
             public void onResult(boolean success, List<DiscogsSearchResult> data) {
                 if(success) {
                     //show results
+                    mEmptyHeading.setText("No results");
+                    mEmptyText.setText("Discogs didn't return any matches, try a different query or adjust your filter");
                     mAdapter = new SearchAdapter(getActivity(),data);
                     mList.setAdapter(mAdapter);
                 }
@@ -194,6 +218,8 @@ public class SearchFragment extends Fragment {
             public void onResult(boolean success, List<DiscogsSearchResult> data) {
                 if(success) {
                     //show results
+                    mEmptyHeading.setText("No matches");
+                    mEmptyText.setText("Discogs didn't have a match on your barcode. This is not uncommon, check the correctness of your barcode or try a text search instead");
                     mAdapter = new SearchAdapter(getActivity(),data);
                     mList.setAdapter(mAdapter);
                 }

@@ -34,6 +34,7 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -122,8 +123,6 @@ public class RecentlyPlayedFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-
         //setup list view
         mList = new ListView(getActivity());
         mList.setId(android.R.id.list);
@@ -135,11 +134,23 @@ public class RecentlyPlayedFragment extends Fragment {
             }
         });
 
+        //create superframe for adding list and empty view
+        FrameLayout superFrame = new FrameLayout(getActivity());
+        FrameLayout.LayoutParams layoutparams=new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT);
+        superFrame.setLayoutParams(layoutparams);
+        View emptyView = inflater.inflate(R.layout.fragment_empty, container, false);
+        ((TextView)emptyView.findViewById(R.id.empty_heading)).setText("No recently played albums");
+        ((TextView)emptyView.findViewById(R.id.empty_text)).setText("Your recently played list is empty. Once you start registering your played records they'll end up here");
+
         /*initialize list with local discogs collection*/
         if(mDiscogs==null) mDiscogs = Discogs.getInstance(getActivity());
         loadList();
 
-        return mList;
+        superFrame.addView(emptyView);
+        mList.setEmptyView(emptyView);
+        superFrame.addView(mList);
+
+        return superFrame;
     }
 
     public void loadList() {

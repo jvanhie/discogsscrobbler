@@ -103,25 +103,26 @@ public class ReleaseListActivity extends DrawerActivity
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
+        if(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("enable_discogs",true)) {
+            // Inflate the menu; this adds items to the action bar if it is present.
+            getMenuInflater().inflate(R.menu.discogs_list, menu);
+            //configure search box
+            SearchView searchView = (SearchView) menu.findItem(R.id.list_search).getActionView();
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String s) {
+                    menu.findItem(R.id.list_search).collapseActionView();
+                    return false;
+                }
 
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.discogs_list, menu);
-        //configure search box
-        SearchView searchView = (SearchView)menu.findItem(R.id.list_search).getActionView();
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String s) {
-                menu.findItem(R.id.list_search).collapseActionView();
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String s) {
-                mReleaseList.filter(s);
-                return false;
-            }
-        });
-        searchView.setQueryHint("Filter your releases");
+                @Override
+                public boolean onQueryTextChange(String s) {
+                    mReleaseList.filter(s);
+                    return false;
+                }
+            });
+            searchView.setQueryHint("Filter your releases");
+        }
         return true;
     }
 
