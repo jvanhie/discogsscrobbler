@@ -28,6 +28,7 @@ import android.preference.PreferenceManager;
 import android.widget.Toast;
 
 import com.activeandroid.ActiveAndroid;
+import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 import com.github.jvanhie.discogsscrobbler.DiscogsLoginActivity;
 import com.github.jvanhie.discogsscrobbler.R;
@@ -508,12 +509,12 @@ public class Discogs extends ContextWrapper {
         mDiscogsService.getPriceSuggestions(id, new Callback<DiscogsPriceSuggestion>() {
             @Override
             public void success(DiscogsPriceSuggestion s, Response response) {
-                waiter.onResult(true,s);
+                waiter.onResult(true, s);
             }
 
             @Override
             public void failure(RetrofitError error) {
-                waiter.onResult(false,null);
+                waiter.onResult(false, null);
             }
         });
     }
@@ -662,12 +663,24 @@ public class Discogs extends ContextWrapper {
         recent.save();
     }
 
+    //TODO: maybe this could get a bit heavy for the main thread, make async?
     public List<Release> getRecentlyPlayed() {
         ArrayList<Release> releases = new ArrayList<Release>();
-        List<RecentlyPlayed> recent = new Select().from(RecentlyPlayed.class).orderBy("timestamp DESC").execute();
+        //get the user preference on recently played size
+        int size = 50;
+        try {
+            String items = PreferenceManager.getDefaultSharedPreferences(mContext).getString("recently_played_size", "50");
+            size = Integer.parseInt(items);
+        } catch(NumberFormatException ex) {}
+        List<RecentlyPlayed> recent = new Select().from(RecentlyPlayed.class).limit(size).orderBy("timestamp DESC").execute();
+        //create release list and store the oldest timestamp
+        long minTimestamp = 0;
         for(RecentlyPlayed r : recent) {
             releases.add(r.getRelease());
+            minTimestamp=r.timestamp;
         }
+        //do some cleanup while we're at it: remove all recently played items with timestamp < oldest timestamp of valid results
+        new Delete().from(RecentlyPlayed.class).where("timestamp < ?", minTimestamp).execute();
         return releases;
     }
 

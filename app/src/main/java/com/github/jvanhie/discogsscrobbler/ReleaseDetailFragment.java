@@ -201,7 +201,9 @@ public class ReleaseDetailFragment extends Fragment {
                                 lastfm.scrobbleTracks(mRelease.tracklist(), new Lastfm.LastfmWaiter() {
                                     @Override
                                     public void onResult(boolean success) {
-                                        Toast.makeText(getActivity(), "Scrobbled " + mRelease.tracklist().size() + " tracks", Toast.LENGTH_SHORT).show();
+                                        if(getActivity()!=null) {
+                                            Toast.makeText(getActivity(), "Scrobbled " + mRelease.tracklist().size() + " tracks", Toast.LENGTH_SHORT).show();
+                                        }
                                     }
                                 });
                                 //save to recentlyplayed

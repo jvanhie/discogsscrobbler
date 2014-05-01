@@ -26,4 +26,12 @@
         android:summary="@string/pref_description_enable_lastfm"
         android:defaultValue="true" />
     </PreferenceCategory>
+
+    <EditTextPreference
+        android:key="recently_played_size"
+        android:dependency="enable_lastfm"
+        android:title="Recently Played size"
+        android:summary="How many releases do you want to store in the Recently Played list?"
+        android:numeric="integer"
+        android:defaultValue="50" />
 </PreferenceScreen>
