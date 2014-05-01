@@ -199,6 +199,8 @@ public class ReleaseTracklistFragment extends ListFragment {
                             if(mRelease.images().size()>0)
                                 i.putExtra(NowPlayingService.ALBUM_ART_URL,mRelease.images().get(0).uri);
                             getActivity().startService(i);
+                            //save to recentlyplayed
+                            mDiscogs.setRecentlyPlayed(mRelease);
                             //go to the now playing activity
                             startActivity(new Intent(getActivity(), NowPlayingActivity.class));
                         }
@@ -214,6 +216,8 @@ public class ReleaseTracklistFragment extends ListFragment {
                                     clearSelection();
                                 }
                             });
+                            //save to recentlyplayed
+                            mDiscogs.setRecentlyPlayed(mRelease);
                         }
                     });
                     builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {

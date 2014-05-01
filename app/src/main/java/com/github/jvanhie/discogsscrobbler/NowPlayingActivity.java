@@ -16,6 +16,7 @@
 
 package com.github.jvanhie.discogsscrobbler;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -35,44 +36,29 @@ import android.view.View;
  * This activity is mostly just a 'shell' activity containing nothing
  * more than a {@link com.github.jvanhie.discogsscrobbler.ReleaseDetailFragment}.
  */
-public class NowPlayingActivity extends DrawerActivity {
+public class NowPlayingActivity extends DrawerActivity implements RecentlyPlayedFragment.Callbacks{
 
     private ViewPager mPager;
     private PagerAdapter mPagerAdapter;
     private NowPlayingFragment mNowPlayingFragment;
-    private long mReleaseId;
+    private RecentlyPlayedFragment mRecentlyPlayedFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_now_playing);
 
-        /*
-        if (savedInstanceState == null) {
-            // Create the release pager fragment and add it to the activity
-            // using a fragment transaction.
-            Bundle arguments = new Bundle();
-            arguments.putLong(ReleaseDetailFragment.ARG_ITEM_ID,
-                    getIntent().getLongExtra(ReleaseDetailFragment.ARG_ITEM_ID,0));
-            ReleasePagerFragment fragment = new ReleasePagerFragment();
-            fragment.setArguments(arguments);
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.release_pager_container, fragment)
-                    .commit();
-        }
-        */
-        //add now playing fragment in a pager
+        //add now playing and recently played fragment in a pager
         mPager = (ViewPager) findViewById(R.id.now_playing_pager);
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
-        //hide de page tab as long as we don't have more to show than 1 fragment
-        findViewById(R.id.now_playing_pager_strip).setVisibility(View.GONE);
+
         //set navigation drawer
         setDrawer(R.id.now_playing_drawer_layout, R.id.now_playing_drawer, getTitle().toString(), getTitle().toString(), true);
     }
 
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
-        private final String[] titles = { "now playing"};
+        private final String[] titles = { "now playing","recently played"};
 
         public ScreenSlidePagerAdapter(FragmentManager fm) {
             super(fm);
@@ -84,13 +70,16 @@ public class NowPlayingActivity extends DrawerActivity {
                 case 0:
                     if(mNowPlayingFragment == null) mNowPlayingFragment = new NowPlayingFragment();
                     return mNowPlayingFragment;
+                case 1:
+                    if(mRecentlyPlayedFragment == null) mRecentlyPlayedFragment = new RecentlyPlayedFragment();
+                    return mRecentlyPlayedFragment;
             }
             return null;
         }
 
         @Override
         public int getCount() {
-            return 1;
+            return 2;
         }
 
 
@@ -100,5 +89,12 @@ public class NowPlayingActivity extends DrawerActivity {
             return titles[position];
         }
 
+    }
+
+    @Override
+    public void onItemSelected(long id) {
+        Intent detailIntent = new Intent(this, ReleaseDetailActivity.class);
+        detailIntent.putExtra(ReleaseDetailFragment.ARG_ITEM_ID, id);
+        startActivity(detailIntent);
     }
 }

@@ -176,19 +176,20 @@ public class ReleaseDetailFragment extends Fragment {
                 final Lastfm lastfm = Lastfm.getInstance(getActivity());
                 if (lastfm.isLoggedIn()) {
                     //we're in detailview, just scrobble everything
-                    final Release release = mRelease;
-                    if (release != null) {
+                    if (mRelease != null) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                        builder.setMessage("Did you just finished listening to " + release.title + " or are you about to listen to it?").setTitle("Scrobble this album?");
+                        builder.setMessage("Did you just finished listening to " + mRelease.title + " or are you about to listen to it?").setTitle("Scrobble this album?");
                         builder.setPositiveButton("About to", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 //start now playing service
                                 Intent i=new Intent(getActivity(), NowPlayingService.class);
-                                i.putParcelableArrayListExtra(NowPlayingService.TRACK_LIST, new ArrayList<Track>(release.tracklist()));
-                                i.putExtra(NowPlayingService.THUMB_URL,release.thumb);
-                                if(release.images().size()>0)
-                                    i.putExtra(NowPlayingService.ALBUM_ART_URL,release.images().get(0).uri);
+                                i.putParcelableArrayListExtra(NowPlayingService.TRACK_LIST, new ArrayList<Track>(mRelease.tracklist()));
+                                i.putExtra(NowPlayingService.THUMB_URL,mRelease.thumb);
+                                if(mRelease.images().size()>0)
+                                    i.putExtra(NowPlayingService.ALBUM_ART_URL,mRelease.images().get(0).uri);
                                 getActivity().startService(i);
+                                //save to recentlyplayed
+                                mDiscogs.setRecentlyPlayed(mRelease);
                                 //go to the now playing activity
                                 startActivity(new Intent(getActivity(), NowPlayingActivity.class));
                             }
@@ -197,12 +198,14 @@ public class ReleaseDetailFragment extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 //scrobble the tracks now
-                                lastfm.scrobbleTracks(release.tracklist(), new Lastfm.LastfmWaiter() {
+                                lastfm.scrobbleTracks(mRelease.tracklist(), new Lastfm.LastfmWaiter() {
                                     @Override
                                     public void onResult(boolean success) {
-                                        Toast.makeText(getActivity(), "Scrobbled " + release.tracklist().size() + " tracks", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getActivity(), "Scrobbled " + mRelease.tracklist().size() + " tracks", Toast.LENGTH_SHORT).show();
                                     }
                                 });
+                                //save to recentlyplayed
+                                mDiscogs.setRecentlyPlayed(mRelease);
                             }
                         });
                         builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {

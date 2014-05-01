@@ -25,6 +25,7 @@ import com.github.jvanhie.discogsscrobbler.queries.DiscogsRelease;
 import com.github.jvanhie.discogsscrobbler.util.Discogs;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -87,8 +88,10 @@ public class Release extends Model{
 
     /*transient members*/
     public boolean isTransient = false;
+    public long timestamp = 0;
     private List<Image> mImages;
     private List<Track> mTracks;
+
 
     public List<Image> images() {
         if(isTransient) {

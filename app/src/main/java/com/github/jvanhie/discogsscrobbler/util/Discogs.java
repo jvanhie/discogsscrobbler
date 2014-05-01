@@ -32,6 +32,7 @@ import com.activeandroid.query.Select;
 import com.github.jvanhie.discogsscrobbler.DiscogsLoginActivity;
 import com.github.jvanhie.discogsscrobbler.R;
 import com.github.jvanhie.discogsscrobbler.ReleaseListActivity;
+import com.github.jvanhie.discogsscrobbler.models.RecentlyPlayed;
 import com.github.jvanhie.discogsscrobbler.models.Release;
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsCollection.DiscogsBasicRelease;
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsCollection;
@@ -653,6 +654,21 @@ public class Discogs extends ContextWrapper {
                 }
             });
         }
+    }
+
+    /*recentlyplayed functions - behind the scenes they use a more lightweight object (RecentlyPlayed) for db persistence*/
+    public void setRecentlyPlayed(Release r) {
+        RecentlyPlayed recent = new RecentlyPlayed(r);
+        recent.save();
+    }
+
+    public List<Release> getRecentlyPlayed() {
+        ArrayList<Release> releases = new ArrayList<Release>();
+        List<RecentlyPlayed> recent = new Select().from(RecentlyPlayed.class).orderBy("timestamp DESC").execute();
+        for(RecentlyPlayed r : recent) {
+            releases.add(r.getRelease());
+        }
+        return releases;
     }
 
     public void refreshCollection(final DiscogsWaiter waiter) {
