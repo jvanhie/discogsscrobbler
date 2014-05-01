@@ -73,12 +73,13 @@ public class ReleaseAdapter extends BaseAdapter implements Filterable, SectionIn
     private void updateAlphaIndex() {
         ArrayList<String> sections = new ArrayList<String>();
         ArrayList<Integer> sectionValues = new ArrayList<Integer>();
-        String currSection = "";
+        Character currSection = Character.UNASSIGNED;
 
         for (int i = 0; i < mReleases.size(); i++) {
-            String ch = mReleases.get(i).artist.substring(0, 1).toUpperCase();
+            Character ch = mReleases.get(i).artist.substring(0, 1).toUpperCase().charAt(0);
+            if(!Character.isLetter(ch)) ch = '#';
             if (!ch.equals(currSection)) {
-                sections.add(ch);
+                sections.add(ch.toString());
                 sectionValues.add(i);
                 currSection=ch;
             }
