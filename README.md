@@ -7,12 +7,13 @@ If you want to compile this app yourself, edit and copy the discogs.xml file in 
 ##Current functionality
 - manage and view your Discogs collection
 - search and browse the Discogs catalog
+- get price suggestions when checking a release
 - Scrobble releases (or just the tracks you listened to) to Last.fm
+- now playing mode (scrobbling in the future)
+- search filtering
 
 ##Coming functionality
-- now playing mode (scrobbling in the future)
 - extra info views
-- search filtering
 - multiple collection folders
 
 ##Acknowledgements
