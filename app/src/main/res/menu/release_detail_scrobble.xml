@@ -20,8 +20,8 @@
 
     <item
         android:id="@+id/detail_scrobble_release"
-        android:icon="@android:drawable/ic_media_play"
-        android:showAsAction="collapseActionView|ifRoom"
+        android:icon="@drawable/ic_action_play"
+        android:showAsAction="ifRoom"
         android:title="Scrobble release"/>
 
 

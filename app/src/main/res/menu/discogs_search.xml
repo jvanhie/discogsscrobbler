@@ -21,18 +21,18 @@
     
     <item android:id="@+id/search_field"
         android:title="Search"
-        android:icon="@android:drawable/ic_menu_search"
+        android:icon="@drawable/ic_action_search"
         android:showAsAction="collapseActionView|ifRoom"
         android:actionViewClass="android.widget.SearchView" />
 
     <item android:id="@+id/search_barcode"
         android:title="Scan Barcode"
-        android:icon="@android:drawable/ic_menu_camera"
+        android:icon="@drawable/ic_action_camera"
         android:showAsAction="ifRoom" />
 
     <item android:id="@+id/search_filter"
         android:title="Filter results"
-        android:icon="@android:drawable/ic_menu_sort_by_size"
+        android:icon="@drawable/ic_action_sort_by_size"
         android:showAsAction="collapseActionView|ifRoom"
         android:actionViewClass="android.widget.Spinner"/>
 </menu>

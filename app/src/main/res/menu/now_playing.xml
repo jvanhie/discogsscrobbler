@@ -20,19 +20,19 @@
 
     <item
         android:id="@+id/now_playing_play"
-        android:icon="@android:drawable/ic_media_play"
+        android:icon="@drawable/ic_action_play"
         android:showAsAction="ifRoom"
         android:title="Play"/>
 
     <item
         android:id="@+id/now_playing_pause"
-        android:icon="@android:drawable/ic_media_pause"
+        android:icon="@drawable/ic_action_pause"
         android:showAsAction="ifRoom"
         android:title="Pause"/>
 
     <item
         android:id="@+id/now_playing_stop"
-        android:icon="@android:drawable/ic_menu_close_clear_cancel"
+        android:icon="@drawable/ic_action_stop"
         android:showAsAction="ifRoom"
         android:title="Clear playlist"/>
 

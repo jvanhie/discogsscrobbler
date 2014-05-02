@@ -20,7 +20,7 @@
 
     <item
         android:id="@+id/detail_add_to_discogs"
-        android:icon="@android:drawable/ic_menu_save"
-        android:showAsAction="collapseActionView|ifRoom"
+        android:icon="@drawable/ic_action_save"
+        android:showAsAction="ifRoom"
         android:title="Add to your collection"/>
 </menu>

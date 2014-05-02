@@ -51,11 +51,11 @@
 
     <!-- Nav Drawer List Item Icons -->
     <array name="nav_drawer_icons">
-        <item>@android:drawable/ic_dialog_dialer</item>
-        <item>@android:drawable/ic_menu_search</item>
-        <item>@android:drawable/ic_media_play</item>
-        <item>@android:drawable/ic_menu_manage</item>
-        <item>@android:drawable/ic_menu_help</item>
+        <item>@drawable/ic_drawer_collection</item>
+        <item>@drawable/ic_drawer_search</item>
+        <item>@drawable/ic_drawer_play</item>
+        <item>@drawable/ic_drawer_settings</item>
+        <item>@drawable/ic_drawer_help</item>
     </array>
 
     <string-array name="search_filter_items">

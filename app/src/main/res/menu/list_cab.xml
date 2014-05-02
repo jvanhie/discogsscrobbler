@@ -20,15 +20,15 @@
 
         <item
             android:id="@+id/reload_release"
-            android:icon="@android:drawable/ic_popup_sync"
+            android:icon="@drawable/ic_action_refresh"
             android:title="Reload release"/>
         <item
             android:id="@+id/delete_release"
-            android:icon="@android:drawable/ic_menu_delete"
+            android:icon="@drawable/ic_action_discard"
             android:title="Delete release"/>
         <item
             android:id="@+id/cancel_selection"
-            android:icon="@android:drawable/ic_menu_close_clear_cancel"
+            android:icon="@drawable/abc_ic_clear"
             android:title="Cancel selection"/>
 
 </menu>
