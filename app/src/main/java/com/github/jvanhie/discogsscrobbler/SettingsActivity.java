@@ -36,6 +36,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.text.TextUtils;
+import android.view.MenuItem;
 
 
 import com.github.jvanhie.discogsscrobbler.util.Discogs;
@@ -97,7 +98,8 @@ public class SettingsActivity extends PreferenceActivity {
             }
         });
 
-
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setHomeButtonEnabled(true);
 
     }
 
@@ -185,6 +187,15 @@ public class SettingsActivity extends PreferenceActivity {
 
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == android.R.id.home) {
+            //up button pressed, in the detailview we want this implemented as back (goes to certain selected item in release or search list)
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     /** {@inheritDoc} */
     @Override

@@ -661,6 +661,17 @@ public class Discogs extends ContextWrapper {
     public void setRecentlyPlayed(Release r) {
         RecentlyPlayed recent = new RecentlyPlayed(r);
         recent.save();
+        /*hook into the recently played function to add missing releases to the collection*/
+        if(PreferenceManager.getDefaultSharedPreferences(mContext).getBoolean("release_auto_add",false)) {
+            addRelease(r.releaseid, new DiscogsWaiter() {
+                @Override
+                public void onResult(boolean success) {
+                    if(success) {
+                        Toast.makeText(mContext, "Added release to your Discogs collection", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }
     }
 
     //TODO: maybe this could get a bit heavy for the main thread, make async?
