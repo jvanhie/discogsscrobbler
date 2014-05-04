@@ -2,7 +2,7 @@ Discogs Scrobbler
 =================
 
 View and manage your Discogs collection, with scrobbling support to Last.fm
-If you want to compile this app yourself, edit and copy the discogs.xml file in the root of this project to the /res/values/ folder with your Discogs API key and secret.
+If you want to compile this app yourself, edit and copy the discogs.xml and lastfm.xml file in the root of this project to the /res/values/ folder with your Discogs API key and secret.
 
 ##Current functionality
 - manage and view your Discogs collection
