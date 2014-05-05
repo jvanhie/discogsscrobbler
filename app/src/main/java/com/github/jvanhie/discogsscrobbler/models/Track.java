@@ -113,4 +113,30 @@ public class Track extends Model implements Parcelable{
             return new Track[i];
         }
     };
+
+    /*static formatting functions*/
+    public static int formatDurationToSeconds(String duration) {
+        int defaultDuration = 0;
+        if(duration != null && !duration.equals("") && duration.contains(":")) {
+            try {
+                String[] tokens = duration.split(":");
+                int minutes = Integer.parseInt(tokens[0]);
+                int seconds = Integer.parseInt(tokens[1]);
+                return (60 * minutes + seconds);
+            } catch (NumberFormatException e) {
+            }
+        }
+        return defaultDuration;
+    }
+
+    public static String formatDurationToString(int duration) {
+        String format = null;
+        if(duration > 0) {
+            //discogs uses a fixed string representation of duration: mm:ss
+            int minutes = (int) Math.floor((double)duration/60.0);
+            int seconds = duration%60;
+            format = minutes+":"+seconds;
+        }
+        return  format;
+    }
 }

@@ -20,7 +20,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.AsyncTask;
@@ -28,9 +27,7 @@ import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.Toast;
 
-import com.github.jvanhie.discogsscrobbler.DiscogsLoginActivity;
 import com.github.jvanhie.discogsscrobbler.R;
 import com.github.jvanhie.discogsscrobbler.models.Track;
 
@@ -49,6 +46,8 @@ import de.umass.lastfm.scrobble.ScrobbleResult;
  * Created by Jono on 03/04/2014.
  */
 public class Lastfm extends ContextWrapper {
+
+    public static int DEFAULT_TRACK_DURATION = 180;
 
     private Caller mLastfm;
     private Context mContext;
@@ -114,7 +113,10 @@ public class Lastfm extends ContextWrapper {
                 String title = track.title;
                 String album = track.album;
                 String artist = track.artist;
-                int duration = Discogs.formatDurationToSeconds(track.duration);
+                int duration = Track.formatDurationToSeconds(track.duration);
+                if(duration==0) {
+                    duration= DEFAULT_TRACK_DURATION;
+                }
                 ScrobbleData data = new ScrobbleData();
                 data.setArtist(artist);
                 data.setTrack(title);
@@ -181,7 +183,8 @@ public class Lastfm extends ContextWrapper {
         int time = (int) (System.currentTimeMillis() / 1000);
         int[] times = new int[trackList.size()];
         for (int i = trackList.size()-1; i >= 0; --i) {
-            int length = Discogs.formatDurationToSeconds(trackList.get(i).duration);
+            int length = Track.formatDurationToSeconds(trackList.get(i).duration);
+            if(length==0) length = DEFAULT_TRACK_DURATION;
             time -= length;
             times[i] = time;
         }
@@ -192,7 +195,7 @@ public class Lastfm extends ContextWrapper {
                     if (!success) allSuccess.set(false);
                     int updates = ctr.incrementAndGet();
                     if (updates == total) {
-                        //all updates done, return total result and remove releases from the db
+                        //all updates done, return total result
                         waiter.onResult(allSuccess.get());
                     }
                 }
@@ -209,6 +212,49 @@ public class Lastfm extends ContextWrapper {
             }
         }
         return filtered;
+    }
+
+    public void getDuration(List<Track> trackList, final LastfmWaiter waiter) {
+        //only keep real tracks
+        trackList = filterTracks(trackList);
+        final AtomicInteger ctr = new AtomicInteger(0);
+        final int total = trackList.size();
+        for (int i = 0 ; i < trackList.size() ; i++) {
+            getDuration(trackList.get(i), new LastfmWaiter() {
+                @Override
+                public void onResult(boolean success) {
+                    if (ctr.incrementAndGet() == total) {
+                        //all updates done, notify waiter
+                        waiter.onResult(true);
+                    }
+                }
+            });
+        }
+    }
+
+    public void getDuration(final Track track, final LastfmWaiter waiter ) {
+        AsyncTask<Void,Void,Boolean> t = new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... voids) {
+                de.umass.lastfm.Track info = de.umass.lastfm.Track.getInfo(track.artist,track.title,API_KEY);
+                track.duration=Track.formatDurationToString(info.getDuration());
+                //currently errors seem to be caught by the last.fm library, so only success will follow
+                return true;
+            }
+
+            @Override
+            protected void onPostExecute(Boolean result) {
+                super.onPostExecute(result);
+                waiter.onResult(result);
+            }
+
+        };
+        if(Track.formatDurationToSeconds(track.duration)!=0) {
+            //we already have a valid duration, no need to query it (indicate it by returning false)
+            waiter.onResult(false);
+        } else {
+            t.execute();
+        }
     }
 
     public void getSession(final String username, final String password) {

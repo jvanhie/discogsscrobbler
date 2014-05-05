@@ -200,30 +200,40 @@ public class NowPlayingService extends Service {
         album = track.album;
         currentTrack = trackNumber;
         mNotificationBuilder.setContentTitle(track.title).setContentText(track.artist + " - " + track.album).setWhen(System.currentTimeMillis()).setSmallIcon(android.R.drawable.ic_media_play);
-        //set nowplaying, scrobbling happens on the alarm callback
-        mLastfm.updateNowPlaying(track,new Lastfm.LastfmWaiter() {
+        //fetch the duration (will return immediately when available) and start the alarm for when it's done
+        mLastfm.getDuration(track, new Lastfm.LastfmWaiter() {
             @Override
             public void onResult(boolean success) {
-                //the user already sees the notification, no need for extras notifications atm.
+                //set nowplaying, scrobbling happens on the alarm callback
+                mLastfm.updateNowPlaying(track,new Lastfm.LastfmWaiter() {
+                    @Override
+                    public void onResult(boolean success) {
+                        //the user already sees the notification, no need for extras notifications atm.
+                    }
+                });
+
+                //notify user
+                startForeground(NOTIFICATION_ID, mNotificationBuilder.build());
+                //update listeners to track change
+                sendBroadcast(new Intent(TRACK_CHANGE));
+
+                Intent intent = new Intent(NowPlayingService.this, NowPlayingAlarm.class);
+                if(trackNumber < trackList.size()-1) {
+                    intent.putExtra(NEXT_TRACK_ID, (trackNumber + 1));
+                    intent.putExtra(NEXT_TRACK_TITLE, trackList.get(trackNumber + 1).title);
+                } else {
+                    //this is the last track, alarm will be used to stop the service (by issuing pos = -1 and title = first song title)
+                    intent.putExtra(NEXT_TRACK_ID, -1);
+                    intent.putExtra(NEXT_TRACK_TITLE, trackList.get(0).title);
+                }
+                int duration = Track.formatDurationToSeconds(track.duration);
+                if(duration == 0 ) duration = Lastfm.DEFAULT_TRACK_DURATION;
+                mAlarmIntent = PendingIntent.getBroadcast(NowPlayingService.this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+                mAlarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + duration * 1000, mAlarmIntent);
+
             }
         });
 
-        //notify user
-        startForeground(NOTIFICATION_ID, mNotificationBuilder.build());
-        //update listeners to track change
-        sendBroadcast(new Intent(TRACK_CHANGE));
-
-        Intent intent = new Intent(this, NowPlayingAlarm.class);
-        if(trackNumber < trackList.size()-1) {
-            intent.putExtra(NEXT_TRACK_ID, (trackNumber + 1));
-            intent.putExtra(NEXT_TRACK_TITLE, trackList.get(trackNumber + 1).title);
-        } else {
-            //this is the last track, alarm will be used to stop the service (by issuing pos = -1 and title = first song title)
-            intent.putExtra(NEXT_TRACK_ID, -1);
-            intent.putExtra(NEXT_TRACK_TITLE, trackList.get(0).title);
-        }
-        mAlarmIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-        mAlarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + mDiscogs.formatDurationToSeconds(track.duration) * 1000, mAlarmIntent);
     }
 
     public void resume() {

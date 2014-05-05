@@ -277,19 +277,7 @@ public class Discogs extends ContextWrapper {
         return ret;
     }
 
-    public static int formatDurationToSeconds(String duration) {
-        int defaultDuration = 180;
-        if(duration != null && !duration.equals("") && duration.contains(":")) {
-            try {
-                String[] tokens = duration.split(":");
-                int minutes = Integer.parseInt(tokens[0]);
-                int seconds = Integer.parseInt(tokens[1]);
-                return (60 * minutes + seconds);
-            } catch (NumberFormatException e) {
-            }
-        }
-        return defaultDuration;
-    }
+
 
     //Code reused from Jollybox's VinylScrobbler, thanks!
     public static String removeNumberFromArtist (String artist) {
