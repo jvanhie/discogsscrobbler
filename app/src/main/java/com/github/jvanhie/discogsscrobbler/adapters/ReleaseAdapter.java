@@ -67,7 +67,17 @@ public class ReleaseAdapter extends BaseAdapter implements Filterable, SectionIn
         mUnfilteredReleases = new ArrayList<Release>(releases);
         updateAlphaIndex();
         //create universal image loader
-        initImageLoader();
+        mImageLoader = ImageLoader.getInstance();
+        DisplayImageOptions options = new DisplayImageOptions.Builder()
+                .showStubImage(R.drawable.default_release)
+                .cacheInMemory()
+                .cacheOnDisc()
+                .build();
+        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(mContext)
+                .defaultDisplayImageOptions(options)
+                .imageDownloader(new DiscogsImageDownloader(Discogs.getInstance(mContext)))
+                .build();
+        mImageLoader.init(config);
     }
 
     private void updateAlphaIndex() {
@@ -91,20 +101,6 @@ public class ReleaseAdapter extends BaseAdapter implements Filterable, SectionIn
         mSectionValues=new Integer[sectionValues.size()];
         sectionValues.toArray(mSectionValues);
 
-    }
-
-    private void initImageLoader() {
-        mImageLoader = ImageLoader.getInstance();
-        DisplayImageOptions options = new DisplayImageOptions.Builder()
-                .showStubImage(R.drawable.default_release)
-                .cacheInMemory()
-                .cacheOnDisc()
-                .build();
-        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(mContext)
-                .defaultDisplayImageOptions(options)
-                .imageDownloader(new DiscogsImageDownloader(Discogs.getInstance(mContext)))
-                .build();
-        mImageLoader.init(config);
     }
 
     public int getCount() {
@@ -193,8 +189,6 @@ public class ReleaseAdapter extends BaseAdapter implements Filterable, SectionIn
         mReleases = releases;
         mUnfilteredReleases = new ArrayList<Release>(mReleases);
         updateAlphaIndex();
-        //TODO: DO we really need to reinit imageloader?
-        initImageLoader();
         notifyDataSetChanged();
     }
 
