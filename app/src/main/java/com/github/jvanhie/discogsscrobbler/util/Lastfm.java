@@ -137,6 +137,50 @@ public class Lastfm extends ContextWrapper {
         t.execute();
     }
 
+    public void stopNowPlaying(final Track track) {
+        if(track != null) {
+            stopNowPlaying(track, new LastfmWaiter() {
+                @Override
+                public void onResult(boolean success) {
+                    //do nothing
+                }
+            });
+        }
+    }
+
+    public void stopNowPlaying(final Track track, final LastfmWaiter waiter) {
+        if(mSession==null) {
+            waiter.onResult(false);
+            return;
+        }
+
+        AsyncTask<Void,Void,Boolean> t = new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... voids) {
+                String title = track.title;
+                String album = track.album;
+                String artist = track.artist;
+                int duration = 0;
+                ScrobbleData data = new ScrobbleData();
+                data.setArtist(artist);
+                data.setTrack(title);
+                data.setAlbum(album);
+                data.setDuration(duration);
+                ScrobbleResult result = de.umass.lastfm.Track.updateNowPlaying(data, mSession);
+                boolean success = (result.isSuccessful() && !result.isIgnored());
+                return success;
+            }
+
+            @Override
+            protected void onPostExecute(Boolean result) {
+                super.onPostExecute(result);
+                waiter.onResult(result);
+            }
+
+        };
+        t.execute();
+    }
+
     public void scrobbleTrack(final Track track, final int time, final LastfmWaiter waiter) {
         if(mSession==null) {
             waiter.onResult(false);

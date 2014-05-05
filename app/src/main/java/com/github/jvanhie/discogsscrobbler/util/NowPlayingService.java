@@ -250,6 +250,8 @@ public class NowPlayingService extends Service {
                 mAlarmIntent.cancel();
             }
             isPlaying=false;
+            //notify last.fm as well
+            mLastfm.stopNowPlaying(track);
             //change notifaction
             mNotificationBuilder.setWhen(System.currentTimeMillis()).setSmallIcon(android.R.drawable.ic_media_pause);
             startForeground(NOTIFICATION_ID, mNotificationBuilder.build());
@@ -263,6 +265,9 @@ public class NowPlayingService extends Service {
                 mAlarmManager.cancel(mAlarmIntent);
                 mAlarmIntent.cancel();
             }
+
+            //notify last.fm as well
+            mLastfm.stopNowPlaying(track);
 
             if(trackList!=null) trackList.clear();
             isPlaying = false;

@@ -135,7 +135,8 @@ public class Track extends Model implements Parcelable{
             //discogs uses a fixed string representation of duration: mm:ss
             int minutes = (int) Math.floor((double)duration/60.0);
             int seconds = duration%60;
-            format = minutes+":"+seconds;
+            String secondsPre = seconds <10? "0" : "";
+            format = minutes+":"+secondsPre+seconds;
         }
         return  format;
     }
