@@ -22,6 +22,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.github.jvanhie.discogsscrobbler.R;
@@ -82,6 +83,7 @@ public class TrackListAdapter extends BaseAdapter {
         TextView pos = (TextView) view.findViewById(R.id.track_pos);
         TextView duration = (TextView) view.findViewById(R.id.track_duration);
         TextView name = (TextView) view.findViewById(R.id.track_name);
+        ImageView playing = (ImageView) view.findViewById(R.id.track_playing);
 
         Track track = mTracklist.get(i);
         pos.setText(track.position);
@@ -106,11 +108,13 @@ public class TrackListAdapter extends BaseAdapter {
             pos.setTextColor(Color.LTGRAY);
             name.setTextColor(Color.LTGRAY);
             duration.setTextColor(Color.LTGRAY);
-        } else if (i==mNowPlaying) {
+        }
+
+        if (i==mNowPlaying) {
             //we're the currently played song, do something fun!
-            pos.setTextColor(Color.BLUE);
-            name.setTextColor(Color.BLUE);
-            duration.setTextColor(Color.BLUE);
+            playing.setVisibility(View.VISIBLE);
+        } else {
+            playing.setVisibility(View.GONE);
         }
 
         return view;
