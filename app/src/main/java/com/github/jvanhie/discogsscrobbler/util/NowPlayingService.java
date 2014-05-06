@@ -62,6 +62,10 @@ public class NowPlayingService extends Service {
     public String artist;
     public String album;
     public Track track;
+
+    //variables to maintain paused position
+    private long mTrackStart;
+    private int mTrackDone = 0;
     
     private ImageLoader mImageLoader;
     private Discogs mDiscogs;
@@ -128,6 +132,7 @@ public class NowPlayingService extends Service {
                         //the user already sees the notification, no need for extras notifications atm.
                     }
                 });
+                mTrackDone = 0;
 
                 if (pos == -1 && trackList.get(0).title.equals(title)) {
                     //stop requested
@@ -226,10 +231,12 @@ public class NowPlayingService extends Service {
                     intent.putExtra(NEXT_TRACK_ID, -1);
                     intent.putExtra(NEXT_TRACK_TITLE, trackList.get(0).title);
                 }
+                mTrackStart = SystemClock.elapsedRealtime();
                 int duration = Track.formatDurationToSeconds(track.duration);
                 if(duration == 0 ) duration = Lastfm.DEFAULT_TRACK_DURATION;
+                if(mTrackDone != 0) duration -= mTrackDone;
                 mAlarmIntent = PendingIntent.getBroadcast(NowPlayingService.this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-                mAlarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + duration * 1000, mAlarmIntent);
+                mAlarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, mTrackStart + duration * 1000, mAlarmIntent);
 
             }
         });
@@ -250,6 +257,9 @@ public class NowPlayingService extends Service {
                 mAlarmIntent.cancel();
             }
             isPlaying=false;
+            //calculate how much of the track we have already played in ms and add it to the done variable in s
+            long diff = SystemClock.elapsedRealtime()-mTrackStart;
+            mTrackDone += diff/1000;
             //notify last.fm as well
             mLastfm.stopNowPlaying(track);
             //change notifaction
