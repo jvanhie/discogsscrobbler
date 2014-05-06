@@ -25,18 +25,24 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
+import android.util.SparseBooleanArray;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.github.jvanhie.discogsscrobbler.adapters.TrackListAdapter;
+import com.github.jvanhie.discogsscrobbler.models.Release;
+import com.github.jvanhie.discogsscrobbler.models.Track;
 import com.github.jvanhie.discogsscrobbler.util.Discogs;
 import com.github.jvanhie.discogsscrobbler.util.DiscogsImageDownloader;
 import com.github.jvanhie.discogsscrobbler.util.NowPlayingService;
@@ -44,6 +50,11 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * A fragment representing a single Release detail screen.
@@ -197,16 +208,129 @@ public class NowPlayingFragment extends Fragment {
         /*initiate list with tracklist*/
         if(mService.trackList != null && mTrackListAdapter == null) {
             mTrackListAdapter = new TrackListAdapter(getActivity(),mService.trackList);
-            ((ListView) mRootView.findViewById(R.id.now_playing_tracklist)).setAdapter(mTrackListAdapter);
+            ListView list = ((ListView) mRootView.findViewById(R.id.now_playing_tracklist));
+            list.setAdapter(mTrackListAdapter);
+            setSelection(list);
         }
 
         //set the currently playing track and status
         if(mTrackListAdapter != null) {
+            if(mTrackListAdapter.getCount() != mService.trackList.size()) {
+                mTrackListAdapter = new TrackListAdapter(getActivity(),mService.trackList);
+                ((ListView) mRootView.findViewById(R.id.now_playing_tracklist)).setAdapter(mTrackListAdapter);
+            }
             mTrackListAdapter.setNowPlaying(mService.currentTrack);
             mTrackListAdapter.notifyDataSetChanged();
         }
 
         setMenuVisibility();
+    }
+
+    private void setSelection(final ListView list) {
+        list.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
+        list.setSelector(R.drawable.track_selector);
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                if(mBound) {
+                    //fully stop previous playlist since we start again from the beginning of the selected track
+                    ArrayList<Track> trackList = new ArrayList<Track>(mService.trackList);
+                    mService.stop();
+                    mService.trackList= trackList;
+                    mService.currentTrack = i;
+                    mService.resume();
+                }
+            }
+        });
+        list.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
+            @Override
+            public void onItemCheckedStateChanged(ActionMode actionMode, int i, long l, boolean b) {
+
+            }
+
+            @Override
+            public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+                MenuInflater inflater = getActivity().getMenuInflater();
+                inflater.inflate(R.menu.now_playing_cab, menu);
+                return true;
+            }
+
+            @Override
+            public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+                return false;
+            }
+
+            @Override
+            public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+                SparseBooleanArray checkedItems = list.getCheckedItemPositions();
+                final List<Integer> positions = new ArrayList<Integer>();
+                if (checkedItems != null) {
+                    for (int i=0; i<checkedItems.size(); i++) {
+                        if (checkedItems.valueAt(i)) {
+                            positions.add(checkedItems.keyAt(i));
+                        }
+                    }
+                }
+                switch(menuItem.getItemId()) {
+                    case R.id.play_selection:
+                        if(mBound) {
+                            //change tracklist and start over again
+                            ArrayList<Track> newTrackList = new ArrayList<Track>();
+                            for(Integer i : positions) {
+                                newTrackList.add(mService.trackList.get(i));
+                            }
+                            //fully stop previous playlist since we start again from the beginning
+                            mService.stop();
+                            mService.trackList=newTrackList;
+                            mService.currentTrack=0;
+                            mService.resume();
+                        }
+                        actionMode.finish();
+                        break;
+                    case R.id.remove_selection:
+                        int currPlaying = mService.currentTrack;
+                        int newPlaying = -1;
+                        //change tracklist and start over again
+                        ArrayList<Track> newTrackList = new ArrayList<Track>();
+                        for(int i = 0 ; i < mService.trackList.size(); i++) {
+                            if(!positions.contains(i)) {
+                                newTrackList.add(mService.trackList.get(i));
+                            }
+                            //calculate new currently playing counter
+                            if(i == currPlaying) {
+                                if(positions.contains(i)) {
+                                    currPlaying++;
+                                } else {
+                                    newPlaying = newTrackList.size()-1;
+                                }
+                            }
+                        }
+                        //the currently playing track was removed, start fresh from the next available
+                        if(currPlaying != mService.currentTrack) {
+                            mService.stop();
+                            if(newPlaying!=-1) {
+                                mService.trackList=newTrackList;
+                                mService.currentTrack=newPlaying;
+                                mService.resume();
+                            }
+                        } else {
+                            //pause the playlist and resume with the new tracklist
+                            mService.pause();
+                            mService.trackList=newTrackList;
+                            mService.currentTrack=newPlaying;
+                            mService.resume();
+                        }
+                        actionMode.finish();
+                        break;
+                }
+                return false;
+            }
+
+            @Override
+            public void onDestroyActionMode(ActionMode actionMode) {
+
+            }
+        });
     }
 
     private void setMenuVisibility() {

@@ -59,6 +59,7 @@ public class NowPlayingService extends Service {
     public List<Track> trackList;
     public int currentTrack;
     public String albumArtURL;
+    public String thumb;
     public String artist;
     public String album;
     public Track track;
@@ -147,7 +148,7 @@ public class NowPlayingService extends Service {
         } else {
             /*we have received a playlist, start playing*/
             trackList = intent.getParcelableArrayListExtra(TRACK_LIST);
-            String thumb = intent.getStringExtra(THUMB_URL);
+            thumb = intent.getStringExtra(THUMB_URL);
             albumArtURL = intent.getStringExtra(ALBUM_ART_URL);
             currentTrack = 0;
             /*first try to load the album art, then start playing*/
