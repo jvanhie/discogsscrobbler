@@ -37,6 +37,7 @@ public class TrackListAdapter extends BaseAdapter {
     private List<Track> mTracklist;
     private Context mContext;
     private int mNowPlaying = -1;
+    private boolean mIsNowPlaying = true;
     private boolean mIsMultiArtist = false;
 
     public TrackListAdapter(Context context, List<Track> trackList) {
@@ -56,6 +57,10 @@ public class TrackListAdapter extends BaseAdapter {
 
     public void setNowPlaying(int nowPlaying) {
         mNowPlaying = nowPlaying;
+    }
+
+    public void setIsNowPlaying(boolean isNowPlaying) {
+        mIsNowPlaying = isNowPlaying;
     }
 
     @Override
@@ -111,8 +116,14 @@ public class TrackListAdapter extends BaseAdapter {
         }
 
         if (i==mNowPlaying) {
-            //we're the currently played song, do something fun!
+            //we're the currently played song, indicate it in the tracklist
+            if(mIsNowPlaying) {
+                playing.setImageResource(R.drawable.now_playing_play);
+            } else {
+                playing.setImageResource(R.drawable.now_playing_pause);
+            }
             playing.setVisibility(View.VISIBLE);
+
         } else {
             playing.setVisibility(View.GONE);
         }

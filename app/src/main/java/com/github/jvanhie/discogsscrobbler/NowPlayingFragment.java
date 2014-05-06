@@ -200,7 +200,7 @@ public class NowPlayingFragment extends Fragment {
             ((ListView) mRootView.findViewById(R.id.now_playing_tracklist)).setAdapter(mTrackListAdapter);
         }
 
-        //set the currently playing track
+        //set the currently playing track and status
         if(mTrackListAdapter != null) {
             mTrackListAdapter.setNowPlaying(mService.currentTrack);
             mTrackListAdapter.notifyDataSetChanged();
@@ -217,6 +217,9 @@ public class NowPlayingFragment extends Fragment {
             mPauseMenu.setVisible(false);
             mStopMenu.setVisible(false);
             if (mBound) {
+                //best place to set the now playing status of the tracklist
+                mTrackListAdapter.setIsNowPlaying(mService.isPlaying);
+                mTrackListAdapter.notifyDataSetChanged();
 
                 //if there's a playlist -> allow to clear it
                 if (mService.trackList != null && mService.trackList.size() > 0) {

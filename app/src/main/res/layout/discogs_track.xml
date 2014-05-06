@@ -10,7 +10,7 @@
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:gravity="center_vertical"
-        android:src="@drawable/ic_drawer_play"
+        android:src="@drawable/now_playing_play"
         android:visibility="visible"
         android:scaleType="fitCenter"
         android:layout_centerVertical="true" />
