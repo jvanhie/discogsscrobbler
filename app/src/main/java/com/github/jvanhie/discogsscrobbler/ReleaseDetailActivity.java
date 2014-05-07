@@ -45,28 +45,13 @@ import java.util.List;
  * This activity is mostly just a 'shell' activity containing nothing
  * more than a {@link ReleaseDetailFragment}.
  */
-public class ReleaseDetailActivity extends DrawerActivity {
-
-    private ViewPager mPager;
-    private PagerAdapter mPagerAdapter;
-    private ReleaseDetailFragment mDetailFragment;
-    private ReleaseTracklistFragment mTrackListFragment;
-    private long mReleaseId;
+public class ReleaseDetailActivity extends DrawerActivity implements ReleaseVersionsFragment.Callbacks{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_release_detail);
 
-        // Show the Up button in the action bar.
-        //getActionBar().setDisplayHomeAsUpEnabled(true);
-
-        /*add detail and tracklist fragment in a pager
-        mReleaseId = getIntent().getLongExtra(ReleaseDetailFragment.ARG_ITEM_ID,0);
-        mPager = (ViewPager) findViewById(R.id.detail_pager);
-        mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
-        mPager.setAdapter(mPagerAdapter);
-        */
         if (savedInstanceState == null) {
             // Create the release pager fragment and add it to the activity
             // using a fragment transaction.
@@ -91,5 +76,12 @@ public class ReleaseDetailActivity extends DrawerActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onItemSelected(long id) {
+        Intent detailIntent = new Intent(this, ReleaseDetailActivity.class);
+        detailIntent.putExtra(ReleaseDetailFragment.ARG_ITEM_ID, id);
+        startActivity(detailIntent);
     }
 }

@@ -45,6 +45,7 @@ import java.util.List;
 public class ReleasePagerFragment extends Fragment {
     private ViewPager mPager;
     private PagerAdapter mPagerAdapter;
+    private ReleaseVersionsFragment mVersionsFragment;
     private ReleaseDetailFragment mDetailFragment;
     private ReleaseTracklistFragment mTrackListFragment;
     private long mReleaseId;
@@ -68,11 +69,12 @@ public class ReleasePagerFragment extends Fragment {
         mPager = (ViewPager) rootView.findViewById(R.id.detail_pager);
         mPagerAdapter = new ScreenSlidePagerAdapter(getChildFragmentManager());
         mPager.setAdapter(mPagerAdapter);
+        mPager.setCurrentItem(1);
         return rootView;
     }
 
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
-        private final String[] titles = { "info", "tracklist"};
+        private final String[] titles = { "versions", "info", "tracklist"};
 
         public ScreenSlidePagerAdapter(FragmentManager fm) {
             super(fm);
@@ -84,10 +86,14 @@ public class ReleasePagerFragment extends Fragment {
             arguments.putLong(ReleaseDetailFragment.ARG_ITEM_ID,mReleaseId);
             switch (position) {
                 case 0:
+                    if(mVersionsFragment == null) mVersionsFragment = new ReleaseVersionsFragment();
+                    mVersionsFragment.setArguments(arguments);
+                    return mVersionsFragment;
+                case 1:
                     if(mDetailFragment == null) mDetailFragment = new ReleaseDetailFragment(true);
                     mDetailFragment.setArguments(arguments);
                     return mDetailFragment;
-                case 1:
+                case 2:
                     if(mTrackListFragment == null) mTrackListFragment = new ReleaseTracklistFragment(true);
                     mTrackListFragment.setArguments(arguments);
                     return mTrackListFragment;
@@ -97,7 +103,7 @@ public class ReleasePagerFragment extends Fragment {
 
         @Override
         public int getCount() {
-            return 2;
+            return 3;
         }
 
 

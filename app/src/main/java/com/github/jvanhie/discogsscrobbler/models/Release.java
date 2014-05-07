@@ -22,6 +22,7 @@ import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsCollection.DiscogsBasicRelease;
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsRelease;
+import com.github.jvanhie.discogsscrobbler.queries.DiscogsSearchRelease;
 import com.github.jvanhie.discogsscrobbler.util.Discogs;
 
 import java.util.ArrayList;
@@ -118,6 +119,11 @@ public class Release extends Model{
         setValues(r);
     }
 
+    public Release(DiscogsSearchRelease r) {
+        this();
+        setValues(r);
+    }
+
     public Release(DiscogsRelease r) {
         this();
         setValues(r,false);
@@ -126,6 +132,20 @@ public class Release extends Model{
     public Release(DiscogsRelease r, boolean isTransient) {
         this();
         setValues(r,isTransient);
+    }
+
+    public void setValues(DiscogsSearchRelease r) {
+        releaseid = r.id;
+        title = r.title;
+        try {
+            year = Integer.parseInt(r.year);
+        } catch (NumberFormatException ex) {}
+        resource_url=r.resource_url;
+        thumb=r.thumb;
+        artist= r.artist;
+        label= r.label;
+        format = r.format;
+        isTransient=true;
     }
 
 
