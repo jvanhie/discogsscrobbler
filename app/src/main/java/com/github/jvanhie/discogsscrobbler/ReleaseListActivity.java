@@ -150,11 +150,13 @@ public class ReleaseListActivity extends DrawerActivity
             case 1: //just start new activity with the details
                 Intent detailIntent = new Intent(this, ReleaseDetailActivity.class);
                 detailIntent.putExtra(ReleaseDetailFragment.ARG_ITEM_ID, id);
+                detailIntent.putExtra(ReleasePagerFragment.SHOW_VERSIONS, false);
                 startActivity(detailIntent);
                 break;
             case 2: //show the pager fragment next to the list
                 Bundle arguments2 = new Bundle();
                 arguments2.putLong(ReleaseDetailFragment.ARG_ITEM_ID, id);
+                arguments2.putBoolean(ReleasePagerFragment.SHOW_VERSIONS, false);
                 ReleasePagerFragment fragment = new ReleasePagerFragment();
                 fragment.setArguments(arguments2);
                 getSupportFragmentManager().beginTransaction()

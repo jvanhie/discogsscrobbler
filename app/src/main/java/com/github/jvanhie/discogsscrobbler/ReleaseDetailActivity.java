@@ -58,6 +58,7 @@ public class ReleaseDetailActivity extends DrawerActivity implements ReleaseVers
             Bundle arguments = new Bundle();
             arguments.putLong(ReleaseDetailFragment.ARG_ITEM_ID,
                     getIntent().getLongExtra(ReleaseDetailFragment.ARG_ITEM_ID,0));
+            arguments.putBoolean(ReleasePagerFragment.SHOW_VERSIONS,getIntent().getBooleanExtra(ReleasePagerFragment.SHOW_VERSIONS,true));
             ReleasePagerFragment fragment = new ReleasePagerFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()

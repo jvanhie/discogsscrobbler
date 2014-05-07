@@ -16,6 +16,7 @@
 
 package com.github.jvanhie.discogsscrobbler;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -81,6 +82,30 @@ public class NowPlayingFragment extends Fragment {
     private MenuItem mPlayMenu;
     private MenuItem mPauseMenu;
     private MenuItem mStopMenu;
+
+    private Callbacks mCallbacks = sDummyCallbacks;
+    /**
+     * A callback interface that all activities containing this fragment must
+     * implement. This mechanism allows activities to be notified of item
+     * selections.
+     */
+    public interface Callbacks {
+        /**
+         * Callback for when an item has been selected.
+         */
+        public void onReleaseSet(long id);
+    }
+
+    /**
+     * A dummy implementation of the {@link Callbacks} interface that does
+     * nothing. Used only when this fragment is not attached to an activity.
+     */
+    private static Callbacks sDummyCallbacks = new Callbacks() {
+        @Override
+        public void onReleaseSet(long id) {
+        }
+
+    };
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -223,7 +248,9 @@ public class NowPlayingFragment extends Fragment {
             mTrackListAdapter.notifyDataSetChanged();
         }
 
+        mCallbacks.onReleaseSet(mService.releaseId);
         setMenuVisibility();
+
     }
 
     private void setSelection(final ListView list) {
@@ -340,7 +367,7 @@ public class NowPlayingFragment extends Fragment {
             mPlayMenu.setVisible(false);
             mPauseMenu.setVisible(false);
             mStopMenu.setVisible(false);
-            if (mBound) {
+            if (mBound && mTrackListAdapter != null) {
                 //best place to set the now playing status of the tracklist
                 mTrackListAdapter.setIsNowPlaying(mService.isPlaying);
                 mTrackListAdapter.notifyDataSetChanged();
@@ -412,5 +439,25 @@ public class NowPlayingFragment extends Fragment {
             getActivity().unbindService(mConnection);
             mBound = false;
         }
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        // Activities containing this fragment must implement its callbacks.
+        if (!(activity instanceof Callbacks)) {
+            throw new IllegalStateException("Activity must implement fragment's callbacks.");
+        }
+
+        mCallbacks = (Callbacks) activity;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+
+        // Reset the active callbacks interface to the dummy implementation.
+        mCallbacks = sDummyCallbacks;
     }
 }

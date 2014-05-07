@@ -13,7 +13,6 @@ If you want to compile this app yourself, edit and copy the discogs.xml and last
 - search filtering
 
 ##Coming functionality
-- extra info views
 - multiple collection folders
 
 ##Acknowledgements

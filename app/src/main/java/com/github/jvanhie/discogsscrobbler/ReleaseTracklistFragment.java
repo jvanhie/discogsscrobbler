@@ -196,6 +196,7 @@ public class ReleaseTracklistFragment extends ListFragment {
                             Intent i=new Intent(getActivity(), NowPlayingService.class);
                             i.putParcelableArrayListExtra(NowPlayingService.TRACK_LIST, new ArrayList<Track>(tracks));
                             i.putExtra(NowPlayingService.THUMB_URL,mRelease.thumb);
+                            i.putExtra(NowPlayingService.RELEASE_ID,mRelease.releaseid);
                             if(mRelease.images().size()>0)
                                 i.putExtra(NowPlayingService.ALBUM_ART_URL,mRelease.images().get(0).uri);
                             getActivity().startService(i);

@@ -43,12 +43,17 @@ import java.util.List;
  * Created by Jono on 04/04/2014.
  */
 public class ReleasePagerFragment extends Fragment {
+
+    public static String SHOW_VERSIONS =" show_versions";
+
     private ViewPager mPager;
     private PagerAdapter mPagerAdapter;
     private ReleaseVersionsFragment mVersionsFragment;
     private ReleaseDetailFragment mDetailFragment;
     private ReleaseTracklistFragment mTrackListFragment;
+
     private long mReleaseId;
+    private boolean mShowVersions;
 
 
     public ReleasePagerFragment() {
@@ -58,6 +63,7 @@ public class ReleasePagerFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mReleaseId = getArguments().getLong(ReleaseDetailFragment.ARG_ITEM_ID,0);
+        mShowVersions = getArguments().getBoolean(SHOW_VERSIONS,true);
     }
 
     @Override
@@ -65,16 +71,18 @@ public class ReleasePagerFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_release_pager, container, false);
 
-        //add detail and tracklist fragment in a pager
+        //add fragment in a pager
         mPager = (ViewPager) rootView.findViewById(R.id.detail_pager);
         mPagerAdapter = new ScreenSlidePagerAdapter(getChildFragmentManager());
         mPager.setAdapter(mPagerAdapter);
-        mPager.setCurrentItem(1);
+        if(mShowVersions) {
+            mPager.setCurrentItem(1);
+        }
         return rootView;
     }
 
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
-        private final String[] titles = { "versions", "info", "tracklist"};
+        private String[] titles = { "versions", "info", "tracklist"};
 
         public ScreenSlidePagerAdapter(FragmentManager fm) {
             super(fm);
@@ -84,6 +92,8 @@ public class ReleasePagerFragment extends Fragment {
         public Fragment getItem(int position) {
             Bundle arguments = new Bundle();
             arguments.putLong(ReleaseDetailFragment.ARG_ITEM_ID,mReleaseId);
+            //hackish way of not showing the first fragment
+            if(!mShowVersions) position++;
             switch (position) {
                 case 0:
                     if(mVersionsFragment == null) mVersionsFragment = new ReleaseVersionsFragment();
@@ -103,14 +113,16 @@ public class ReleasePagerFragment extends Fragment {
 
         @Override
         public int getCount() {
-            return 3;
+            if(!mShowVersions) return 2;
+            else return 3;
         }
 
 
 
         @Override
         public CharSequence getPageTitle(int position) {
-            return titles[position];
+            if(!mShowVersions) return titles[position+1];
+            else return titles[position];
         }
 
     }

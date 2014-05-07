@@ -47,9 +47,10 @@ public class NowPlayingService extends Service {
 
     private static int NOTIFICATION_ID = 666;
     public static String TRACK_CHANGE = "track_change" ;
-    public static String TRACK_LIST = "tracklist";
-    public static String ALBUM_ART_URL = "albumart";
+    public static String TRACK_LIST = "track_list";
+    public static String ALBUM_ART_URL = "album_art";
     public static String THUMB_URL = "thumb";
+    public static String RELEASE_ID = "release_id";
     public static String NEXT_TRACK_MODE = "next_track";
     public static String NEXT_TRACK_ID = "next_track_id";
     public static String NEXT_TRACK_TITLE = "next_track_title";
@@ -62,6 +63,7 @@ public class NowPlayingService extends Service {
     public String thumb;
     public String artist;
     public String album;
+    public long releaseId;
     public Track track;
 
     //variables to maintain paused position
@@ -150,6 +152,7 @@ public class NowPlayingService extends Service {
             trackList = intent.getParcelableArrayListExtra(TRACK_LIST);
             thumb = intent.getStringExtra(THUMB_URL);
             albumArtURL = intent.getStringExtra(ALBUM_ART_URL);
+            releaseId = intent.getLongExtra(RELEASE_ID,0);
             currentTrack = 0;
             /*first try to load the album art, then start playing*/
             mImageLoader.loadImage(this, thumb, new ImageLoadingListener() {

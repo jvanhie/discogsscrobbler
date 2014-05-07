@@ -36,12 +36,15 @@ import android.view.View;
  * This activity is mostly just a 'shell' activity containing nothing
  * more than a {@link com.github.jvanhie.discogsscrobbler.ReleaseDetailFragment}.
  */
-public class NowPlayingActivity extends DrawerActivity implements RecentlyPlayedFragment.Callbacks{
+public class NowPlayingActivity extends DrawerActivity implements RecentlyPlayedFragment.Callbacks, NowPlayingFragment.Callbacks{
 
     private ViewPager mPager;
     private PagerAdapter mPagerAdapter;
+    private ReleaseDetailFragment mDetailFragment;
     private NowPlayingFragment mNowPlayingFragment;
     private RecentlyPlayedFragment mRecentlyPlayedFragment;
+    private long mReleaseId;
+    private boolean mReleaseChanged = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,15 +53,29 @@ public class NowPlayingActivity extends DrawerActivity implements RecentlyPlayed
 
         //add now playing and recently played fragment in a pager
         mPager = (ViewPager) findViewById(R.id.now_playing_pager);
-        mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
-        mPager.setAdapter(mPagerAdapter);
-
+        setPager();
         //set navigation drawer
         setDrawer(R.id.now_playing_drawer_layout, R.id.now_playing_drawer, getTitle().toString(), getTitle().toString(), true);
     }
 
+    private void setPager() {
+        mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
+        mPager.setAdapter(mPagerAdapter);
+        if(mReleaseId!=0) {
+            mPager.setCurrentItem(1);
+        }
+    }
+
+    @Override
+    public void onReleaseSet(long id) {
+        if(mReleaseId != id) {
+            mReleaseId = id;
+            setPager();
+        }
+    }
+
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
-        private final String[] titles = { "now playing","recently played"};
+        private final String[] titles = { "info", "now playing","recently played"};
 
         public ScreenSlidePagerAdapter(FragmentManager fm) {
             super(fm);
@@ -66,11 +83,22 @@ public class NowPlayingActivity extends DrawerActivity implements RecentlyPlayed
 
         @Override
         public Fragment getItem(int position) {
+            //hackish way of skipping the info fragment if we don't have a release id
+            if(mReleaseId==0) position++;
             switch (position) {
                 case 0:
-                    if(mNowPlayingFragment == null) mNowPlayingFragment = new NowPlayingFragment();
-                    return mNowPlayingFragment;
+                        if (mDetailFragment == null) {
+                            mDetailFragment = new ReleaseDetailFragment();
+                            Bundle arguments = new Bundle();
+                            arguments.putLong(ReleaseDetailFragment.ARG_ITEM_ID, mReleaseId);
+                            mDetailFragment.setArguments(arguments);
+                        }
+                        return mDetailFragment;
                 case 1:
+                    //force recreation of now playing tracklist
+                    mNowPlayingFragment = new NowPlayingFragment();
+                    return mNowPlayingFragment;
+                case 2:
                     if(mRecentlyPlayedFragment == null) mRecentlyPlayedFragment = new RecentlyPlayedFragment();
                     return mRecentlyPlayedFragment;
             }
@@ -79,14 +107,16 @@ public class NowPlayingActivity extends DrawerActivity implements RecentlyPlayed
 
         @Override
         public int getCount() {
-            return 2;
+            if(mReleaseId==0) return 2;
+            else return 3;
         }
 
 
 
         @Override
         public CharSequence getPageTitle(int position) {
-            return titles[position];
+            if(mReleaseId==0) return titles[position+1];
+            else return titles[position];
         }
 
     }
