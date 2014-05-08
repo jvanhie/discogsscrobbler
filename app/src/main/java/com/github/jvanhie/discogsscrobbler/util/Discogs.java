@@ -33,10 +33,12 @@ import com.activeandroid.query.Select;
 import com.github.jvanhie.discogsscrobbler.DiscogsLoginActivity;
 import com.github.jvanhie.discogsscrobbler.R;
 import com.github.jvanhie.discogsscrobbler.ReleaseListActivity;
+import com.github.jvanhie.discogsscrobbler.models.Folder;
 import com.github.jvanhie.discogsscrobbler.models.RecentlyPlayed;
 import com.github.jvanhie.discogsscrobbler.models.Release;
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsCollection.DiscogsBasicRelease;
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsCollection;
+import com.github.jvanhie.discogsscrobbler.queries.DiscogsFolders;
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsIdentity;
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsPriceSuggestion;
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsRelease;
@@ -50,6 +52,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.IllegalCharsetNameException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.IllegalFormatException;
 import java.util.List;
 import java.util.Random;
@@ -95,6 +98,8 @@ public class Discogs extends ContextWrapper {
     private OAuthProvider mOAuthProvider;
     private OAuthConsumer mOAuthConsumer;
 
+    private boolean mFoldersChanged = true;
+    private List<Folder> folders;
     private List<Release> collection;
     private List<DiscogsBasicRelease> onlineCollection = new ArrayList<DiscogsBasicRelease>();
 
@@ -321,7 +326,7 @@ public class Discogs extends ContextWrapper {
     }
 
     public void isCollectionChanged(final DiscogsWaiter waiter) {
-
+        //see if releases are changed
         mDiscogsService.getCollectionLastAdded(mUserName, 0, new Callback<DiscogsCollection>() {
             @Override
             public void success(DiscogsCollection discogsCollection, Response response) {
@@ -683,6 +688,47 @@ public class Discogs extends ContextWrapper {
         return releases;
     }
 
+    public void getFolders(final DiscogsDataWaiter<List<Folder>> waiter) {
+        //also check if folders are changed
+        mDiscogsService.getFolders(mUserName, new Callback<DiscogsFolders>() {
+            @Override
+            public void success(DiscogsFolders discogsFolders, Response response) {
+                if (folders == null) loadFolders();
+                if (discogsFolders.folders.size() != folders.size()) {
+                    //number of folders has changed, clear current folders in db, mark folder state as dirty
+                    new Delete().from(Folder.class).execute();
+                    mFoldersChanged=true;
+                } else {
+                    //compare item count (trigger for folder id refresh)
+                    for (int i = 0 ; i < folders.size(); i++) {
+                        if(folders.get(i).count!=discogsFolders.folders.get(i).count) {
+                            mFoldersChanged=true;
+                            break;
+                        }
+                    }
+                }
+                folders.clear();
+                for (DiscogsFolders.Folder f : discogsFolders.folders) {
+                    Folder newFolder = new Folder(f);
+                    folders.add(newFolder);
+                    newFolder.save();
+                }
+                waiter.onResult(true,folders);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                if (folders == null) loadFolders();
+                waiter.onResult(false,folders);
+            }
+        });
+    }
+
+
+    public void loadFolders() {
+        folders = new Select().from(Folder.class).orderBy("folder_id").execute();
+    }
+
     public void refreshCollection(final DiscogsWaiter waiter) {
         onlineCollection = new ArrayList<DiscogsBasicRelease>();
         refreshCollection(1, waiter);
@@ -738,8 +784,30 @@ public class Discogs extends ContextWrapper {
         }
         addToCollection(toAdd);
 
+        //if there has been a change in folders, sync local folder ids
+        if(mFoldersChanged) {
+            syncFolders();
+            mFoldersChanged=false;
+        }
+
         //sync complete, reload collection from db
         loadCollection();
+    }
+
+    public void syncFolders() {
+        HashMap<Long,Long> remoteFolderMap = new HashMap<Long, Long>();
+        for (DiscogsBasicRelease r : onlineCollection) {
+            remoteFolderMap.put(r.id,r.folder_id);
+        }
+        ActiveAndroid.beginTransaction();
+        for(Release r : collection) {
+            long folderId = remoteFolderMap.get(r.releaseid);
+            if(r.folder_id != folderId) {
+                r.folder_id = folderId;
+                r.save();
+            }
+        }
+        ActiveAndroid.endTransaction();
     }
 
     public void removeFromCollection(Set<Long> toRemove) {
@@ -773,6 +841,9 @@ public class Discogs extends ContextWrapper {
 
     public void loadCollection() {
         collection = new Select().from(Release.class).orderBy("artist COLLATE NOCASE").execute();
+        for(Release r : collection) {
+            System.out.println(r.folder_id);
+        }
     }
 
     public List<Release> getCollection() {

@@ -39,6 +39,9 @@ public interface DiscogsService {
     @GET("/{path}")
     Response getRawPath(@EncodedPath("path") String path);
 
+    @GET("/users/{username}/collection/folders")
+    void getFolders(@Path("username") String username, Callback<DiscogsFolders> callback);
+
     @GET("/users/{username}/collection/folders/{folderid}/releases?per_page=100&sort=added&sort_order=asc")
     void getCollection(@Path("username") String username, @Path("folderid") long folderid, @Query("page") int page, Callback<DiscogsCollection> callback);
 

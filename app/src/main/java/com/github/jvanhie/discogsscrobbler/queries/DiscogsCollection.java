@@ -48,6 +48,7 @@ public class DiscogsCollection {
 
         public DiscogsBasicRelease getRelease() {
             basic_information.rating = rating;
+            basic_information.folder_id = folder_id;
             return basic_information;
         }
 
@@ -56,11 +57,13 @@ public class DiscogsCollection {
     public class DiscogsBasicRelease {
 
         public long id;
+        public long folder_id;
         public String title;
         public int year;
         public String resource_url;
         public String thumb;
         public int rating;
+
 
         public List<DiscogsRelease.Artist> artists;
         public List<DiscogsRelease.Label> labels;

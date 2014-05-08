@@ -38,6 +38,9 @@ public class Release extends Model{
     @Column(name = "releaseid", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
     public long releaseid;
 
+    @Column(name = "folder_id")
+    public long folder_id;
+
     @Column(name = "title")
     public String title;
 
@@ -58,6 +61,7 @@ public class Release extends Model{
 
     @Column(name = "format")
     public String format = "";
+
 
     /*extended value*/
     @Column(name = "extended")
@@ -154,6 +158,7 @@ public class Release extends Model{
         title=r.title;
         year=r.year;
         resource_url=r.resource_url;
+        folder_id=r.folder_id;
         thumb=r.thumb;
         artist= Discogs.formatArtist(r.artists);
         label= Discogs.formatLabel(r.labels);
