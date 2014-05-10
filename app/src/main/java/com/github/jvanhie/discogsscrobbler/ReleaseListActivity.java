@@ -22,11 +22,19 @@ import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
+
+import com.github.jvanhie.discogsscrobbler.models.Folder;
+import com.github.jvanhie.discogsscrobbler.util.Discogs;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -58,12 +66,14 @@ public class ReleaseListActivity extends DrawerActivity
     private long mSelected;
     private static final String STATE_RELEASE_SELECTED = "selected_release";
 
+    private Discogs mDiscogs;
     private ReleaseListFragment mReleaseList;
 
     private ProgressBar mReleaseProgressBar;
     private ProgressBar mRefreshProgressBar;
 
     private boolean mLoaded = false;
+    private boolean mRefresh = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,8 +86,9 @@ public class ReleaseListActivity extends DrawerActivity
         mReleaseProgressBar = (ProgressBar) findViewById(R.id.release_list_progressBar);
         mRefreshProgressBar = (ProgressBar) findViewById(R.id.release_list_refresh);
         mReleaseList = ((ReleaseListFragment) getSupportFragmentManager().findFragmentById(R.id.release_list));
-        //single pane mode
+
         if(mReleaseProgressBar != null && mLoaded) mReleaseProgressBar.setVisibility(View.INVISIBLE);
+        if(mRefreshProgressBar != null && mRefresh) mRefreshProgressBar.setVisibility(View.VISIBLE);
 
         //check if we're in tablet mode -> two or tripane layout
         if (findViewById(R.id.release_pager_container) != null) {
@@ -95,6 +106,8 @@ public class ReleaseListActivity extends DrawerActivity
             }
         }
 
+        if(mDiscogs == null) mDiscogs = Discogs.getInstance(this);
+
         //create navigation drawer
         setDrawer(R.id.list_drawer_layout, R.id.list_drawer, getTitle().toString(), getTitle().toString(), true);
 
@@ -107,7 +120,8 @@ public class ReleaseListActivity extends DrawerActivity
             // Inflate the menu; this adds items to the action bar if it is present.
             getMenuInflater().inflate(R.menu.discogs_list, menu);
             //configure search box
-            SearchView searchView = (SearchView) menu.findItem(R.id.list_search).getActionView();
+            final MenuItem search = menu.findItem(R.id.list_search);
+            SearchView searchView = (SearchView) search.getActionView();
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(String s) {
@@ -122,6 +136,61 @@ public class ReleaseListActivity extends DrawerActivity
                 }
             });
             searchView.setQueryHint("Filter your releases");
+            final MenuItem filter = menu.findItem(R.id.list_filter);
+            mDiscogs.getFolders(new Discogs.DiscogsDataWaiter<List<Folder>>() {
+                @Override
+                public void onResult(boolean success, List<Folder> data) {
+                    Spinner s = (Spinner) filter.getActionView(); // find the spinner
+                    ArrayAdapter<Folder> mSpinnerAdapter = new ArrayAdapter<Folder>(getActionBar().getThemedContext(), android.R.layout.simple_spinner_item, data);
+                    mSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    s.setAdapter(mSpinnerAdapter); // set the adapter
+                    s.setSelection(0,false);
+                    s.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                        @Override
+                        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                            mDiscogs.setFolderId(((Folder)adapterView.getItemAtPosition(i)).folderid);
+                            //reload list with id
+                            mReleaseList.loadList();
+                            filter.collapseActionView();
+                        }
+
+                        @Override
+                        public void onNothingSelected(AdapterView<?> adapterView) {
+                            //filter.collapseActionView();
+                        }
+                    });
+                }
+            });
+
+            //make sure only one actionview is expanded
+            filter.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+                @Override
+                public boolean onMenuItemActionExpand(MenuItem menuItem) {
+                    //collapse search
+                    search.collapseActionView();
+                    return true;
+                }
+
+                @Override
+                public boolean onMenuItemActionCollapse(MenuItem menuItem) {
+                    return true;
+                }
+            });
+            search.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+                @Override
+                public boolean onMenuItemActionExpand(MenuItem menuItem) {
+                    //collapse search
+                    filter.collapseActionView();
+                    return true;
+                }
+
+                @Override
+                public boolean onMenuItemActionCollapse(MenuItem menuItem) {
+                    return true;
+                }
+            });
+
+            //s.setSelection(mSearchType,false);
         }
         return true;
     }
@@ -186,6 +255,7 @@ public class ReleaseListActivity extends DrawerActivity
     }
 
     public void setRefreshVisible(boolean visible) {
+        mRefresh = visible;
         if(mRefreshProgressBar!=null) {
             if(visible) {
                 mRefreshProgressBar.setVisibility(View.VISIBLE);

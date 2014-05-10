@@ -50,10 +50,8 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.IllegalCharsetNameException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.IllegalFormatException;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -98,8 +96,10 @@ public class Discogs extends ContextWrapper {
     private OAuthProvider mOAuthProvider;
     private OAuthConsumer mOAuthConsumer;
 
-    private boolean mFoldersChanged = true;
+    private boolean mFoldersChanged = false;
+    private long mFolderId = 0;
     private List<Folder> folders;
+
     private List<Release> collection;
     private List<DiscogsBasicRelease> onlineCollection = new ArrayList<DiscogsBasicRelease>();
 
@@ -341,7 +341,7 @@ public class Discogs extends ContextWrapper {
                     System.out.println("collection ids: " + lastLocal + " vs " + lastAddition);
                     System.out.println("collection size: " + collection.size() + " vs " + collectionSize);
                     //see if the remote collection has changed from the last fetch
-                    if (collection.size() != collectionSize || lastLocal != lastAddition) {
+                    if (collection.size() != collectionSize || lastLocal != lastAddition || mFoldersChanged) {
                         //yes, it has!
                         waiter.onResult(true);
                     } else {
@@ -516,7 +516,6 @@ public class Discogs extends ContextWrapper {
         mDiscogsService.removeRelease(mUserName, id, new Callback<Response>() {
             @Override
             public void success(Response r, Response response) {
-                System.out.println(r.getBody());
                 waiter.onResult(true);
             }
 
@@ -726,7 +725,15 @@ public class Discogs extends ContextWrapper {
 
 
     public void loadFolders() {
-        folders = new Select().from(Folder.class).orderBy("folder_id").execute();
+        folders = new Select().from(Folder.class).orderBy("folderid").execute();
+    }
+
+    public void setFolderId(long folderId) {
+        this.mFolderId = folderId;
+    }
+
+    public long getFolderId() {
+        return mFolderId;
     }
 
     public void refreshCollection(final DiscogsWaiter waiter) {
@@ -797,7 +804,7 @@ public class Discogs extends ContextWrapper {
     public void syncFolders() {
         HashMap<Long,Long> remoteFolderMap = new HashMap<Long, Long>();
         for (DiscogsBasicRelease r : onlineCollection) {
-            remoteFolderMap.put(r.id,r.folder_id);
+            remoteFolderMap.put(r.id, r.folder_id);
         }
         ActiveAndroid.beginTransaction();
         for(Release r : collection) {
@@ -807,6 +814,7 @@ public class Discogs extends ContextWrapper {
                 r.save();
             }
         }
+        ActiveAndroid.setTransactionSuccessful();
         ActiveAndroid.endTransaction();
     }
 
@@ -841,14 +849,18 @@ public class Discogs extends ContextWrapper {
 
     public void loadCollection() {
         collection = new Select().from(Release.class).orderBy("artist COLLATE NOCASE").execute();
-        for(Release r : collection) {
-            System.out.println(r.folder_id);
-        }
     }
 
     public List<Release> getCollection() {
         if(collection==null) loadCollection();
-        return collection;
+        /*check if we need to filter releases by folder id*/
+        if(mFolderId!=0) {
+            ArrayList<Release> filtered = new ArrayList<Release>();
+            for(Release r : collection) {
+                if(r.folder_id==mFolderId) filtered.add(r);
+            }
+            return filtered;
+        } else return collection;
     }
 
     public String getOAuthURL() {

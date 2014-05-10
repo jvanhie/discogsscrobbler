@@ -27,12 +27,12 @@
 
     <item android:id="@+id/search_barcode"
         android:title="Scan Barcode"
-        android:icon="@drawable/ic_action_camera"
+        android:icon="@drawable/ic_action_barcode"
         android:showAsAction="ifRoom" />
 
     <item android:id="@+id/search_filter"
         android:title="Filter results"
-        android:icon="@drawable/ic_action_sort_by_size"
+        android:icon="@drawable/ic_action_filter"
         android:showAsAction="collapseActionView|ifRoom"
         android:actionViewClass="android.widget.Spinner"/>
 </menu>

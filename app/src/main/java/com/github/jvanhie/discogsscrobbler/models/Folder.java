@@ -45,4 +45,8 @@ public class Folder extends Model {
         name = f.name;
     }
 
+    @Override
+    public String toString() {
+        return name;
+    }
 }

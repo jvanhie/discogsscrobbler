@@ -22,7 +22,7 @@
     <item android:id="@+id/list_search"
         android:title="Search"
         android:icon="@drawable/ic_action_search"
-        android:showAsAction="ifRoom"
+        android:showAsAction="collapseActionView|ifRoom"
         android:actionViewClass="android.widget.SearchView" />
 
     <item
@@ -30,4 +30,11 @@
         android:icon="@drawable/ic_action_refresh"
         android:showAsAction="ifRoom"
         android:title="Refresh list"/>
+
+    <item
+        android:id="@+id/list_filter"
+        android:icon="@drawable/ic_action_filter"
+        android:showAsAction="collapseActionView|ifRoom"
+        android:actionViewClass="android.widget.Spinner"
+        android:title="Choose folder"/>
 </menu>
