@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -85,7 +86,7 @@ public class DrawerActivity extends FragmentActivity {
                         startActivity(new Intent(DrawerActivity.this, SettingsActivity.class));
                         break;
                     case 4: //help
-
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/jvanhie/discogsscrobbler/wiki")));
                         break;
                 }
             }
