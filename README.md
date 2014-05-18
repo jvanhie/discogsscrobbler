@@ -11,9 +11,11 @@ If you want to compile this app yourself, edit and copy the discogs.xml and last
 - Scrobble releases (or just the tracks you listened to) to Last.fm
 - now playing mode (scrobbling in the future)
 - search filtering
+- Discogs collection folder supported
 
 ##Coming functionality
-- multiple collection folders
+- Optional info queries about artist/album
+- Fully tablet compatible views
 
 ##Acknowledgements
 First of all, I'd like to thank Thomas Jollans for his great VinylScrobbler project (https://github.com/tjol/vinylscrobbler) which was my primary source of inspiration.
