@@ -120,6 +120,7 @@ public class SearchAdapter extends BaseExpandableListAdapter {
     @Override
     public View getGroupView(int i, boolean isExpanded, View view, ViewGroup viewGroup) {
         if (view == null) {
+            if(mContext == null) return null;
             LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = inflater.inflate(R.layout.discogs_item, viewGroup, false);
         }
@@ -161,6 +162,7 @@ public class SearchAdapter extends BaseExpandableListAdapter {
     @Override
     public View getChildView(int i, int i2, boolean b, View view, ViewGroup viewGroup) {
         if (view == null) {
+            if(mContext == null) return null;
             LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = inflater.inflate(R.layout.discogs_item, viewGroup, false);
         }

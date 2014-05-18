@@ -119,6 +119,7 @@ public class ReleaseAdapter extends BaseAdapter implements Filterable, SectionIn
         if (parent instanceof GridView) {
 
             if (view == null) {
+                if(mContext == null) return null;
                 LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 view = inflater.inflate(R.layout.discogs_wall_item, parent, false);
             }
@@ -130,6 +131,7 @@ public class ReleaseAdapter extends BaseAdapter implements Filterable, SectionIn
             return view;
         } else {
             if (view == null) {
+                if(mContext == null) return null;
                 LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 view = inflater.inflate(R.layout.discogs_item, parent, false);
             }
