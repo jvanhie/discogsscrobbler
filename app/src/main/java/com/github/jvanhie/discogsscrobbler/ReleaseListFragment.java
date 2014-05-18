@@ -193,8 +193,11 @@ public class ReleaseListFragment extends Fragment {
         if(mDiscogs==null) mDiscogs = Discogs.getInstance(getActivity());
 
         loadList();
-        //do a background call to update the discogs collection if necessary
-        checkOnlineCollection();
+
+        if(PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("collection_auto_refresh",true)) {
+            //do a background call to update the discogs collection if necessary
+            checkOnlineCollection();
+        }
 
         superFrame.addView(emptyView);
         mList.setEmptyView(emptyView);

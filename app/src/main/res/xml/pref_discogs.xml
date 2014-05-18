@@ -37,6 +37,13 @@
             android:defaultValue="@string/pref_collection_view_default" />
 
         <CheckBoxPreference
+            android:key="collection_auto_refresh"
+            android:title="Check collection at startup"
+            android:summary="Perform an automated check whenever you check your Collection. Can always be performed manually"
+            android:defaultValue="true"
+            />
+
+        <CheckBoxPreference
             android:key="release_auto_add"
             android:title="Auto add releases"
             android:summary="Add a scrobbled release to your Discogs collection if it's not already in it"
