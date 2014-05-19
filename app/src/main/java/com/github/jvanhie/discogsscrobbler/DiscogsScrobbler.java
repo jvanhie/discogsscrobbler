@@ -17,20 +17,18 @@
 package com.github.jvanhie.discogsscrobbler;
 
 import com.activeandroid.app.Application;
+import com.crashlytics.android.Crashlytics;
 
-import org.acra.ACRA;
-import org.acra.annotation.ReportsCrashes;
 
 /**
  * Created by Jono on 18/05/2014.
  */
-@ReportsCrashes(formKey = "", formUri = "http://www.bugsense.com/api/acra?api_key=0af5f0db")
 public class DiscogsScrobbler extends Application {
     @Override
     public void onCreate() {
-        // The following line triggers the initialization of ACRA
         super.onCreate();
-        ACRA.init(this);
+        //init crashlytics
+        Crashlytics.start(this);
     }
 
 }
