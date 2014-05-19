@@ -44,7 +44,9 @@ import java.util.List;
  */
 public class ReleasePagerFragment extends Fragment {
 
+    public static String HAS_MENU = "has_menu";
     public static String SHOW_VERSIONS =" show_versions";
+    public static String SHOW_TRACKLIST =" show_tracklist";
 
     private ViewPager mPager;
     private PagerAdapter mPagerAdapter;
@@ -54,7 +56,7 @@ public class ReleasePagerFragment extends Fragment {
 
     private long mReleaseId;
     private boolean mShowVersions;
-
+    private boolean mShowTracklist;
 
     public ReleasePagerFragment() {
 
@@ -64,6 +66,7 @@ public class ReleasePagerFragment extends Fragment {
         super.onCreate(savedInstanceState);
         mReleaseId = getArguments().getLong(ReleaseDetailFragment.ARG_ITEM_ID,0);
         mShowVersions = getArguments().getBoolean(SHOW_VERSIONS,true);
+        mShowTracklist = getArguments().getBoolean(SHOW_TRACKLIST,true);
     }
 
     @Override
@@ -92,7 +95,7 @@ public class ReleasePagerFragment extends Fragment {
         public Fragment getItem(int position) {
             Bundle arguments = new Bundle();
             arguments.putLong(ReleaseDetailFragment.ARG_ITEM_ID,mReleaseId);
-            arguments.putBoolean(ReleaseDetailFragment.HAS_MENU,true);
+            arguments.putBoolean(ReleaseDetailFragment.HAS_MENU,getArguments().getBoolean(HAS_MENU,true));
             //hackish way of not showing the first fragment
             if(!mShowVersions) position++;
             switch (position) {
@@ -114,8 +117,10 @@ public class ReleasePagerFragment extends Fragment {
 
         @Override
         public int getCount() {
-            if(!mShowVersions) return 2;
-            else return 3;
+            int count = titles.length;
+            if(!mShowVersions) count--;
+            if(!mShowTracklist) count--;
+            return count;
         }
 
 

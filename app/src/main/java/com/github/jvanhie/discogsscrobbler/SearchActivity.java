@@ -258,8 +258,9 @@ public class SearchActivity extends DrawerActivity
                 mDetailVisible = true;
                 Bundle arguments3 = new Bundle();
                 arguments3.putLong(ReleaseDetailFragment.ARG_ITEM_ID, id);
-                arguments3.putBoolean(ReleaseDetailFragment.HAS_MENU,false);
-                ReleaseDetailFragment detailFragment = new ReleaseDetailFragment();
+                arguments3.putBoolean(ReleasePagerFragment.HAS_MENU,false);
+                arguments3.putBoolean(ReleasePagerFragment.SHOW_TRACKLIST,false);
+                ReleasePagerFragment detailFragment = new ReleasePagerFragment();
                 detailFragment.setArguments(arguments3);
                 Bundle arguments3_t = new Bundle();
                 arguments3_t.putLong(ReleaseDetailFragment.ARG_ITEM_ID, id);
