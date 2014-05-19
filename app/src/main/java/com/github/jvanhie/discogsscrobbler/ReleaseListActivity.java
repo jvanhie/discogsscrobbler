@@ -235,10 +235,14 @@ public class ReleaseListActivity extends DrawerActivity
             case 3: //whoa, screen estate! Show detail view _and_ tracklist
                 Bundle arguments3 = new Bundle();
                 arguments3.putLong(ReleaseDetailFragment.ARG_ITEM_ID, id);
-                ReleaseDetailFragment detailFragment = new ReleaseDetailFragment(false);
+                arguments3.putBoolean(ReleaseDetailFragment.HAS_MENU,false);
+                ReleaseDetailFragment detailFragment = new ReleaseDetailFragment();
                 detailFragment.setArguments(arguments3);
-                ReleaseTracklistFragment tracklistFragment = new ReleaseTracklistFragment(true);
-                tracklistFragment.setArguments(arguments3);
+                Bundle arguments3_t = new Bundle();
+                arguments3_t.putLong(ReleaseTracklistFragment.ARG_ITEM_ID, id);
+                arguments3_t.putBoolean(ReleaseTracklistFragment.HAS_MENU,true);
+                ReleaseTracklistFragment tracklistFragment = new ReleaseTracklistFragment();
+                tracklistFragment.setArguments(arguments3_t);
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.release_detail_container, detailFragment)
                         .replace(R.id.release_tracklist_container, tracklistFragment)

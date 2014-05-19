@@ -245,17 +245,14 @@ public class SettingsActivity extends PreferenceActivity {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_discogs);
 
-            ListPreference api = (ListPreference) findPreference("discogs_api_id");
-            int size = getResources().getStringArray(R.array.discogs_api_keys).length;
-            String[] entries = new String[size+1];
-            String[] values = new String[size+1];
-            for (int i = 0; i <= size; i++) {
-                if(i==0) entries[0] = "custom";
-                else entries[i] = "" + (i);
-                values[i] = "" + (i-1);
-            }
-            api.setEntries(entries);
-            api.setEntryValues(values);
+            Preference preloadButton = findPreference("discogs_preload_collection");
+            preloadButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference arg0) {
+                    Discogs.getInstance(getActivity()).preloadCollection();
+                    return true;
+                }
+            });
 
         }
     }
@@ -283,12 +280,59 @@ public class SettingsActivity extends PreferenceActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_advanced);
+
+            ListPreference api = (ListPreference) findPreference("discogs_api_id");
+            int size = getResources().getStringArray(R.array.discogs_api_keys).length;
+            String[] entries = new String[size+1];
+            String[] values = new String[size+1];
+            for (int i = 0; i <= size; i++) {
+                if(i==0) entries[0] = "custom";
+                else entries[i] = "" + (i);
+                values[i] = "" + (i-1);
+            }
+            api.setEntries(entries);
+            api.setEntryValues(values);
+
+            Preference button = findPreference("discogs_create_api_button");
+            button.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference arg0) {
+                    Intent apiIntent = new Intent(getActivity(), DiscogsApiActivity.class);
+                    apiIntent.putExtra(DiscogsApiActivity.ARG_API_MODE, "create");
+                    startActivity(apiIntent);
+                    return true;
+                }
+            });
+
+
+
+            Preference sellerButton = findPreference("discogs_seller_settings_button");
+            sellerButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference arg0) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setMessage(getString(R.string.discogs_seller_dialog_message)).setTitle(getString(R.string.discogs_seller_dialog_title));
+                    builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.discogs.com/settings/seller")));
+                        }
+                    });
+                    builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            // User cancelled the dialog don't do anything
+                        }
+                    });
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+                    return true;
+                }
+            });
         }
     }
 
     protected boolean isValidFragment (String fragmentName)
     {
-        if(LastfmPreferenceFragment.class.getName().equals(fragmentName) || DiscogsPreferenceFragment.class.getName().equals(fragmentName))
+        if(LastfmPreferenceFragment.class.getName().equals(fragmentName) || DiscogsPreferenceFragment.class.getName().equals(fragmentName) || AdvancedPreferenceFragment.class.getName().equals(fragmentName))
             return true;
         return false;
 

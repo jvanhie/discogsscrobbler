@@ -54,11 +54,9 @@ import java.util.List;
  * on handsets.
  */
 public class ReleaseTracklistFragment extends ListFragment {
-    /**
-     * The fragment argument representing the item ID that this fragment
-     * represents.
-     */
+
     public static final String ARG_ITEM_ID = "item_id";
+    public static final String HAS_MENU = "has_menu";
 
     private Release mRelease;
 
@@ -75,12 +73,6 @@ public class ReleaseTracklistFragment extends ListFragment {
     public ReleaseTracklistFragment() {
     }
 
-    public ReleaseTracklistFragment(boolean hasMenu) {
-        this();
-        this.hasMenu = hasMenu;
-    }
-
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,6 +82,8 @@ public class ReleaseTracklistFragment extends ListFragment {
         if (getArguments().containsKey(ARG_ITEM_ID)) {
             mRelease=mDiscogs.getRelease(getArguments().getLong(ARG_ITEM_ID));
         }
+        hasMenu = getArguments().getBoolean(HAS_MENU,false);
+
         if(hasMenu) {
             setHasOptionsMenu(true);
         }

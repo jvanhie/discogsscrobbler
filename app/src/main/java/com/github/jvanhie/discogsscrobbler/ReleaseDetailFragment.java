@@ -60,11 +60,9 @@ import java.util.ArrayList;
  * on handsets.
  */
 public class ReleaseDetailFragment extends Fragment {
-    /**
-     * The fragment argument representing the item ID that this fragment
-     * represents.
-     */
+
     public static final String ARG_ITEM_ID = "item_id";
+    public static final String HAS_MENU = "has_menu";
 
     private Release mRelease;
 
@@ -82,11 +80,6 @@ public class ReleaseDetailFragment extends Fragment {
      * fragment (e.g. upon screen orientation changes).
      */
     public ReleaseDetailFragment() {
-    }
-
-    public ReleaseDetailFragment(boolean hasMenu) {
-        this();
-        this.hasMenu = hasMenu;
     }
 
     @Override
@@ -115,6 +108,7 @@ public class ReleaseDetailFragment extends Fragment {
             mRelease = mDiscogs.getRelease(getArguments().getLong(ARG_ITEM_ID,0));
 
         }
+        hasMenu = getArguments().getBoolean(HAS_MENU,false);
 
         if(hasMenu) {
             setHasOptionsMenu(true);
@@ -124,6 +118,7 @@ public class ReleaseDetailFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
+        System.out.println("detailmenu: " + hasMenu);
         if(PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("enable_discogs", true)) {
             if (mRelease == null || mRelease.isTransient) {
                 //the release is not in the collection, give the user the opportunity to add it

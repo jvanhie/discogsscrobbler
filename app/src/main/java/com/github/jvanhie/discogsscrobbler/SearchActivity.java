@@ -49,7 +49,7 @@ import android.widget.SpinnerAdapter;
  * to listen for item selections.
  */
 public class SearchActivity extends DrawerActivity
-        implements SearchFragment.Callbacks {
+        implements SearchFragment.Callbacks, ReleaseVersionsFragment.Callbacks{
 
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
@@ -65,6 +65,8 @@ public class SearchActivity extends DrawerActivity
     private SearchFragment mSearchFragment;
     private SearchView mSearchView;
     private ProgressBar mRefreshProgressBar;
+
+    private boolean mDetailVisible = false;
 
     private int mSearchType;
     private String[] mSearchTypes;
@@ -109,7 +111,6 @@ public class SearchActivity extends DrawerActivity
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
-
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.discogs_search, menu);
         //configure search box
@@ -189,8 +190,8 @@ public class SearchActivity extends DrawerActivity
             }
         });
 
-        //only expand when the drawer is closed
-        if(!((DrawerLayout)findViewById(R.id.search_drawer_layout)).isDrawerOpen(findViewById(R.id.search_drawer))) {
+        //only expand when the drawer is closed and initial page load
+        if(!((DrawerLayout)findViewById(R.id.search_drawer_layout)).isDrawerOpen(findViewById(R.id.search_drawer)) && !mDetailVisible) {
             search.expandActionView();
         }
 
@@ -244,6 +245,7 @@ public class SearchActivity extends DrawerActivity
                 startActivity(detailIntent);
                 break;
             case 2: //show the pager fragment next to the list
+                mDetailVisible = true;
                 Bundle arguments2 = new Bundle();
                 arguments2.putLong(ReleaseDetailFragment.ARG_ITEM_ID, id);
                 ReleasePagerFragment fragment = new ReleasePagerFragment();
@@ -253,12 +255,17 @@ public class SearchActivity extends DrawerActivity
                         .commit();
                 break;
             case 3: //whoa, screen estate! Show detail view _and_ tracklist
+                mDetailVisible = true;
                 Bundle arguments3 = new Bundle();
                 arguments3.putLong(ReleaseDetailFragment.ARG_ITEM_ID, id);
-                ReleaseDetailFragment detailFragment = new ReleaseDetailFragment(false);
+                arguments3.putBoolean(ReleaseDetailFragment.HAS_MENU,false);
+                ReleaseDetailFragment detailFragment = new ReleaseDetailFragment();
                 detailFragment.setArguments(arguments3);
-                ReleaseTracklistFragment tracklistFragment = new ReleaseTracklistFragment(true);
-                tracklistFragment.setArguments(arguments3);
+                Bundle arguments3_t = new Bundle();
+                arguments3_t.putLong(ReleaseDetailFragment.ARG_ITEM_ID, id);
+                arguments3_t.putBoolean(ReleaseTracklistFragment.HAS_MENU,true);
+                ReleaseTracklistFragment tracklistFragment = new ReleaseTracklistFragment();
+                tracklistFragment.setArguments(arguments3_t);
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.release_detail_container, detailFragment)
                         .replace(R.id.release_tracklist_container, tracklistFragment)

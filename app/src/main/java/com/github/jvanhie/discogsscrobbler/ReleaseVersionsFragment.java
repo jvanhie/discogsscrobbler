@@ -167,7 +167,7 @@ public class ReleaseVersionsFragment extends Fragment {
                     if (success && data != null) {
                         mReleases = new ArrayList<Release>();
                         for (DiscogsSearchRelease r : data) {
-                            //create release object that releaseadapter will unedrstand (discogs does not provide artist name with it's master versions call, get it from the current release)
+                            //create release object that releaseadapter will understand (discogs does not provide artist name with it's master versions call, get it from the current release)
                             Release release = new Release(r);
                             release.artist = mRelease.artist;
                             //don't add the current release

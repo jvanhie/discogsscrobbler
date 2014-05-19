@@ -92,6 +92,7 @@ public class ReleasePagerFragment extends Fragment {
         public Fragment getItem(int position) {
             Bundle arguments = new Bundle();
             arguments.putLong(ReleaseDetailFragment.ARG_ITEM_ID,mReleaseId);
+            arguments.putBoolean(ReleaseDetailFragment.HAS_MENU,true);
             //hackish way of not showing the first fragment
             if(!mShowVersions) position++;
             switch (position) {
@@ -100,11 +101,11 @@ public class ReleasePagerFragment extends Fragment {
                     mVersionsFragment.setArguments(arguments);
                     return mVersionsFragment;
                 case 1:
-                    if(mDetailFragment == null) mDetailFragment = new ReleaseDetailFragment(true);
+                    if(mDetailFragment == null) mDetailFragment = new ReleaseDetailFragment();
                     mDetailFragment.setArguments(arguments);
                     return mDetailFragment;
                 case 2:
-                    if(mTrackListFragment == null) mTrackListFragment = new ReleaseTracklistFragment(true);
+                    if(mTrackListFragment == null) mTrackListFragment = new ReleaseTracklistFragment();
                     mTrackListFragment.setArguments(arguments);
                     return mTrackListFragment;
             }
