@@ -281,7 +281,11 @@ public class Lastfm extends ContextWrapper {
             @Override
             protected Boolean doInBackground(Void... voids) {
                 de.umass.lastfm.Track info = de.umass.lastfm.Track.getInfo(track.artist,track.title,API_KEY);
-                track.duration=Track.formatDurationToString(info.getDuration());
+                if(info != null) {
+                    track.duration = Track.formatDurationToString(info.getDuration());
+                } else {
+                    track.duration = Track.formatDurationToString(DEFAULT_TRACK_DURATION);
+                }
                 //currently errors seem to be caught by the last.fm library, so only success will follow
                 return true;
             }
