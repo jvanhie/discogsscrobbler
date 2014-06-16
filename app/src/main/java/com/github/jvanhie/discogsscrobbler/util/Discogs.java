@@ -370,7 +370,7 @@ public class Discogs extends ContextWrapper {
     }
 
     public void search(String query, final DiscogsDataWaiter<List<DiscogsSearchResult>> waiter) {
-        mDiscogsPublicService.search(query, new Callback<DiscogsSearch>() {
+        mDiscogsService.search(query, new Callback<DiscogsSearch>() {
             @Override
             public void success(DiscogsSearch discogsSearch, Response response) {
                 waiter.onResult(true,discogsSearch.results);
@@ -384,7 +384,7 @@ public class Discogs extends ContextWrapper {
     }
 
     public void search(String query, String type, final DiscogsDataWaiter<List<DiscogsSearchResult>> waiter) {
-        mDiscogsPublicService.search(query, type, new Callback<DiscogsSearch>() {
+        mDiscogsService.search(query, type, new Callback<DiscogsSearch>() {
             @Override
             public void success(DiscogsSearch discogsSearch, Response response) {
                 waiter.onResult(true,discogsSearch.results);
@@ -398,7 +398,7 @@ public class Discogs extends ContextWrapper {
     }
 
     public void searchBarcode(String query, final DiscogsDataWaiter<List<DiscogsSearchResult>> waiter) {
-        mDiscogsPublicService.searchBarcode(query, new Callback<DiscogsSearch>() {
+        mDiscogsService.searchBarcode(query, new Callback<DiscogsSearch>() {
             @Override
             public void success(DiscogsSearch discogsSearch, Response response) {
                 waiter.onResult(true,discogsSearch.results);
