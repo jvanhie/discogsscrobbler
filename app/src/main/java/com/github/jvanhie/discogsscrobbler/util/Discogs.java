@@ -378,6 +378,7 @@ public class Discogs extends ContextWrapper {
 
             @Override
             public void failure(RetrofitError error) {
+                parseRetrofitError(error);
                 waiter.onResult(false,null);
             }
         });
@@ -392,6 +393,7 @@ public class Discogs extends ContextWrapper {
 
             @Override
             public void failure(RetrofitError error) {
+                parseRetrofitError(error);
                 waiter.onResult(false,null);
             }
         });
@@ -406,6 +408,7 @@ public class Discogs extends ContextWrapper {
 
             @Override
             public void failure(RetrofitError error) {
+                parseRetrofitError(error);
                 waiter.onResult(false,null);
             }
         });
