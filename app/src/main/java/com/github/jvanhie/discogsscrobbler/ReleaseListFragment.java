@@ -217,7 +217,14 @@ public class ReleaseListFragment extends Fragment {
                 if(fragmentWidth > 0)
                 {
                     if(mGrid) {
-                        ((GridView) mList).setNumColumns(Math.round((fragmentWidth / logicalDensity) / (float) 150));
+                        GridView grid = (GridView) mList;
+                        int col = grid.getNumColumns();
+                        int newCol = Math.round((fragmentWidth / logicalDensity) / (float) 150);
+                        if(col != newCol) {
+                            int pos = grid.getFirstVisiblePosition();
+                            grid.setNumColumns(newCol);
+                            grid.setSelection(pos);
+                        }
                     }
                 }
             }
