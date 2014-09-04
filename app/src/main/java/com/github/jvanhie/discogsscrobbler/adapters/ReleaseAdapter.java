@@ -66,7 +66,8 @@ public class ReleaseAdapter extends BaseAdapter implements Filterable, SectionIn
         mReleases = releases;
         mUnfilteredReleases = new ArrayList<Release>(releases);
         updateAlphaIndex();
-        //create universal image loader
+        //create universal image loader as long as the context is initialized
+        if(context==null) return;
         mImageLoader = ImageLoader.getInstance();
         DisplayImageOptions options = new DisplayImageOptions.Builder()
                 .showStubImage(R.drawable.default_release)
