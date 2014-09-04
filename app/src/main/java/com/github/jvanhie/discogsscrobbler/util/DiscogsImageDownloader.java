@@ -44,8 +44,8 @@ public class DiscogsImageDownloader extends ImageDownloader {
 
     @Override
     protected InputStream getStreamFromNetwork(URI imageUri) throws IOException {
-        //slight hack to remove the api root of the url
-        String image = imageUri.toString().replace("http://api.discogs.com/","");
+        //slight hack to remove the api root of the url and discogs wrong (deprecated!) image endpoint
+        String image = imageUri.toString().replace("http://api.discogs.com/","").replace("image/","images/");
         return mDiscogs.getImage(image);
     }
 
