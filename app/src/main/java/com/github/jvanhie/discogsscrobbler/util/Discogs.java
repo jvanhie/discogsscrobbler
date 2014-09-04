@@ -807,14 +807,18 @@ public class Discogs extends ContextWrapper {
     public void syncFolders() {
         HashMap<Long,Long> remoteFolderMap = new HashMap<Long, Long>();
         for (DiscogsBasicRelease r : onlineCollection) {
-            remoteFolderMap.put(r.id, r.folder_id);
+            if(r!=null) {
+                remoteFolderMap.put(r.id, r.folder_id);
+            }
         }
         ActiveAndroid.beginTransaction();
         for(Release r : collection) {
-            long folderId = remoteFolderMap.get(r.releaseid);
-            if(r.folder_id != folderId) {
-                r.folder_id = folderId;
-                r.save();
+            if(r!=null) {
+                long folderId = remoteFolderMap.get(r.releaseid);
+                if (r.folder_id != folderId) {
+                    r.folder_id = folderId;
+                    r.save();
+                }
             }
         }
         ActiveAndroid.setTransactionSuccessful();
