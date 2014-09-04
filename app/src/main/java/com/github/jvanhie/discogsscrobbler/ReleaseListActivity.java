@@ -20,6 +20,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -68,6 +69,11 @@ public class ReleaseListActivity extends DrawerActivity
 
     private Discogs mDiscogs;
     private ReleaseListFragment mReleaseList;
+
+    //all possible extra fragments in tablet mode
+    private ReleasePagerFragment mReleasePager;
+    private ReleaseDetailFragment mReleaseDetail;
+    private ReleaseTracklistFragment mReleaseTracklist;
 
     private ProgressBar mReleaseProgressBar;
     private ProgressBar mRefreshProgressBar;
@@ -118,7 +124,8 @@ public class ReleaseListActivity extends DrawerActivity
     public boolean onCreateOptionsMenu(final Menu menu) {
         if(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("enable_discogs",true)) {
             // Inflate the menu; this adds items to the action bar if it is present.
-            getMenuInflater().inflate(R.menu.discogs_list, menu);
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.discogs_list, menu);
             //configure search box
             final MenuItem search = menu.findItem(R.id.list_search);
             SearchView searchView = (SearchView) search.getActionView();
@@ -144,11 +151,11 @@ public class ReleaseListActivity extends DrawerActivity
                     ArrayAdapter<Folder> mSpinnerAdapter = new ArrayAdapter<Folder>(getActionBar().getThemedContext(), android.R.layout.simple_spinner_item, data);
                     mSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                     s.setAdapter(mSpinnerAdapter); // set the adapter
-                    s.setSelection(0,false);
+                    s.setSelection(0, false);
                     s.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                         @Override
                         public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                            mDiscogs.setFolderId(((Folder)adapterView.getItemAtPosition(i)).folderid);
+                            mDiscogs.setFolderId(((Folder) adapterView.getItemAtPosition(i)).folderid);
                             //reload list with id
                             mReleaseList.loadList();
                             filter.collapseActionView();
@@ -191,6 +198,12 @@ public class ReleaseListActivity extends DrawerActivity
             });
 
             //s.setSelection(mSearchType,false);
+
+            if (mSelected > 0) {
+                if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("enable_lastfm", true)) {
+                    inflater.inflate(R.menu.release_detail_scrobble, menu);
+                }
+            }
         }
         return true;
     }
@@ -205,6 +218,14 @@ public class ReleaseListActivity extends DrawerActivity
             //refresh the list
             mReleaseList.refreshCollection();
         }
+        if(id == R.id.detail_scrobble_release) {
+            //if tracklist is available, always scrobble from this view
+            if(mPanes==3 && mReleaseTracklist!=null) {
+                mReleaseTracklist.scrobble();
+            } else if (mPanes==2 && mReleasePager!=null) {
+                mReleasePager.scrobble();
+            }
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -215,6 +236,7 @@ public class ReleaseListActivity extends DrawerActivity
     @Override
     public void onItemSelected(long id) {
         mSelected = id;
+        invalidateOptionsMenu();
         switch (mPanes) {
             case 1: //just start new activity with the details
                 Intent detailIntent = new Intent(this, ReleaseDetailActivity.class);
@@ -226,26 +248,25 @@ public class ReleaseListActivity extends DrawerActivity
                 Bundle arguments2 = new Bundle();
                 arguments2.putLong(ReleaseDetailFragment.ARG_ITEM_ID, id);
                 arguments2.putBoolean(ReleasePagerFragment.SHOW_VERSIONS, false);
-                ReleasePagerFragment fragment = new ReleasePagerFragment();
-                fragment.setArguments(arguments2);
+                arguments2.putBoolean(ReleasePagerFragment.HAS_MENU, false);
+                mReleasePager = new ReleasePagerFragment();
+                mReleasePager.setArguments(arguments2);
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.release_pager_container, fragment)
+                        .replace(R.id.release_pager_container, mReleasePager)
                         .commit();
                 break;
             case 3: //whoa, screen estate! Show detail view _and_ tracklist
                 Bundle arguments3 = new Bundle();
                 arguments3.putLong(ReleaseDetailFragment.ARG_ITEM_ID, id);
-                arguments3.putBoolean(ReleaseDetailFragment.HAS_MENU,false);
-                ReleaseDetailFragment detailFragment = new ReleaseDetailFragment();
-                detailFragment.setArguments(arguments3);
+                mReleaseDetail = new ReleaseDetailFragment();
+                mReleaseDetail.setArguments(arguments3);
                 Bundle arguments3_t = new Bundle();
                 arguments3_t.putLong(ReleaseTracklistFragment.ARG_ITEM_ID, id);
-                arguments3_t.putBoolean(ReleaseTracklistFragment.HAS_MENU,true);
-                ReleaseTracklistFragment tracklistFragment = new ReleaseTracklistFragment();
-                tracklistFragment.setArguments(arguments3_t);
+                mReleaseTracklist = new ReleaseTracklistFragment();
+                mReleaseTracklist.setArguments(arguments3_t);
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.release_detail_container, detailFragment)
-                        .replace(R.id.release_tracklist_container, tracklistFragment)
+                        .replace(R.id.release_detail_container, mReleaseDetail)
+                        .replace(R.id.release_tracklist_container, mReleaseTracklist)
                         .commit();
                 break;
         }

@@ -126,6 +126,7 @@ public class ReleaseTracklistFragment extends ListFragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
+        System.out.println("trackmenu: " + hasMenu);
         if(PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("enable_discogs", true)) {
             if (mRelease == null || mRelease.isTransient) {
                 //the release is not in the collection, give the user the opportunity to add it
@@ -150,14 +151,7 @@ public class ReleaseTracklistFragment extends ListFragment {
         if(hasMenu && isVisible()) {
             int id = item.getItemId();
             if (id == R.id.detail_add_to_discogs) {
-                mDiscogs.addRelease(mRelease.releaseid, new Discogs.DiscogsWaiter() {
-                    @Override
-                    public void onResult(boolean success) {
-                        if (success) {
-                            Toast.makeText(getActivity(), "Added release to Discogs collection", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
+                addToDiscogs();
             }
             if (id == R.id.detail_reload_release) {
                 mDiscogs.refreshRelease(mRelease, new Discogs.DiscogsWaiter() {
@@ -173,62 +167,8 @@ public class ReleaseTracklistFragment extends ListFragment {
                     }
                 });
             }
-            if (id == R.id.detail_scrobble_release && mRelease != null) {
-                final Lastfm lastfm = Lastfm.getInstance(getActivity());
-                if (lastfm.isLoggedIn()) {
-
-                    //get selected tracks
-                    final List<Track> tracks = getSelectedTracks();
-                    System.out.println("scrobbling tracklist accuracy");
-
-
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                    builder.setMessage("Did you just finished listening to " + mRelease.title + " or are you about to listen to it?").setTitle("Scrobble this album?");
-                    builder.setPositiveButton("About to", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            //start now playing service
-                            Intent i=new Intent(getActivity(), NowPlayingService.class);
-                            i.putParcelableArrayListExtra(NowPlayingService.TRACK_LIST, new ArrayList<Track>(tracks));
-                            i.putExtra(NowPlayingService.THUMB_URL,mRelease.thumb);
-                            i.putExtra(NowPlayingService.RELEASE_ID,mRelease.releaseid);
-                            if(mRelease.images().size()>0)
-                                i.putExtra(NowPlayingService.ALBUM_ART_URL,mRelease.images().get(0).uri);
-                            getActivity().startService(i);
-                            //save to recentlyplayed
-                            mDiscogs.setRecentlyPlayed(mRelease);
-                            //go to the now playing activity
-                            startActivity(new Intent(getActivity(), NowPlayingActivity.class));
-                        }
-                    });
-                    builder.setNeutralButton("Just finished", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            //scrobble the tracks now
-                            lastfm.scrobbleTracks(tracks, new Lastfm.LastfmWaiter() {
-                                @Override
-                                public void onResult(boolean success) {
-                                    if(getActivity()!=null) {
-                                        Toast.makeText(getActivity(), "Scrobbled " + tracks.size() + " tracks", Toast.LENGTH_SHORT).show();
-                                        clearSelection();
-                                    }
-                                }
-                            });
-                            //save to recentlyplayed
-                            mDiscogs.setRecentlyPlayed(mRelease);
-                        }
-                    });
-                    builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            // User cancelled the dialog don't do anything
-                        }
-                    });
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
-
-                } else {
-                    //log in first
-                    lastfm.logIn();
-                }
+            if (id == R.id.detail_scrobble_release) {
+                scrobble();
             }
         }
         return super.onOptionsItemSelected(item);
@@ -275,6 +215,80 @@ public class ReleaseTracklistFragment extends ListFragment {
     public void clearSelection() {
         for(int i = 0; i < mTracklist.size(); i ++) {
             getListView().setItemChecked(i, false);
+        }
+    }
+
+    public void addToDiscogs() {
+        if(mRelease==null) return;
+        mDiscogs.addRelease(mRelease.releaseid, new Discogs.DiscogsWaiter() {
+            @Override
+            public void onResult(boolean success) {
+                if (success) {
+                    Toast.makeText(getActivity(), "Added release to Discogs collection", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getActivity(), "Release already in Discogs collection", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    public void scrobble() {
+        //first a small sanity check
+        if(mRelease==null) return;
+        final Lastfm lastfm = Lastfm.getInstance(getActivity());
+        if (lastfm.isLoggedIn()) {
+
+            //get selected tracks
+            final List<Track> tracks = getSelectedTracks();
+            System.out.println("scrobbling tracklist accuracy");
+
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setMessage("Did you just finished listening to " + mRelease.title + " or are you about to listen to it?").setTitle("Scrobble this album?");
+            builder.setPositiveButton("About to", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    //start now playing service
+                    Intent i=new Intent(getActivity(), NowPlayingService.class);
+                    i.putParcelableArrayListExtra(NowPlayingService.TRACK_LIST, new ArrayList<Track>(tracks));
+                    i.putExtra(NowPlayingService.THUMB_URL,mRelease.thumb);
+                    i.putExtra(NowPlayingService.RELEASE_ID,mRelease.releaseid);
+                    if(mRelease.images().size()>0)
+                        i.putExtra(NowPlayingService.ALBUM_ART_URL,mRelease.images().get(0).uri);
+                    getActivity().startService(i);
+                    //save to recentlyplayed
+                    mDiscogs.setRecentlyPlayed(mRelease);
+                    //go to the now playing activity
+                    startActivity(new Intent(getActivity(), NowPlayingActivity.class));
+                }
+            });
+            builder.setNeutralButton("Just finished", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    //scrobble the tracks now
+                    lastfm.scrobbleTracks(tracks, new Lastfm.LastfmWaiter() {
+                        @Override
+                        public void onResult(boolean success) {
+                            if(getActivity()!=null) {
+                                Toast.makeText(getActivity(), "Scrobbled " + tracks.size() + " tracks", Toast.LENGTH_SHORT).show();
+                                clearSelection();
+                            }
+                        }
+                    });
+                    //save to recentlyplayed
+                    mDiscogs.setRecentlyPlayed(mRelease);
+                }
+            });
+            builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    // User cancelled the dialog don't do anything
+                }
+            });
+            AlertDialog dialog = builder.create();
+            dialog.show();
+
+        } else {
+            //log in first
+            lastfm.logIn();
         }
     }
 }

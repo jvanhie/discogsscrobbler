@@ -47,6 +47,7 @@ public class ReleasePagerFragment extends Fragment {
     public static String HAS_MENU = "has_menu";
     public static String SHOW_VERSIONS =" show_versions";
     public static String SHOW_TRACKLIST =" show_tracklist";
+    public static final String ARG_ITEM_ID = "item_id";
 
     private ViewPager mPager;
     private PagerAdapter mPagerAdapter;
@@ -64,7 +65,7 @@ public class ReleasePagerFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mReleaseId = getArguments().getLong(ReleaseDetailFragment.ARG_ITEM_ID,0);
+        mReleaseId = getArguments().getLong(ARG_ITEM_ID,0);
         mShowVersions = getArguments().getBoolean(SHOW_VERSIONS,true);
         mShowTracklist = getArguments().getBoolean(SHOW_TRACKLIST,true);
     }
@@ -131,6 +132,26 @@ public class ReleasePagerFragment extends Fragment {
             else return titles[position];
         }
 
+    }
+
+    public void addToDiscogs() {
+        int pos = mPager.getCurrentItem();
+        if(mShowVersions) pos--;
+        if(pos == 0 && mDetailFragment!=null) {
+            mDetailFragment.addToDiscogs();
+        } else if (pos ==1 && mTrackListFragment!=null){
+            mTrackListFragment.addToDiscogs();
+        }
+    }
+
+    public void scrobble() {
+        int pos = mPager.getCurrentItem();
+        if(mShowVersions) pos--;
+        if(pos == 0 && mDetailFragment!=null) {
+            mDetailFragment.scrobble();
+        } else if (pos ==1 && mTrackListFragment!=null){
+            mTrackListFragment.scrobble();
+        }
     }
 }
 

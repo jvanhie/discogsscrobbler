@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -63,6 +64,12 @@ public class SearchActivity extends DrawerActivity
     private static final String STATE_RELEASE_SELECTED = "selected_release";
 
     private SearchFragment mSearchFragment;
+
+    //all possible extra fragments in tablet mode
+    private ReleasePagerFragment mReleasePager;
+    private ReleaseDetailFragment mReleaseDetail;
+    private ReleaseTracklistFragment mReleaseTracklist;
+
     private SearchView mSearchView;
     private ProgressBar mRefreshProgressBar;
 
@@ -112,7 +119,8 @@ public class SearchActivity extends DrawerActivity
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.discogs_search, menu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.discogs_search, menu);
         //configure search box
         final MenuItem search = menu.findItem(R.id.search_field);
         mSearchView = (SearchView)search.getActionView();
@@ -195,6 +203,15 @@ public class SearchActivity extends DrawerActivity
             search.expandActionView();
         }
 
+        if (mSelected > 0) {
+
+            inflater.inflate(R.menu.release_detail_search, menu);
+            if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("enable_lastfm", true)) {
+                inflater.inflate(R.menu.release_detail_scrobble, menu);
+            }
+        }
+
+
         return true;
     }
 
@@ -228,6 +245,22 @@ public class SearchActivity extends DrawerActivity
                 //TODO: give users the option to download it
             }
         }
+        if(id == R.id.detail_scrobble_release) {
+            //if tracklist is available, always scrobble from this view
+            if(mPanes==3 && mReleaseTracklist!=null) {
+                mReleaseTracklist.scrobble();
+            } else if (mPanes==2 && mReleasePager!=null) {
+                mReleasePager.scrobble();
+            }
+        }
+        if(id == R.id.detail_add_to_discogs) {
+            //if tracklist is available, always scrobble from this view
+            if(mPanes==3 && mReleaseTracklist!=null) {
+                mReleaseTracklist.addToDiscogs();
+            } else if (mPanes==2 && mReleasePager!=null) {
+                mReleasePager.addToDiscogs();
+            }
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -238,6 +271,7 @@ public class SearchActivity extends DrawerActivity
     @Override
     public void onItemSelected(long id) {
         mSelected = id;
+        invalidateOptionsMenu();
         switch (mPanes) {
             case 1: //just start new activity with the details
                 Intent detailIntent = new Intent(this, ReleaseDetailActivity.class);
@@ -247,29 +281,29 @@ public class SearchActivity extends DrawerActivity
             case 2: //show the pager fragment next to the list
                 mDetailVisible = true;
                 Bundle arguments2 = new Bundle();
-                arguments2.putLong(ReleaseDetailFragment.ARG_ITEM_ID, id);
-                ReleasePagerFragment fragment = new ReleasePagerFragment();
-                fragment.setArguments(arguments2);
+                arguments2.putLong(ReleasePagerFragment.ARG_ITEM_ID, id);
+                arguments2.putBoolean(ReleasePagerFragment.HAS_MENU, false);
+                mReleasePager = new ReleasePagerFragment();
+                mReleasePager.setArguments(arguments2);
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.release_pager_container, fragment)
+                        .replace(R.id.release_pager_container, mReleasePager)
                         .commit();
                 break;
             case 3: //whoa, screen estate! Show detail view _and_ tracklist
                 mDetailVisible = true;
                 Bundle arguments3 = new Bundle();
-                arguments3.putLong(ReleaseDetailFragment.ARG_ITEM_ID, id);
-                arguments3.putBoolean(ReleasePagerFragment.HAS_MENU,false);
+                arguments3.putLong(ReleasePagerFragment.ARG_ITEM_ID, id);
                 arguments3.putBoolean(ReleasePagerFragment.SHOW_TRACKLIST,false);
-                ReleasePagerFragment detailFragment = new ReleasePagerFragment();
-                detailFragment.setArguments(arguments3);
+                arguments3.putBoolean(ReleasePagerFragment.HAS_MENU, false);
+                mReleasePager = new ReleasePagerFragment();
+                mReleasePager.setArguments(arguments3);
                 Bundle arguments3_t = new Bundle();
                 arguments3_t.putLong(ReleaseDetailFragment.ARG_ITEM_ID, id);
-                arguments3_t.putBoolean(ReleaseTracklistFragment.HAS_MENU,true);
-                ReleaseTracklistFragment tracklistFragment = new ReleaseTracklistFragment();
-                tracklistFragment.setArguments(arguments3_t);
+                mReleaseTracklist = new ReleaseTracklistFragment();
+                mReleaseTracklist.setArguments(arguments3_t);
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.release_detail_container, detailFragment)
-                        .replace(R.id.release_tracklist_container, tracklistFragment)
+                        .replace(R.id.release_detail_container, mReleasePager)
+                        .replace(R.id.release_tracklist_container, mReleaseTracklist)
                         .commit();
                 break;
         }

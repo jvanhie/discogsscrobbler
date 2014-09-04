@@ -24,4 +24,5 @@
     -->
     <item type="layout" name="activity_release_list">@layout/activity_release_twopane</item>
     <item type="layout" name="activity_search">@layout/activity_search_twopane</item>
+    <item type="layout" name="activity_now_playing">@layout/activity_now_playing_twopane</item>
 </resources>

@@ -17,4 +17,5 @@
 <resources>
     <item type="layout" name="activity_release_list">@layout/activity_release_tripane</item>
     <item type="layout" name="activity_search">@layout/activity_search_tripane</item>
+    <item type="layout" name="activity_now_playing">@layout/activity_now_playing_tripane</item>
 </resources>
