@@ -155,6 +155,9 @@ public class NowPlayingFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
+        //since this fragment will be the only menu producing object in this activity, clear leftovers from strange android screen rotation magic
+        //TODO: move menu items to the activity, would be cleaner I suppose
+        menu.clear();
         inflater.inflate(R.menu.now_playing, menu);
     }
 
@@ -202,8 +205,8 @@ public class NowPlayingFragment extends Fragment {
     }
 
     private void setEmptyView(boolean empty) {
-        //only change views when state changed
-        if(isEmpty != empty) {
+        //only change views when state changed and superframe is initialized
+        if(isEmpty != empty && mSuperFrame != null) {
             if(empty) {
                 mSuperFrame.removeView(mRootView);
                 mSuperFrame.addView(mEmptyView);
@@ -217,7 +220,7 @@ public class NowPlayingFragment extends Fragment {
     }
 
     private void setNowPlaying() {
-        if(mService == null || mService.trackList == null || mService.trackList.size()==0) {
+        if(mService == null || mService.trackList == null || mService.trackList.size()==0 || mRootView == null) {
             setEmptyView(true);
             return;
         } else {

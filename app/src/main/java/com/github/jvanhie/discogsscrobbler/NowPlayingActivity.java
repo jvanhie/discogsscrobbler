@@ -62,7 +62,7 @@ public class NowPlayingActivity extends DrawerActivity implements RecentlyPlayed
         System.out.println("panes: " + mPanes);
 
         //initialize pager
-        mPager = (ViewPager) findViewById(R.id.now_playing_pager);
+
         setPager();
 
         //set navigation drawer
@@ -70,33 +70,39 @@ public class NowPlayingActivity extends DrawerActivity implements RecentlyPlayed
     }
 
     private void setPager() {
-        if(mPager != null) {
+        if(mPanes != 3) {
+            //first initialization
+            if(mPager == null) {
+                mPager = (ViewPager) findViewById(R.id.now_playing_pager);
+                if(mPanes == 2) {
+                    if(mRecentlyPlayedFragment == null) mRecentlyPlayedFragment = new RecentlyPlayedFragment();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.recently_played_container, mRecentlyPlayedFragment).commit();
+                }
+            }
+            //update the pager
             mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
             mPager.setAdapter(mPagerAdapter);
             if (mReleaseId != 0) {
                 mPager.setCurrentItem(1);
             }
-            if(mPanes == 2) {
-                if(mRecentlyPlayedFragment == null) mRecentlyPlayedFragment = new RecentlyPlayedFragment();
-                getSupportFragmentManager().beginTransaction().replace(R.id.recently_played_container, mRecentlyPlayedFragment).commit();
-            }
         } else {
             //3 pane goodness, no pagers needed
-            //if(mReleaseId!=0 && mDetailFragment == null) {
-                System.out.println("release found! " + mReleaseId);
-                mDetailFragment = new ReleaseDetailFragment();
-                Bundle arguments = new Bundle();
-                arguments.putLong(ReleaseDetailFragment.ARG_ITEM_ID, mReleaseId);
-                mDetailFragment.setArguments(arguments);
-                //getSupportFragmentManager().beginTransaction().replace(R.id.detail_container, mDetailFragment).commit();
-            //}
-            mNowPlayingFragment = new NowPlayingFragment();
-            if(mRecentlyPlayedFragment == null) mRecentlyPlayedFragment = new RecentlyPlayedFragment();
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.now_playing_container,mNowPlayingFragment)
-                    .replace(R.id.detail_container, mDetailFragment)
-                    .replace(R.id.recently_played_container, mRecentlyPlayedFragment)
-                    .commit();
+            mDetailFragment = new ReleaseDetailFragment();
+            Bundle arguments = new Bundle();
+            arguments.putLong(ReleaseDetailFragment.ARG_ITEM_ID, mReleaseId);
+            mDetailFragment.setArguments(arguments);
+            getSupportFragmentManager().beginTransaction().replace(R.id.detail_container, mDetailFragment).commit();
+
+            if(mNowPlayingFragment==null) {
+                mNowPlayingFragment = new NowPlayingFragment();
+                if (mRecentlyPlayedFragment == null) {
+                    mRecentlyPlayedFragment = new RecentlyPlayedFragment();
+                }
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.now_playing_container, mNowPlayingFragment)
+                        .replace(R.id.recently_played_container, mRecentlyPlayedFragment)
+                        .commit();
+            }
 
         }
     }
@@ -119,26 +125,28 @@ public class NowPlayingActivity extends DrawerActivity implements RecentlyPlayed
         @Override
         public Fragment getItem(int position) {
             //hackish way of skipping the info fragment if we don't have a release id
-            if(mReleaseId==0) position++;
+            if (mReleaseId == 0) position++;
             switch (position) {
                 case 0:
-                        if (mDetailFragment == null) {
-                            mDetailFragment = new ReleaseDetailFragment();
-                            Bundle arguments = new Bundle();
-                            arguments.putLong(ReleaseDetailFragment.ARG_ITEM_ID, mReleaseId);
-                            mDetailFragment.setArguments(arguments);
-                        }
-                        return mDetailFragment;
+                    //if (mDetailFragment == null) {
+                        mDetailFragment = new ReleaseDetailFragment();
+                        Bundle arguments = new Bundle();
+                        arguments.putLong(ReleaseDetailFragment.ARG_ITEM_ID, mReleaseId);
+                        mDetailFragment.setArguments(arguments);
+                    //}
+                    return mDetailFragment;
                 case 1:
                     //force recreation of now playing tracklist
                     mNowPlayingFragment = new NowPlayingFragment();
                     return mNowPlayingFragment;
                 case 2:
-                    if(mRecentlyPlayedFragment == null) mRecentlyPlayedFragment = new RecentlyPlayedFragment();
+                    if (mRecentlyPlayedFragment == null)
+                        mRecentlyPlayedFragment = new RecentlyPlayedFragment();
                     return mRecentlyPlayedFragment;
             }
             return null;
         }
+
 
         @Override
         public int getCount() {
@@ -153,7 +161,8 @@ public class NowPlayingActivity extends DrawerActivity implements RecentlyPlayed
         @Override
         public CharSequence getPageTitle(int position) {
             if(mReleaseId==0) return titles[position+1];
-            else return titles[position];
+            else
+                return titles[position];
         }
 
     }
