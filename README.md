@@ -12,10 +12,11 @@ If you want to compile this app yourself, edit and copy the discogs.xml and last
 - now playing mode (scrobbling in the future)
 - search filtering
 - Discogs collection folder supported
+- Fully tablet compatible views
 
 ##Coming functionality
 - Optional info queries about artist/album
-- Fully tablet compatible views
+
 
 ##Acknowledgements
 First of all, I'd like to thank Thomas Jollans for his great VinylScrobbler project (https://github.com/tjol/vinylscrobbler) which was my primary source of inspiration.
