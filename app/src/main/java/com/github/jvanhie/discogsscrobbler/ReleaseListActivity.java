@@ -96,11 +96,14 @@ public class ReleaseListActivity extends DrawerActivity
         if(mReleaseProgressBar != null && mLoaded) mReleaseProgressBar.setVisibility(View.INVISIBLE);
         if(mRefreshProgressBar != null && mRefresh) mRefreshProgressBar.setVisibility(View.VISIBLE);
 
-        //check if we're in tablet mode -> two or tripane layout
+        //check if we're in tablet mode -> two or tripane layout (hide details fields first, for a nice collection view)
         if (findViewById(R.id.release_pager_container) != null) {
             mPanes = 2;
+            findViewById(R.id.release_pager_container).setVisibility(View.GONE);
         } else if (findViewById(R.id.release_tracklist_container) != null) {
             mPanes = 3;
+            findViewById(R.id.release_detail_container).setVisibility(View.GONE);
+            findViewById(R.id.release_tracklist_container).setVisibility(View.GONE);
         }
 
         // Restore the previously serialized activated release
@@ -254,6 +257,7 @@ public class ReleaseListActivity extends DrawerActivity
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.release_pager_container, mReleasePager)
                         .commit();
+                findViewById(R.id.release_pager_container).setVisibility(View.VISIBLE);
                 break;
             case 3: //whoa, screen estate! Show detail view _and_ tracklist
                 Bundle arguments3 = new Bundle();
@@ -268,6 +272,8 @@ public class ReleaseListActivity extends DrawerActivity
                         .replace(R.id.release_detail_container, mReleaseDetail)
                         .replace(R.id.release_tracklist_container, mReleaseTracklist)
                         .commit();
+                findViewById(R.id.release_detail_container).setVisibility(View.VISIBLE);
+                findViewById(R.id.release_tracklist_container).setVisibility(View.VISIBLE);
                 break;
         }
 

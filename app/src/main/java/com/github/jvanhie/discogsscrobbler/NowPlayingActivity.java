@@ -55,6 +55,8 @@ public class NowPlayingActivity extends DrawerActivity implements RecentlyPlayed
         //check if we're in tablet mode -> two or tripane layout
         if (findViewById(R.id.detail_container) != null) {
             mPanes = 3;
+            //hide the detail view by default, until there is something to display
+            findViewById(R.id.detail_container).setVisibility(View.GONE);
         } else if (findViewById(R.id.recently_played_container) != null) {
             mPanes = 2;
         }
@@ -62,7 +64,6 @@ public class NowPlayingActivity extends DrawerActivity implements RecentlyPlayed
         System.out.println("panes: " + mPanes);
 
         //initialize pager
-
         setPager();
 
         //set navigation drawer
@@ -87,12 +88,14 @@ public class NowPlayingActivity extends DrawerActivity implements RecentlyPlayed
             }
         } else {
             //3 pane goodness, no pagers needed
-            mDetailFragment = new ReleaseDetailFragment();
-            Bundle arguments = new Bundle();
-            arguments.putLong(ReleaseDetailFragment.ARG_ITEM_ID, mReleaseId);
-            mDetailFragment.setArguments(arguments);
-            getSupportFragmentManager().beginTransaction().replace(R.id.detail_container, mDetailFragment).commit();
-
+            if(mReleaseId!=0) {
+                mDetailFragment = new ReleaseDetailFragment();
+                Bundle arguments = new Bundle();
+                arguments.putLong(ReleaseDetailFragment.ARG_ITEM_ID, mReleaseId);
+                mDetailFragment.setArguments(arguments);
+                getSupportFragmentManager().beginTransaction().replace(R.id.detail_container, mDetailFragment).commit();
+                findViewById(R.id.detail_container).setVisibility(View.VISIBLE);
+            }
             if(mNowPlayingFragment==null) {
                 mNowPlayingFragment = new NowPlayingFragment();
                 if (mRecentlyPlayedFragment == null) {

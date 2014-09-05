@@ -222,6 +222,8 @@ public class ReleaseListFragment extends Fragment {
                         int newCol = Math.round((fragmentWidth / logicalDensity) / (float) 150);
                         if(col != newCol) {
                             int pos = grid.getFirstVisiblePosition();
+                            //if an item is selected, focus on this instead
+                            if(mActivatedPosition!=ListView.INVALID_POSITION) pos = mActivatedPosition;
                             grid.setNumColumns(newCol);
                             grid.setSelection(pos);
                         }
@@ -423,6 +425,7 @@ public class ReleaseListFragment extends Fragment {
     public void onListItemClick(View view, int position, long id) {
         // Notify the active callbacks interface (the activity, if the
         // fragment is attached to one) that an item has been selected.
+        mActivatedPosition = position;
         mCallbacks.onItemSelected(id);
     }
 
@@ -434,18 +437,6 @@ public class ReleaseListFragment extends Fragment {
             outState.putInt(STATE_ACTIVATED_POSITION, mActivatedPosition);
             System.out.println(mActivatedPosition);
         }
-    }
-
-    /**
-     * Turns on activate-on-click mode. When this mode is on, list items will be
-     * given the 'activated' state when touched.
-     */
-    public void setActivateOnItemClick(boolean activateOnItemClick) {
-        // When setting CHOICE_MODE_SINGLE, ListView will automatically
-        // give items the 'activated' state when touched.
-        mList.setChoiceMode(activateOnItemClick
-                ? AbsListView.CHOICE_MODE_SINGLE
-                : AbsListView.CHOICE_MODE_NONE);
     }
 
     private void setActivatedPosition(int position) {

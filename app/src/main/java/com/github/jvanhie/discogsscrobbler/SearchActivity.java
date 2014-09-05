@@ -92,8 +92,11 @@ public class SearchActivity extends DrawerActivity
         //check if we're in tablet mode -> two or tripane layout
         if (findViewById(R.id.release_pager_container) != null) {
             mPanes = 2;
+            findViewById(R.id.release_pager_container).setVisibility(View.GONE);
         } else if (findViewById(R.id.release_tracklist_container) != null) {
             mPanes = 3;
+            findViewById(R.id.release_detail_container).setVisibility(View.GONE);
+            findViewById(R.id.release_tracklist_container).setVisibility(View.GONE);
         }
 
         mSearchFragment.setActivateOnItemClick(true);
@@ -288,6 +291,7 @@ public class SearchActivity extends DrawerActivity
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.release_pager_container, mReleasePager)
                         .commit();
+                findViewById(R.id.release_pager_container).setVisibility(View.VISIBLE);
                 break;
             case 3: //whoa, screen estate! Show detail view _and_ tracklist
                 mDetailVisible = true;
@@ -305,6 +309,8 @@ public class SearchActivity extends DrawerActivity
                         .replace(R.id.release_detail_container, mReleasePager)
                         .replace(R.id.release_tracklist_container, mReleaseTracklist)
                         .commit();
+                findViewById(R.id.release_detail_container).setVisibility(View.VISIBLE);
+                findViewById(R.id.release_tracklist_container).setVisibility(View.VISIBLE);
                 break;
         }
     }
