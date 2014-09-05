@@ -292,15 +292,13 @@ public class ReleaseListFragment extends Fragment {
 
     public void loadList() {
         List<Release> releases = mDiscogs.getCollection();
-        if(releases.size()!=0) {
-            if (mList.getAdapter() == null) {
-                mList.setAdapter(new ReleaseAdapter(getActivity(), releases));
-                setSelection();
-            } else {
-                ((ReleaseAdapter) mList.getAdapter()).updateReleases(releases);
-            }
-            mCallbacks.onAdapterSet();
+        if (mList.getAdapter() == null) {
+            mList.setAdapter(new ReleaseAdapter(getActivity(), releases));
+            setSelection();
+        } else {
+            ((ReleaseAdapter) mList.getAdapter()).updateReleases(releases);
         }
+        mCallbacks.onAdapterSet();
     }
 
     private void setSelection() {
