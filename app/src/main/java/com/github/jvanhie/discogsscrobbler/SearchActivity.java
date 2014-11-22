@@ -78,6 +78,7 @@ public class SearchActivity extends DrawerActivity
     private int mSearchType;
     private String[] mSearchTypes;
     private static final String SEARCH_TYPE = "search_type";
+    private String mLastSearch;
 
 
     @Override
@@ -131,6 +132,7 @@ public class SearchActivity extends DrawerActivity
             @Override
             public boolean onQueryTextSubmit(String s) {
                 menu.findItem(R.id.search_field).collapseActionView();
+                mLastSearch = s;
                 //pass query to search fragment
                 if(mSearchType>0) {
                     mSearchFragment.search(s,mSearchTypes[mSearchType]);
@@ -145,7 +147,20 @@ public class SearchActivity extends DrawerActivity
                 return false;
             }
         });
-        mSearchView.setQueryHint("Search Discogs");
+        mSearchView.setOnSearchClickListener(new SearchView.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                //restore last search
+                if(mLastSearch!=null) {
+                    mSearchView.setQuery(mLastSearch,false);
+                }
+            }
+        });
+        if(mSearchType>0) {
+            mSearchView.setQueryHint("Search Discogs (" + mSearchTypes[mSearchType] + ")");
+        } else {
+            mSearchView.setQueryHint("Search Discogs");
+        }
         //config filter spinner
         final MenuItem filter = menu.findItem(R.id.search_filter);
         Spinner s = (Spinner) filter.getActionView(); // find the spinner
@@ -190,7 +205,7 @@ public class SearchActivity extends DrawerActivity
         search.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
             @Override
             public boolean onMenuItemActionExpand(MenuItem menuItem) {
-                //collapse search
+                //collapse filter
                 filter.collapseActionView();
                 return true;
             }
