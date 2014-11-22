@@ -343,8 +343,6 @@ public class Discogs extends ContextWrapper {
                     long lastLocal = -1;
                     Release last = new Select().from(Release.class).orderBy("id DESC").executeSingle();
                     if (last != null) lastLocal = last.releaseid;
-                    System.out.println("collection ids: " + lastLocal + " vs " + lastAddition);
-                    System.out.println("collection size: " + collection.size() + " vs " + collectionSize);
                     //see if the remote collection has changed from the last fetch
                     if (collection.size() != collectionSize || lastLocal != lastAddition || mFoldersChanged) {
                         //yes, it has!
@@ -910,7 +908,6 @@ public class Discogs extends ContextWrapper {
     public String getOAuthURL() {
         try {
             String auth = mOAuthProvider.retrieveRequestToken(mOAuthConsumer, "oauth://discogs");
-            System.out.println("OAuthURL: " + auth);
             return auth;
         } catch (OAuthException e) {
             e.printStackTrace();
@@ -922,7 +919,6 @@ public class Discogs extends ContextWrapper {
         try {
             if(verifier!=null) {
                 mOAuthProvider.retrieveAccessToken(mOAuthConsumer, verifier);
-                System.out.println("OAuth results: " + verifier + " -> " + mOAuthConsumer.getToken() + "/" + mOAuthConsumer.getTokenSecret());
                 setSession(mOAuthConsumer.getToken(), mOAuthConsumer.getTokenSecret());
             }
 
@@ -1005,7 +1001,6 @@ public class Discogs extends ContextWrapper {
                 ActiveAndroid.endTransaction();
                 ImageLoader.getInstance().clearDiscCache();
                 ImageLoader.getInstance().clearMemoryCache();
-                System.out.println("cleared all local data");
                 return true;
             }
         };

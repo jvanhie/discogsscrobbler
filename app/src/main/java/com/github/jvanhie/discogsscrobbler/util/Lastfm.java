@@ -200,7 +200,6 @@ public class Lastfm extends ContextWrapper {
                 data.setTimestamp(time);
                 ScrobbleResult result = de.umass.lastfm.Track.scrobble(data, mSession);
                 boolean success = (result.isSuccessful() && !result.isIgnored());
-                System.out.println("scrobbled: "+ artist +":"+title + " -> "+ success);
                 return success;
             }
 

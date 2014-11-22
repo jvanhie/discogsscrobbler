@@ -61,8 +61,6 @@ public class NowPlayingActivity extends DrawerActivity implements RecentlyPlayed
             mPanes = 2;
         }
 
-        System.out.println("panes: " + mPanes);
-
         //initialize pager
         setPager();
 

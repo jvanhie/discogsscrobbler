@@ -126,7 +126,6 @@ public class ReleaseTracklistFragment extends ListFragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        System.out.println("trackmenu: " + hasMenu);
         if(PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("enable_discogs", true)) {
             if (mRelease == null || mRelease.isTransient) {
                 //the release is not in the collection, give the user the opportunity to add it
@@ -240,8 +239,6 @@ public class ReleaseTracklistFragment extends ListFragment {
 
             //get selected tracks
             final List<Track> tracks = getSelectedTracks();
-            System.out.println("scrobbling tracklist accuracy");
-
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setMessage("Did you just finished listening to " + mRelease.title + " or are you about to listen to it?").setTitle("Scrobble this album?");

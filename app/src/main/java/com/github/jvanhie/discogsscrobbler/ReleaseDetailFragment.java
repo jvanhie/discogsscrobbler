@@ -118,7 +118,6 @@ public class ReleaseDetailFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        System.out.println("detailmenu: " + hasMenu);
         if(PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("enable_discogs", true)) {
             if (mRelease == null || mRelease.isTransient) {
                 //the release is not in the collection, give the user the opportunity to add it
