@@ -80,6 +80,7 @@ public class ReleaseListActivity extends DrawerActivity
 
     private boolean mLoaded = false;
     private boolean mRefresh = false;
+    private boolean mFolders = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -147,30 +148,33 @@ public class ReleaseListActivity extends DrawerActivity
             });
             searchView.setQueryHint("Filter your releases");
             final MenuItem filter = menu.findItem(R.id.list_filter);
-            mDiscogs.getFolders(new Discogs.DiscogsDataWaiter<List<Folder>>() {
-                @Override
-                public void onResult(boolean success, List<Folder> data) {
-                    Spinner s = (Spinner) filter.getActionView(); // find the spinner
-                    ArrayAdapter<Folder> mSpinnerAdapter = new ArrayAdapter<Folder>(getActionBar().getThemedContext(), android.R.layout.simple_spinner_item, data);
-                    mSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    s.setAdapter(mSpinnerAdapter); // set the adapter
-                    s.setSelection(0, false);
-                    s.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                            mDiscogs.setFolderId(((Folder) adapterView.getItemAtPosition(i)).folderid);
-                            //reload list with id
-                            mReleaseList.loadList();
-                            filter.collapseActionView();
-                        }
+            if(!mFolders) {
+                mDiscogs.getFolders(new Discogs.DiscogsDataWaiter<List<Folder>>() {
+                    @Override
+                    public void onResult(boolean success, List<Folder> data) {
+                        mFolders=true;
+                        Spinner s = (Spinner) filter.getActionView(); // find the spinner
+                        ArrayAdapter<Folder> mSpinnerAdapter = new ArrayAdapter<Folder>(getActionBar().getThemedContext(), android.R.layout.simple_spinner_item, data);
+                        mSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        s.setAdapter(mSpinnerAdapter); // set the adapter
+                        s.setSelection(0, false);
+                        s.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                            @Override
+                            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                                mDiscogs.setFolderId(((Folder) adapterView.getItemAtPosition(i)).folderid);
+                                //reload list with id
+                                mReleaseList.loadList();
+                                filter.collapseActionView();
+                            }
 
-                        @Override
-                        public void onNothingSelected(AdapterView<?> adapterView) {
-                            //filter.collapseActionView();
-                        }
-                    });
-                }
-            });
+                            @Override
+                            public void onNothingSelected(AdapterView<?> adapterView) {
+                                //filter.collapseActionView();
+                            }
+                        });
+                    }
+                });
+            }
 
             //make sure only one actionview is expanded
             filter.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
@@ -239,7 +243,6 @@ public class ReleaseListActivity extends DrawerActivity
     @Override
     public void onItemSelected(long id) {
         mSelected = id;
-        invalidateOptionsMenu();
         switch (mPanes) {
             case 1: //just start new activity with the details
                 Intent detailIntent = new Intent(this, ReleaseDetailActivity.class);
@@ -248,6 +251,7 @@ public class ReleaseListActivity extends DrawerActivity
                 startActivity(detailIntent);
                 break;
             case 2: //show the pager fragment next to the list
+                invalidateOptionsMenu();
                 Bundle arguments2 = new Bundle();
                 arguments2.putLong(ReleaseDetailFragment.ARG_ITEM_ID, id);
                 arguments2.putBoolean(ReleasePagerFragment.SHOW_VERSIONS, false);
@@ -260,6 +264,7 @@ public class ReleaseListActivity extends DrawerActivity
                 findViewById(R.id.release_pager_container).setVisibility(View.VISIBLE);
                 break;
             case 3: //whoa, screen estate! Show detail view _and_ tracklist
+                invalidateOptionsMenu();
                 Bundle arguments3 = new Bundle();
                 arguments3.putLong(ReleaseDetailFragment.ARG_ITEM_ID, id);
                 mReleaseDetail = new ReleaseDetailFragment();

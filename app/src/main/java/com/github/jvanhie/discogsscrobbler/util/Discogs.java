@@ -24,6 +24,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
@@ -48,6 +49,7 @@ import com.github.jvanhie.discogsscrobbler.queries.DiscogsSearchResult;
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsService;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -99,6 +101,9 @@ public class Discogs extends ContextWrapper {
     private boolean mFoldersChanged = false;
     private long mFolderId = 0;
     private List<Folder> folders;
+
+    private AtomicInteger mRetries=new AtomicInteger(0);
+    private static final int MAX_RETRIES = 10;
 
     private List<Release> collection;
     private List<DiscogsBasicRelease> onlineCollection = new ArrayList<DiscogsBasicRelease>();
@@ -505,12 +510,28 @@ public class Discogs extends ContextWrapper {
         mDiscogsService.getPriceSuggestions(id, new Callback<DiscogsPriceSuggestion>() {
             @Override
             public void success(DiscogsPriceSuggestion s, Response response) {
+                mRetries.set(0);
                 waiter.onResult(true, s);
             }
 
             @Override
             public void failure(RetrofitError error) {
-                waiter.onResult(false, null);
+                if(error.isNetworkError()) {
+                    //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
+                    if(mRetries.getAndIncrement()<MAX_RETRIES) {
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                getPriceSuggestions(id,waiter);
+                            }
+                        }, 1000);
+                    } else {
+                        //we reached the global max retries, give up
+                        waiter.onResult(false, null);
+                    }
+                } else {
+                    waiter.onResult(false, null);
+                }
             }
         });
     }
@@ -534,6 +555,7 @@ public class Discogs extends ContextWrapper {
         mDiscogsService.getRelease(release.releaseid, new Callback<DiscogsRelease>() {
             @Override
             public void success(DiscogsRelease discogsRelease, Response response) {
+                mRetries.set(0);
                 release.setValues(discogsRelease);
                 release.save();
                 waiter.onResult(true);
@@ -541,8 +563,23 @@ public class Discogs extends ContextWrapper {
 
             @Override
             public void failure(RetrofitError error) {
-                waiter.onResult(false);
-                parseRetrofitError(error);
+                if(error.isNetworkError()) {
+                    //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
+                    if(mRetries.getAndIncrement()<MAX_RETRIES) {
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                refreshRelease(release, waiter);
+                            }
+                        }, 1000);
+                    } else {
+                        //we reached the global max retries, give up
+                        waiter.onResult(false);
+                    }
+                } else {
+                    waiter.onResult(false);
+                    parseRetrofitError(error);
+                }
             }
         });
     }
@@ -699,12 +736,12 @@ public class Discogs extends ContextWrapper {
                 if (discogsFolders.folders.size() != folders.size()) {
                     //number of folders has changed, clear current folders in db, mark folder state as dirty
                     new Delete().from(Folder.class).execute();
-                    mFoldersChanged=true;
+                    mFoldersChanged = true;
                 } else {
                     //compare item count (trigger for folder id refresh)
-                    for (int i = 0 ; i < folders.size(); i++) {
-                        if(folders.get(i).count!=discogsFolders.folders.get(i).count) {
-                            mFoldersChanged=true;
+                    for (int i = 0; i < folders.size(); i++) {
+                        if (folders.get(i).count != discogsFolders.folders.get(i).count) {
+                            mFoldersChanged = true;
                             break;
                         }
                     }
@@ -715,13 +752,13 @@ public class Discogs extends ContextWrapper {
                     folders.add(newFolder);
                     newFolder.save();
                 }
-                waiter.onResult(true,folders);
+                waiter.onResult(true, folders);
             }
 
             @Override
             public void failure(RetrofitError error) {
                 if (folders == null) loadFolders();
-                waiter.onResult(false,folders);
+                waiter.onResult(false, folders);
             }
         });
     }
