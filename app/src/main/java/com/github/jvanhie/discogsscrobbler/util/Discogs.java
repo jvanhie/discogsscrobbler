@@ -326,9 +326,32 @@ public class Discogs extends ContextWrapper {
         return mUserName;
     }
 
+
+
     public InputStream getImage(String image) throws IOException {
-        Response r = mDiscogsService.getRawPath(image);
-        return (r == null) ? null : r.getBody().in();
+        Response r = null;
+        try {
+            r =mDiscogsService.getRawPath(image);
+        } catch (Exception e) {
+            if (mRetries.getAndIncrement()<MAX_RETRIES) {
+                return getImage(image);
+            }
+        }
+        if(r == null) {
+            return null;
+        } else {
+            mRetries.set(0);
+            return r.getBody().in();
+        }
+    }
+
+    private void parseRetrofitError(RetrofitError error) {
+        if(!error.isNetworkError()) {
+            if(error.getResponse().getStatus()==401) {
+                //we made an unauthorized call, token was invalidated, log in again
+                logIn();
+            }
+        }
     }
 
     public void isCollectionChanged(final DiscogsWaiter waiter) {
@@ -336,6 +359,7 @@ public class Discogs extends ContextWrapper {
         mDiscogsService.getCollectionLastAdded(mUserName, 0, new Callback<DiscogsCollection>() {
             @Override
             public void success(DiscogsCollection discogsCollection, Response response) {
+                mRetries.set(0);
                 int collectionSize = discogsCollection.getPagination().items;
                 if (collectionSize != 0) {
                     //last online addition
@@ -358,62 +382,116 @@ public class Discogs extends ContextWrapper {
 
             @Override
             public void failure(RetrofitError error) {
-                parseRetrofitError(error);
-                waiter.onResult(false);
+                if(error.isNetworkError()) {
+                    //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
+                    if(mRetries.getAndIncrement()<MAX_RETRIES) {
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                isCollectionChanged(waiter);
+                            }
+                        }, 1000);
+                    } else {
+                        //we reached the global max retries, give up
+                        waiter.onResult(false);
+                    }
+                } else {
+                    parseRetrofitError(error);
+                    waiter.onResult(false);
+                }
             }
         });
     }
 
-    private void parseRetrofitError(RetrofitError error) {
-        if(!error.isNetworkError()) {
-            if(error.getResponse().getStatus()==401) {
-                //we made an unauthorized call, token was invalidated, log in again
-                logIn();
-            }
-        }
-    }
-
-    public void search(String query, final DiscogsDataWaiter<List<DiscogsSearchResult>> waiter) {
+    public void search(final String query, final DiscogsDataWaiter<List<DiscogsSearchResult>> waiter) {
         mDiscogsService.search(query, new Callback<DiscogsSearch>() {
             @Override
             public void success(DiscogsSearch discogsSearch, Response response) {
+                mRetries.set(0);
                 waiter.onResult(true,discogsSearch.results);
             }
 
             @Override
             public void failure(RetrofitError error) {
-                parseRetrofitError(error);
-                waiter.onResult(false,null);
+                if(error.isNetworkError()) {
+                    //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
+                    if(mRetries.getAndIncrement()<MAX_RETRIES) {
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                search(query, waiter);
+                            }
+                        }, 1000);
+                    } else {
+                        //we reached the global max retries, give up
+                        waiter.onResult(false, null);
+                    }
+                } else {
+                    parseRetrofitError(error);
+                    waiter.onResult(false, null);
+                }
             }
         });
     }
 
-    public void search(String query, String type, final DiscogsDataWaiter<List<DiscogsSearchResult>> waiter) {
+    public void search(final String query, final String type, final DiscogsDataWaiter<List<DiscogsSearchResult>> waiter) {
         mDiscogsService.search(query, type, new Callback<DiscogsSearch>() {
             @Override
             public void success(DiscogsSearch discogsSearch, Response response) {
+                mRetries.set(0);
                 waiter.onResult(true,discogsSearch.results);
             }
 
             @Override
             public void failure(RetrofitError error) {
-                parseRetrofitError(error);
-                waiter.onResult(false,null);
+                if(error.isNetworkError()) {
+                    //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
+                    if(mRetries.getAndIncrement()<MAX_RETRIES) {
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                search(query, type, waiter);
+                            }
+                        }, 1000);
+                    } else {
+                        //we reached the global max retries, give up
+                        waiter.onResult(false, null);
+                    }
+                } else {
+                    parseRetrofitError(error);
+                    waiter.onResult(false, null);
+                }
             }
         });
     }
 
-    public void searchBarcode(String query, final DiscogsDataWaiter<List<DiscogsSearchResult>> waiter) {
+    public void searchBarcode(final String query, final DiscogsDataWaiter<List<DiscogsSearchResult>> waiter) {
         mDiscogsService.searchBarcode(query, new Callback<DiscogsSearch>() {
             @Override
             public void success(DiscogsSearch discogsSearch, Response response) {
-                waiter.onResult(true,discogsSearch.results);
+                mRetries.set(0);
+                waiter.onResult(true, discogsSearch.results);
             }
 
             @Override
             public void failure(RetrofitError error) {
-                parseRetrofitError(error);
-                waiter.onResult(false,null);
+                if(error.isNetworkError()) {
+                    //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
+                    if(mRetries.getAndIncrement()<MAX_RETRIES) {
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                searchBarcode(query, waiter);
+                            }
+                        }, 1000);
+                    } else {
+                        //we reached the global max retries, give up
+                        waiter.onResult(false, null);
+                    }
+                } else {
+                    parseRetrofitError(error);
+                    waiter.onResult(false, null);
+                }
             }
         });
     }
@@ -440,12 +518,28 @@ public class Discogs extends ContextWrapper {
                     loader.parentid = id;
                     result.add(loader);
                 }
+                mRetries.set(0);
                 waiter.onResult(true, result);
             }
 
             @Override
             public void failure(RetrofitError error) {
-                waiter.onResult(false, null);
+                if(error.isNetworkError()) {
+                    //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
+                    if(mRetries.getAndIncrement()<MAX_RETRIES) {
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                getArtistReleases(id, page, waiter);
+                            }
+                        }, 1000);
+                    } else {
+                        //we reached the global max retries, give up
+                        waiter.onResult(false, null);
+                    }
+                } else {
+                    waiter.onResult(false, null);
+                }
             }
         });
     }
@@ -454,69 +548,117 @@ public class Discogs extends ContextWrapper {
         mDiscogsPublicService.getLabelReleases(id, page, new Callback<DiscogsSearch>() {
             @Override
             public void success(DiscogsSearch discogsSearch, Response response) {
-                if(discogsSearch.pagination.page<discogsSearch.pagination.pages) {
+                if (discogsSearch.pagination.page < discogsSearch.pagination.pages) {
                     //add dummy release - loader to get more
                     DiscogsSearchLoader loader = new DiscogsSearchLoader();
                     loader.title = "Load more releases";
                     loader.artist = "Click here to load more releases";
-                    loader.format = "Page " + (page+1) + " of " + discogsSearch.pagination.pages;
+                    loader.format = "Page " + (page + 1) + " of " + discogsSearch.pagination.pages;
                     loader.type = "loader";
                     loader.id = 0;
                     //loader specific options
                     loader.parenttype = "label";
-                    loader.page = page+1;
+                    loader.page = page + 1;
                     loader.parentid = id;
                     discogsSearch.releases.add(loader);
                 }
+                mRetries.set(0);
                 waiter.onResult(true, discogsSearch.releases);
             }
 
             @Override
             public void failure(RetrofitError error) {
-                waiter.onResult(false, null);
+                if(error.isNetworkError()) {
+                    //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
+                    if(mRetries.getAndIncrement()<MAX_RETRIES) {
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                getLabelReleases(id, page, waiter);
+                            }
+                        }, 1000);
+                    } else {
+                        //we reached the global max retries, give up
+                        waiter.onResult(false, null);
+                    }
+                } else {
+                    waiter.onResult(false, null);
+                }
             }
         });
     }
 
     public void getMasterReleases(final long id, final int page, final DiscogsDataWaiter<List<DiscogsSearchRelease>> waiter) {
-        mDiscogsPublicService.getMasterReleases(id, page,new Callback<DiscogsSearch>() {
+        mDiscogsPublicService.getMasterReleases(id, page, new Callback<DiscogsSearch>() {
             @Override
             public void success(DiscogsSearch discogsSearch, Response response) {
-                if(discogsSearch.pagination.page<discogsSearch.pagination.pages) {
+                if (discogsSearch.pagination.page < discogsSearch.pagination.pages) {
                     //add dummy release - loader to get more
                     DiscogsSearchLoader loader = new DiscogsSearchLoader();
                     loader.title = "Load more releases";
                     loader.artist = "Click here to load more releases";
-                    loader.format = "Page " + (page+1) + " of " + discogsSearch.pagination.pages;
+                    loader.format = "Page " + (page + 1) + " of " + discogsSearch.pagination.pages;
                     loader.type = "loader";
                     loader.id = 0;
                     //loader specific options
                     loader.parenttype = "master";
-                    loader.page = page+1;
+                    loader.page = page + 1;
                     loader.parentid = id;
                     discogsSearch.versions.add(loader);
                 }
+                mRetries.set(0);
                 waiter.onResult(true, discogsSearch.versions);
             }
 
             @Override
             public void failure(RetrofitError error) {
-                waiter.onResult(false, null);
+                if(error.isNetworkError()) {
+                    //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
+                    if(mRetries.getAndIncrement()<MAX_RETRIES) {
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                getMasterReleases(id, page, waiter);
+                            }
+                        }, 1000);
+                    } else {
+                        //we reached the global max retries, give up
+                        waiter.onResult(false, null);
+                    }
+                } else {
+                    waiter.onResult(false, null);
+                }
             }
         });
     }
 
     /*returns a transient release from discogs, cannot be saved to the db unless the flag is set to false before saving*/
-    public void getRelease(long id, final DiscogsDataWaiter<Release> waiter) {
+    public void getRelease(final long id, final DiscogsDataWaiter<Release> waiter) {
         mDiscogsPublicService.getRelease(id, new Callback<DiscogsRelease>() {
             @Override
             public void success(DiscogsRelease discogsRelease, Response response) {
+                mRetries.set(0);
                 waiter.onResult(true, new Release(discogsRelease, true));
             }
 
             @Override
             public void failure(RetrofitError error) {
-                waiter.onResult(false, null);
+                if (error.isNetworkError()) {
+                    //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
+                    if (mRetries.getAndIncrement() < MAX_RETRIES) {
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                getRelease(id, waiter);
+                            }
+                        }, 1000);
+                    } else {
+                        //we reached the global max retries, give up
+                        waiter.onResult(false, null);
+                    }
+                } else {
+                    waiter.onResult(false, null);
+                }
             }
         });
     }
@@ -526,23 +668,60 @@ public class Discogs extends ContextWrapper {
             @Override
             public void success(DiscogsRelease discogsRelease, Response response) {
                 //release is already in the collection, we won't add it again!
+                mRetries.set(0);
                 waiter.onResult(false);
             }
 
             @Override
             public void failure(RetrofitError error) {
-                //this is actually what we expect -> release not found, we can add it now
-                mDiscogsService.addRelease(mUserName, id, new Callback<Response>() {
-                    @Override
-                    public void success(Response response, Response response2) {
-                        waiter.onResult(true);
-                    }
-
-                    @Override
-                    public void failure(RetrofitError error) {
+                if(error.isNetworkError()) {
+                    //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
+                    if(mRetries.getAndIncrement()<MAX_RETRIES) {
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                addRelease(id, waiter);
+                            }
+                        }, 1000);
+                    } else {
+                        //we reached the global max retries, give up
                         waiter.onResult(false);
                     }
-                });
+                } else {
+                    //this is actually what we expect -> release not found, we can add it now
+                    mRetries.set(0);
+                    reallyAddRelease(id,waiter);
+                }
+            }
+        });
+    }
+
+    private void reallyAddRelease(final long id, final DiscogsWaiter waiter) {
+        mDiscogsService.addRelease(mUserName, id, new Callback<Response>() {
+            @Override
+            public void success(Response response, Response response2) {
+                mRetries.set(0);
+                waiter.onResult(true);
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                if(error.isNetworkError()) {
+                    //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
+                    if(mRetries.getAndIncrement()<MAX_RETRIES) {
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                reallyAddRelease(id, waiter);
+                            }
+                        }, 1000);
+                    } else {
+                        //we reached the global max retries, give up
+                        waiter.onResult(false);
+                    }
+                } else {
+                    waiter.onResult(false);
+                }
             }
         });
     }
@@ -557,9 +736,9 @@ public class Discogs extends ContextWrapper {
 
             @Override
             public void failure(RetrofitError error) {
-                if(error.isNetworkError()) {
+                if (error.isNetworkError()) {
                     //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
-                    if(mRetries.getAndIncrement()<MAX_RETRIES) {
+                    if (mRetries.getAndIncrement() < MAX_RETRIES) {
                         new Handler().postDelayed(new Runnable() {
                             @Override
                             public void run() {
@@ -577,16 +756,32 @@ public class Discogs extends ContextWrapper {
         });
     }
 
-    public void removeRelease(long id, final DiscogsWaiter waiter) {
+    public void removeRelease(final long id, final DiscogsWaiter waiter) {
         mDiscogsService.removeRelease(mUserName, id, new Callback<Response>() {
             @Override
             public void success(Response r, Response response) {
+                mRetries.set(0);
                 waiter.onResult(true);
             }
 
             @Override
             public void failure(RetrofitError error) {
-                waiter.onResult(false);
+                if(error.isNetworkError()) {
+                    //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
+                    if(mRetries.getAndIncrement()<MAX_RETRIES) {
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                removeRelease(id, waiter);
+                            }
+                        }, 1000);
+                    } else {
+                        //we reached the global max retries, give up
+                        waiter.onResult(false);
+                    }
+                } else {
+                    waiter.onResult(false);
+                }
             }
         });
     }
@@ -773,6 +968,7 @@ public class Discogs extends ContextWrapper {
         mDiscogsService.getFolders(mUserName, new Callback<DiscogsFolders>() {
             @Override
             public void success(DiscogsFolders discogsFolders, Response response) {
+                mRetries.set(0);
                 if (folders == null) loadFolders();
                 if (discogsFolders.folders.size() != folders.size()) {
                     //number of folders has changed, clear current folders in db, mark folder state as dirty
@@ -798,8 +994,23 @@ public class Discogs extends ContextWrapper {
 
             @Override
             public void failure(RetrofitError error) {
-                if (folders == null) loadFolders();
-                waiter.onResult(false, folders);
+                if(error.isNetworkError()) {
+                    //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
+                    if(mRetries.getAndIncrement()<MAX_RETRIES) {
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                getFolders(waiter);
+                            }
+                        }, 1000);
+                    } else {
+                        //we reached the global max retries, give up
+                        waiter.onResult(false, folders);
+                    }
+                } else {
+                    if (folders == null) loadFolders();
+                    waiter.onResult(false, folders);
+                }
             }
         });
     }
@@ -827,6 +1038,7 @@ public class Discogs extends ContextWrapper {
         mDiscogsService.getCollection(mUserName, 0, page, new Callback<DiscogsCollection>() {
             @Override
             public void success(DiscogsCollection result, Response response) {
+                mRetries.set(0);
                 //store collection for parsing
                 onlineCollection.addAll(result.getReleases());
                 if (page < result.getPagination().pages) {
@@ -841,8 +1053,23 @@ public class Discogs extends ContextWrapper {
 
             @Override
             public void failure(RetrofitError error) {
-                parseRetrofitError(error);
-                waiter.onResult(false);
+                if(error.isNetworkError()) {
+                    //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
+                    if(mRetries.getAndIncrement()<MAX_RETRIES) {
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                refreshCollection(page, waiter);
+                            }
+                        }, 1000);
+                    } else {
+                        //we reached the global max retries, give up
+                        waiter.onResult(false);
+                    }
+                } else {
+                    parseRetrofitError(error);
+                    waiter.onResult(false);
+                }
             }
         });
     }
@@ -970,7 +1197,7 @@ public class Discogs extends ContextWrapper {
         }
     }
 
-    public void setSession(String accessToken, String accessSecret) {
+    public void setSession(final String accessToken, final String accessSecret) {
 
         mAccessToken = accessToken;
         mAccessSecret = accessSecret;
@@ -980,6 +1207,7 @@ public class Discogs extends ContextWrapper {
         mDiscogsService.getIdentity(new Callback<DiscogsIdentity>() {
             @Override
             public void success(DiscogsIdentity discogsIdentity, Response response) {
+                mRetries.set(0);
                 if (discogsIdentity.username != null) {
                     //only save the credentials when a username has been correctly parsed
                     mUserName = discogsIdentity.username;
@@ -994,7 +1222,17 @@ public class Discogs extends ContextWrapper {
 
             @Override
             public void failure(RetrofitError error) {
-
+                if(error.isNetworkError()) {
+                    //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
+                    if(mRetries.getAndIncrement()<MAX_RETRIES) {
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                setSession(accessToken, accessSecret);
+                            }
+                        }, 1000);
+                    }
+                }
             }
         });
     }
