@@ -371,6 +371,7 @@ public class Discogs extends ContextWrapper {
                     //see if the remote collection has changed from the last fetch
                     if (collection.size() != collectionSize || lastLocal != lastAddition || mFoldersChanged) {
                         //yes, it has!
+                        System.out.println("collection changed! " + collection.size() + "-" + collectionSize + "|" + lastLocal + "-" + lastAddition + "|" + mFoldersChanged);
                         waiter.onResult(true);
                     } else {
                         waiter.onResult(false);
@@ -976,9 +977,13 @@ public class Discogs extends ContextWrapper {
                 } else {
                     //compare item count (trigger for folder id refresh)
                     for (int i = 0; i < folders.size(); i++) {
-                        if (folders.get(i).count != discogsFolders.folders.get(i).count) {
-                            mFoldersChanged = true;
-                            break;
+                        for(int j = 0; j < folders.size(); j++) {
+                            if(folders.get(i).folderid == discogsFolders.folders.get(j).id) {
+                                if (folders.get(i).count != discogsFolders.folders.get(j).count) {
+                                    mFoldersChanged = true;
+                                    break;
+                                }
+                            }
                         }
                     }
                 }
