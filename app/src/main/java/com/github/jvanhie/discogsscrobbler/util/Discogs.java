@@ -687,7 +687,7 @@ public class Discogs extends ContextWrapper {
                         //we reached the global max retries, give up
                         waiter.onResult(false);
                     }
-                } else {
+                } else if (error.getResponse() != null && error.getResponse().getStatus() == 404) {
                     //this is actually what we expect -> release not found, we can add it now
                     mRetries.set(0);
                     reallyAddRelease(id,waiter);
