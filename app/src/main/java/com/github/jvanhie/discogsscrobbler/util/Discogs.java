@@ -44,6 +44,7 @@ import com.github.jvanhie.discogsscrobbler.queries.DiscogsIdentity;
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsPriceSuggestion;
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsRelease;
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsSearch;
+import com.github.jvanhie.discogsscrobbler.queries.DiscogsSearchLoader;
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsSearchRelease;
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsSearchResult;
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsService;
@@ -417,13 +418,27 @@ public class Discogs extends ContextWrapper {
         });
     }
 
-    public void getArtistReleases(long id, final DiscogsDataWaiter<List<DiscogsSearchRelease>> waiter) {
-        mDiscogsPublicService.getArtistReleases(id, new Callback<DiscogsSearch>() {
+    public void getArtistReleases(final long id, final int page, final DiscogsDataWaiter<List<DiscogsSearchRelease>> waiter) {
+        mDiscogsPublicService.getArtistReleases(id, page, new Callback<DiscogsSearch>() {
             @Override
             public void success(DiscogsSearch discogsSearch, Response response) {
                 ArrayList<DiscogsSearchRelease> result = new ArrayList<DiscogsSearchRelease>();
                 for(DiscogsSearchRelease r : discogsSearch.releases) {
                     if (r.type.equals("release")) result.add(r);
+                }
+                if(discogsSearch.pagination.page<discogsSearch.pagination.pages) {
+                    //add dummy release - loader to get more
+                    DiscogsSearchLoader loader = new DiscogsSearchLoader();
+                    loader.title = "Load more releases";
+                    loader.artist = "Click here to load more releases";
+                    loader.format = "Page " + (page+1) + " of " + discogsSearch.pagination.pages;
+                    loader.type = "loader";
+                    loader.id = 0;
+                    //loader specific options
+                    loader.parenttype = "artist";
+                    loader.page = page+1;
+                    loader.parentid = id;
+                    result.add(loader);
                 }
                 waiter.onResult(true, result);
             }
@@ -435,10 +450,24 @@ public class Discogs extends ContextWrapper {
         });
     }
 
-    public void getLabelReleases(long id, final DiscogsDataWaiter<List<DiscogsSearchRelease>> waiter) {
-        mDiscogsPublicService.getLabelReleases(id, new Callback<DiscogsSearch>() {
+    public void getLabelReleases(final long id, final int page, final DiscogsDataWaiter<List<DiscogsSearchRelease>> waiter) {
+        mDiscogsPublicService.getLabelReleases(id, page, new Callback<DiscogsSearch>() {
             @Override
             public void success(DiscogsSearch discogsSearch, Response response) {
+                if(discogsSearch.pagination.page<discogsSearch.pagination.pages) {
+                    //add dummy release - loader to get more
+                    DiscogsSearchLoader loader = new DiscogsSearchLoader();
+                    loader.title = "Load more releases";
+                    loader.artist = "Click here to load more releases";
+                    loader.format = "Page " + (page+1) + " of " + discogsSearch.pagination.pages;
+                    loader.type = "loader";
+                    loader.id = 0;
+                    //loader specific options
+                    loader.parenttype = "label";
+                    loader.page = page+1;
+                    loader.parentid = id;
+                    discogsSearch.releases.add(loader);
+                }
                 waiter.onResult(true, discogsSearch.releases);
             }
 
@@ -449,10 +478,24 @@ public class Discogs extends ContextWrapper {
         });
     }
 
-    public void getMasterReleases(long id, final DiscogsDataWaiter<List<DiscogsSearchRelease>> waiter) {
-        mDiscogsPublicService.getMasterReleases(id, new Callback<DiscogsSearch>() {
+    public void getMasterReleases(final long id, final int page, final DiscogsDataWaiter<List<DiscogsSearchRelease>> waiter) {
+        mDiscogsPublicService.getMasterReleases(id, page,new Callback<DiscogsSearch>() {
             @Override
             public void success(DiscogsSearch discogsSearch, Response response) {
+                if(discogsSearch.pagination.page<discogsSearch.pagination.pages) {
+                    //add dummy release - loader to get more
+                    DiscogsSearchLoader loader = new DiscogsSearchLoader();
+                    loader.title = "Load more releases";
+                    loader.artist = "Click here to load more releases";
+                    loader.format = "Page " + (page+1) + " of " + discogsSearch.pagination.pages;
+                    loader.type = "loader";
+                    loader.id = 0;
+                    //loader specific options
+                    loader.parenttype = "master";
+                    loader.page = page+1;
+                    loader.parentid = id;
+                    discogsSearch.versions.add(loader);
+                }
                 waiter.onResult(true, discogsSearch.versions);
             }
 
@@ -520,7 +563,7 @@ public class Discogs extends ContextWrapper {
                         new Handler().postDelayed(new Runnable() {
                             @Override
                             public void run() {
-                                getPriceSuggestions(id,waiter);
+                                getPriceSuggestions(id, waiter);
                             }
                         }, 1000);
                     } else {

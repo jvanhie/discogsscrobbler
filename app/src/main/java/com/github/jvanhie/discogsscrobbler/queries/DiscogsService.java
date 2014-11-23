@@ -54,14 +54,14 @@ public interface DiscogsService {
     @GET("/releases/{id}")
     void getRelease(@Path("id") long id, Callback<DiscogsRelease> callback);
 
-    @GET("/artists/{id}/releases")
-    void getArtistReleases(@Path("id") long id, Callback<DiscogsSearch> callback);
+    @GET("/artists/{id}/releases?per_page=100")
+    void getArtistReleases(@Path("id") long id, @Query("page") int page, Callback<DiscogsSearch> callback);
 
-    @GET("/labels/{id}/releases")
-    void getLabelReleases(@Path("id") long id, Callback<DiscogsSearch> callback);
+    @GET("/labels/{id}/releases?per_page=100")
+    void getLabelReleases(@Path("id") long id, @Query("page") int page, Callback<DiscogsSearch> callback);
 
-    @GET("/masters/{id}/versions")
-    void getMasterReleases(@Path("id") long id, Callback<DiscogsSearch> callback);
+    @GET("/masters/{id}/versions?per_page=100")
+    void getMasterReleases(@Path("id") long id, @Query("page") int page, Callback<DiscogsSearch> callback);
 
     @GET("/users/{username}/collection/folders/0/releases/{id}/instances/1")
     void getCollectionRelease(@Path("username") String username, @Path("id") long id, Callback<DiscogsRelease> callback);

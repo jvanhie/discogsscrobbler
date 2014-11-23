@@ -76,7 +76,13 @@ public class SearchAdapter extends BaseExpandableListAdapter {
 
     //called when a subquery in the searchfragement was completed
     public void addChildren(int i, List<DiscogsSearchRelease> releases ) {
-        mReleases.put(i,releases);
+        List<DiscogsSearchRelease> r = mReleases.get(i,new ArrayList<DiscogsSearchRelease>());
+        if(r.size()>0 && r.get(r.size()-1).type=="loader") {
+            //remove the last "release" -> it's a loader
+            r.remove(r.size()-1);
+        }
+        r.addAll(releases);
+        mReleases.put(i,r);
         notifyDataSetChanged();
     }
 
@@ -190,7 +196,11 @@ public class SearchAdapter extends BaseExpandableListAdapter {
                 info2.setText(release.format);
             }
 
-            mImageLoader.displayImage(release.thumb, img);
+            if(release.type=="loader") {
+                img.setImageResource(R.drawable.load_releases);
+            } else {
+                mImageLoader.displayImage(release.thumb, img);
+            }
         }
         return view;
     }

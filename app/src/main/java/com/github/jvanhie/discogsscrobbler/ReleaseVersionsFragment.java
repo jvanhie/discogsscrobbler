@@ -74,6 +74,9 @@ public class ReleaseVersionsFragment extends Fragment {
     private AbsListView mList;
     private Discogs mDiscogs;
 
+    private int mPage = 1;
+    private int mLoadpage = 1;
+
     /**
      * A callback interface that all activities containing this fragment must
      * implement. This mechanism allows activities to be notified of item
@@ -160,12 +163,18 @@ public class ReleaseVersionsFragment extends Fragment {
     }
 
     public void loadList() {
-        if(mReleases == null) {
-            mDiscogs.getMasterReleases(mRelease.master_id, new Discogs.DiscogsDataWaiter<List<DiscogsSearchRelease>>() {
+        if(mReleases == null || mPage!=mLoadpage) {
+            mDiscogs.getMasterReleases(mRelease.master_id,mLoadpage, new Discogs.DiscogsDataWaiter<List<DiscogsSearchRelease>>() {
                 @Override
                 public void onResult(boolean success, List<DiscogsSearchRelease> data) {
                     if (success && data != null) {
-                        mReleases = new ArrayList<Release>();
+                        mPage=mLoadpage;
+                        if(mReleases== null) {
+                            mReleases = new ArrayList<Release>();
+                        } else {
+                            //it's an additional load, remove the previous loader
+                            mReleases.remove(mReleases.size()-1);
+                        }
                         for (DiscogsSearchRelease r : data) {
                             //create release object that releaseadapter will understand (discogs does not provide artist name with it's master versions call, get it from the current release)
                             Release release = new Release(r);
@@ -221,7 +230,13 @@ public class ReleaseVersionsFragment extends Fragment {
     public void onListItemClick(View view, int position, long id) {
         // Notify the active callbacks interface (the activity, if the
         // fragment is attached to one) that an item has been selected.
-        mCallbacks.onItemSelected(id);
+        if(id==0) {
+            //it's a loader, get the next page
+            mLoadpage=mPage+1;
+            loadList();
+        } else {
+            mCallbacks.onItemSelected(id);
+        }
     }
 
     @Override

@@ -43,6 +43,7 @@ import android.widget.Toast;
 import com.github.jvanhie.discogsscrobbler.adapters.ReleaseAdapter;
 import com.github.jvanhie.discogsscrobbler.adapters.SearchAdapter;
 import com.github.jvanhie.discogsscrobbler.models.Release;
+import com.github.jvanhie.discogsscrobbler.queries.DiscogsSearchLoader;
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsSearchRelease;
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsSearchResult;
 import com.github.jvanhie.discogsscrobbler.util.Discogs;
@@ -150,8 +151,47 @@ public class SearchFragment extends Fragment {
 
         mList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
-            public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i2, long l) {
-                onItemSelected(l);
+            public boolean onChildClick(ExpandableListView expandableListView, View view, final int i, int i2, long l) {
+                if(l==0) {
+                    //it's a loader (yes, hackish afterthought) get the necessary data from it
+                    DiscogsSearchLoader loader = (DiscogsSearchLoader) mAdapter.getChild(i,i2);
+                    mCallbacks.setRefreshVisible(true);
+                    if(loader.parenttype.equals("artist")) {
+                        mDiscogs.getArtistReleases(loader.parentid,loader.page, new Discogs.DiscogsDataWaiter<List<DiscogsSearchRelease>>() {
+                            @Override
+                            public void onResult(boolean success, List<DiscogsSearchRelease> data) {
+                                if(success) {
+                                    mAdapter.addChildren(i,data);
+                                }
+                                mCallbacks.setRefreshVisible(false);
+                            }
+                        });
+                    } else if(loader.parenttype.equals("label")) {
+                        mDiscogs.getLabelReleases(loader.parentid,loader.page, new Discogs.DiscogsDataWaiter<List<DiscogsSearchRelease>>() {
+                            @Override
+                            public void onResult(boolean success, List<DiscogsSearchRelease> data) {
+                                if (success) {
+                                    mAdapter.addChildren(i, data);
+                                }
+                                mCallbacks.setRefreshVisible(false);
+                            }
+                        });
+                    } else if(loader.parenttype.equals("master")) {
+                        mDiscogs.getMasterReleases(loader.parentid,loader.page, new Discogs.DiscogsDataWaiter<List<DiscogsSearchRelease>>() {
+                            @Override
+                            public void onResult(boolean success, List<DiscogsSearchRelease> data) {
+                                if (success) {
+                                    mAdapter.addChildren(i, data);
+                                }
+                                mCallbacks.setRefreshVisible(false);
+                            }
+                        });
+                    }
+                } else {
+                    //normal release selected
+                    onItemSelected(l);
+                }
+
                 return false;
             }
         });
@@ -293,10 +333,10 @@ public class SearchFragment extends Fragment {
                 onItemSelected(result.id);
             } else {
                 //this is a group item, fetch it's content and add it dynamically to the list if collapsed and first click, else let the listview do it's magic
-                if(mList.isGroupExpanded(i) || mAdapter.getChildrenCount(i) != 0) return false;
+                if (mList.isGroupExpanded(i) || mAdapter.getChildrenCount(i) != 0) return false;
                 mCallbacks.setRefreshVisible(true);
                 if(result.type.equals("artist")) {
-                    mDiscogs.getArtistReleases(result.id, new Discogs.DiscogsDataWaiter<List<DiscogsSearchRelease>>() {
+                    mDiscogs.getArtistReleases(result.id,1, new Discogs.DiscogsDataWaiter<List<DiscogsSearchRelease>>() {
                         @Override
                         public void onResult(boolean success, List<DiscogsSearchRelease> data) {
                             if(success) {
@@ -307,7 +347,7 @@ public class SearchFragment extends Fragment {
                         }
                     });
                 } else if(result.type.equals("label")) {
-                    mDiscogs.getLabelReleases(result.id, new Discogs.DiscogsDataWaiter<List<DiscogsSearchRelease>>() {
+                    mDiscogs.getLabelReleases(result.id,1, new Discogs.DiscogsDataWaiter<List<DiscogsSearchRelease>>() {
                         @Override
                         public void onResult(boolean success, List<DiscogsSearchRelease> data) {
                             if (success) {
@@ -318,7 +358,7 @@ public class SearchFragment extends Fragment {
                         }
                     });
                 } else if(result.type.equals("master")) {
-                    mDiscogs.getMasterReleases(result.id, new Discogs.DiscogsDataWaiter<List<DiscogsSearchRelease>>() {
+                    mDiscogs.getMasterReleases(result.id,1, new Discogs.DiscogsDataWaiter<List<DiscogsSearchRelease>>() {
                         @Override
                         public void onResult(boolean success, List<DiscogsSearchRelease> data) {
                             if (success) {
