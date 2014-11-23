@@ -245,7 +245,6 @@ public class ReleaseVersionsFragment extends Fragment {
         if (mActivatedPosition != ListView.INVALID_POSITION) {
             // Serialize and persist the activated item position.
             outState.putInt(STATE_ACTIVATED_POSITION, mActivatedPosition);
-            System.out.println(mActivatedPosition);
         }
     }
 
