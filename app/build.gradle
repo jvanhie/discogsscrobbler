@@ -25,7 +25,7 @@ buildscript {
 
 
 
-apply plugin: 'android'
+apply plugin: 'com.android.application'
 apply plugin: 'crashlytics'
 
 android {
@@ -54,13 +54,13 @@ repositories {
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:+'
+    compile 'com.android.support:appcompat-v7:19.1.0'
     compile 'oauth.signpost:signpost-core:1.2.1.2'
     compile 'com.squareup.okhttp:okhttp:1.5.2'
     compile 'com.squareup.retrofit:retrofit:1.4.1'
     compile 'com.nostra13.universalimageloader:universal-image-loader:1.7.0'
     compile 'com.android.support:support-v4:19.1.0'
-    compile 'de.u-mass:lastfm-java:+'
+    compile 'de.u-mass:lastfm-java:0.1.2'
     compile 'com.echo.holographlibrary:holographlibrary:1.0.0@aar'
     compile 'com.crashlytics.android:crashlytics:1.+'
 
