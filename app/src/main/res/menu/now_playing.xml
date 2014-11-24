@@ -16,24 +16,24 @@
   ~ limitations under the License.
   -->
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/now_playing_play"
         android:icon="@drawable/ic_action_play"
-        android:showAsAction="ifRoom"
+        app:showAsAction="ifRoom"
         android:title="Play"/>
 
     <item
         android:id="@+id/now_playing_pause"
         android:icon="@drawable/ic_action_pause"
-        android:showAsAction="ifRoom"
+        app:showAsAction="ifRoom"
         android:title="Pause"/>
 
     <item
         android:id="@+id/now_playing_stop"
         android:icon="@drawable/ic_action_stop"
-        android:showAsAction="ifRoom"
+        app:showAsAction="ifRoom"
         android:title="Clear playlist"/>
 
 </menu>

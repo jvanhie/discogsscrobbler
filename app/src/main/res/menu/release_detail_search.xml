@@ -16,11 +16,12 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.github.jvanhie.discogsscrobbler.ReleaseDetailActivity" >
 
     <item
         android:id="@+id/detail_add_to_discogs"
         android:icon="@drawable/ic_action_save"
-        android:showAsAction="ifRoom"
+        app:showAsAction="ifRoom"
         android:title="Add to your collection"/>
 </menu>

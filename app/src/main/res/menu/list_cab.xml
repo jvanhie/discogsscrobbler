@@ -28,7 +28,7 @@
             android:title="Delete release"/>
         <item
             android:id="@+id/cancel_selection"
-            android:icon="@drawable/abc_ic_clear"
+            android:icon="@drawable/ic_action_cancel"
             android:title="Cancel selection"/>
 
 </menu>

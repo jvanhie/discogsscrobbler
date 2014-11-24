@@ -27,7 +27,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ProgressBar;
-import android.widget.SearchView;
+import android.support.v7.widget.SearchView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 
@@ -154,7 +154,7 @@ public class ReleaseListActivity extends DrawerActivity
                     public void onResult(boolean success, List<Folder> data) {
                         mFolders=true;
                         Spinner s = (Spinner) filter.getActionView(); // find the spinner
-                        ArrayAdapter<Folder> mSpinnerAdapter = new ArrayAdapter<Folder>(getActionBar().getThemedContext(), android.R.layout.simple_spinner_item, data);
+                        ArrayAdapter<Folder> mSpinnerAdapter = new ArrayAdapter<Folder>(getSupportActionBar().getThemedContext(), android.R.layout.simple_spinner_item, data);
                         mSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                         s.setAdapter(mSpinnerAdapter); // set the adapter
                         s.setSelection(0, false);

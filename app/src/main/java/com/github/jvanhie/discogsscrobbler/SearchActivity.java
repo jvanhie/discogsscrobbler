@@ -28,7 +28,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
-import android.widget.SearchView;
+import android.support.v7.widget.SearchView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 
@@ -164,7 +164,7 @@ public class SearchActivity extends DrawerActivity
         //config filter spinner
         final MenuItem filter = menu.findItem(R.id.search_filter);
         Spinner s = (Spinner) filter.getActionView(); // find the spinner
-        SpinnerAdapter mSpinnerAdapter = ArrayAdapter.createFromResource(getActionBar()
+        SpinnerAdapter mSpinnerAdapter = ArrayAdapter.createFromResource(getSupportActionBar()
                 .getThemedContext(), R.array.search_filter_items, android.R.layout.simple_spinner_dropdown_item); //  create the adapter from a StringArray
         s.setAdapter(mSpinnerAdapter); // set the adapter
         s.setSelection(mSearchType,false);

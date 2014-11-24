@@ -17,24 +17,24 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.github.jvanhie.discogsscrobbler.DiscogsLoginActivity" >
+    tools:context="com.github.jvanhie.discogsscrobbler.ReleaseListActivity" >
     
     <item android:id="@+id/list_search"
         android:title="Search"
         android:icon="@drawable/ic_action_search"
-        android:showAsAction="collapseActionView|ifRoom"
-        android:actionViewClass="android.widget.SearchView" />
+        app:showAsAction="collapseActionView|ifRoom"
+        app:actionViewClass="android.support.v7.widget.SearchView" />
 
     <item
         android:id="@+id/list_refresh"
         android:icon="@drawable/ic_action_refresh"
-        android:showAsAction="ifRoom"
+        app:showAsAction="ifRoom"
         android:title="Refresh list"/>
 
     <item
         android:id="@+id/list_filter"
         android:icon="@drawable/ic_action_filter"
-        android:showAsAction="collapseActionView|ifRoom"
-        android:actionViewClass="android.widget.Spinner"
+        app:showAsAction="collapseActionView|ifRoom"
+        app:actionViewClass="android.widget.Spinner"
         android:title="Choose folder"/>
 </menu>

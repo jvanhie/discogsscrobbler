@@ -16,6 +16,7 @@
 
 package com.github.jvanhie.discogsscrobbler.util;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -327,6 +328,7 @@ public class Lastfm extends ContextWrapper {
         t.execute();
     }
 
+    @SuppressLint("InflateParams")
     public void logIn() {
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         // Get the layout inflater
