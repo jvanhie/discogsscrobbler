@@ -16,9 +16,11 @@
 
 package com.github.jvanhie.discogsscrobbler;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -45,6 +47,7 @@ import com.github.jvanhie.discogsscrobbler.adapters.ReleaseAdapter;
 import com.github.jvanhie.discogsscrobbler.models.Release;
 import com.github.jvanhie.discogsscrobbler.util.Discogs;
 
+import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -294,13 +297,17 @@ public class ReleaseListFragment extends Fragment {
         List<Release> releases = mDiscogs.getCollection();
         if (mList.getAdapter() == null) {
             mList.setAdapter(new ReleaseAdapter(getActivity(), releases));
-            setSelection();
+            //only set fancy modal selection support on devices supporting it
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                setSelection();
+            }
         } else {
             ((ReleaseAdapter) mList.getAdapter()).updateReleases(releases);
         }
         mCallbacks.onAdapterSet();
     }
 
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private void setSelection() {
         mList.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
         mList.setSelector(R.drawable.track_selector);

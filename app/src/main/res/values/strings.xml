@@ -37,7 +37,7 @@
     <string name="discogs_seller_dialog_title">Open Discogs seller settings in browser?</string>
     <string name="title_now_playing">Now Playing</string>
     <string name="pref_title_preload_collection">Preload your collection</string>
-    <string name="pref_description_preload_collection">Download detailled information on all your releases. This can take a while with big collections!</string>
+    <string name="pref_description_preload_collection">Download detailed information on all your releases. This can take a while with big collections!</string>
 
 
     <!-- Nav Drawer Menu Items -->

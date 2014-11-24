@@ -16,6 +16,7 @@
 
 package com.github.jvanhie.discogsscrobbler;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -23,6 +24,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
@@ -238,7 +240,10 @@ public class NowPlayingFragment extends Fragment {
             mTrackListAdapter = new TrackListAdapter(getActivity(),mService.trackList);
             ListView list = ((ListView) mRootView.findViewById(R.id.now_playing_tracklist));
             list.setAdapter(mTrackListAdapter);
-            setSelection(list);
+            //only set fancy modal selection support on devices supporting it
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                setSelection(list);
+            }
         }
 
         //set the currently playing track and status
@@ -256,6 +261,7 @@ public class NowPlayingFragment extends Fragment {
 
     }
 
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private void setSelection(final ListView list) {
         list.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
         list.setSelector(R.drawable.track_selector);
