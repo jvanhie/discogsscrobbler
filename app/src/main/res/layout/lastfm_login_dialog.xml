@@ -46,6 +46,5 @@
         android:layout_marginLeft="4dp"
         android:layout_marginRight="4dp"
         android:layout_marginBottom="16dp"
-        android:fontFamily="sans-serif"
         android:hint="@string/password"/>
 </LinearLayout>
