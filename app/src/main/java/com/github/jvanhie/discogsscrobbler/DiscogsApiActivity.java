@@ -16,15 +16,8 @@
 
 package com.github.jvanhie.discogsscrobbler;
 
-import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
@@ -33,12 +26,8 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.github.jvanhie.discogsscrobbler.util.Discogs;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 
 
 public class DiscogsApiActivity extends ActionBarActivity {

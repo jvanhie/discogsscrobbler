@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import oauth.signpost.http.HttpRequest;
-
 import retrofit.client.Header;
 import retrofit.client.Request;
 

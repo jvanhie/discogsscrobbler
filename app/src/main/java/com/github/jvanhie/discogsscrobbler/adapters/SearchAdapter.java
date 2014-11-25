@@ -22,31 +22,21 @@ import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.BaseExpandableListAdapter;
-import android.widget.Filter;
-import android.widget.Filterable;
-import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.github.jvanhie.discogsscrobbler.R;
-import com.github.jvanhie.discogsscrobbler.models.Release;
-import com.github.jvanhie.discogsscrobbler.queries.DiscogsRelease;
-import com.github.jvanhie.discogsscrobbler.queries.DiscogsSearch;
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsSearchRelease;
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsSearchResult;
 import com.github.jvanhie.discogsscrobbler.util.Discogs;
 import com.github.jvanhie.discogsscrobbler.util.DiscogsImageDownloader;
-import com.github.jvanhie.discogsscrobbler.util.SquareView;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Jono on 20/03/14.
@@ -77,7 +67,7 @@ public class SearchAdapter extends BaseExpandableListAdapter {
     //called when a subquery in the searchfragement was completed
     public void addChildren(int i, List<DiscogsSearchRelease> releases ) {
         List<DiscogsSearchRelease> r = mReleases.get(i,new ArrayList<DiscogsSearchRelease>());
-        if(r.size()>0 && r.get(r.size()-1).type=="loader") {
+        if(r.size()>0 && r.get(r.size()-1).type.equals("loader")) {
             //remove the last "release" -> it's a loader
             r.remove(r.size()-1);
         }
@@ -196,7 +186,7 @@ public class SearchAdapter extends BaseExpandableListAdapter {
                 info2.setText(release.format);
             }
 
-            if(release.type=="loader") {
+            if(release.type.equals("loader")) {
                 img.setImageResource(R.drawable.load_releases);
             } else {
                 mImageLoader.displayImage(release.thumb, img);

@@ -19,22 +19,19 @@ package com.github.jvanhie.discogsscrobbler;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.GridView;
 import android.widget.ProgressBar;
-import android.support.v7.widget.SearchView;
 import android.widget.Spinner;
-import android.widget.SpinnerAdapter;
 
 import com.github.jvanhie.discogsscrobbler.models.Folder;
 import com.github.jvanhie.discogsscrobbler.util.Discogs;
 
-import java.util.ArrayList;
 import java.util.List;
 
 

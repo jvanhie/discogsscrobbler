@@ -16,7 +16,6 @@
 
 package com.github.jvanhie.discogsscrobbler.queries;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

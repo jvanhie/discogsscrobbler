@@ -16,17 +16,10 @@
 
 package com.github.jvanhie.discogsscrobbler.queries;
 
-import com.github.jvanhie.discogsscrobbler.models.Release;
-
-import java.io.InputStream;
-import java.util.List;
-
 import retrofit.Callback;
 import retrofit.client.Response;
 import retrofit.http.DELETE;
-import retrofit.http.EncodedPath;
 import retrofit.http.GET;
-import retrofit.http.Headers;
 import retrofit.http.POST;
 import retrofit.http.Path;
 import retrofit.http.Query;
@@ -37,7 +30,7 @@ import retrofit.http.Query;
 public interface DiscogsService {
 
     @GET("/{path}")
-    Response getRawPath(@EncodedPath("path") String path);
+    Response getRawPath(@Path(value = "path", encode=false) String path);
 
     @GET("/users/{username}/collection/folders")
     void getFolders(@Path("username") String username, Callback<DiscogsFolders> callback);

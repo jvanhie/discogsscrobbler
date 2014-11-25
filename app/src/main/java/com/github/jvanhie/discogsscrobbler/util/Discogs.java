@@ -37,8 +37,8 @@ import com.github.jvanhie.discogsscrobbler.ReleaseListActivity;
 import com.github.jvanhie.discogsscrobbler.models.Folder;
 import com.github.jvanhie.discogsscrobbler.models.RecentlyPlayed;
 import com.github.jvanhie.discogsscrobbler.models.Release;
-import com.github.jvanhie.discogsscrobbler.queries.DiscogsCollection.DiscogsBasicRelease;
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsCollection;
+import com.github.jvanhie.discogsscrobbler.queries.DiscogsCollection.DiscogsBasicRelease;
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsFolders;
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsIdentity;
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsPriceSuggestion;
@@ -50,7 +50,6 @@ import com.github.jvanhie.discogsscrobbler.queries.DiscogsSearchResult;
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsService;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -77,8 +76,8 @@ import retrofit.Callback;
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
-import retrofit.client.Response;
 import retrofit.RetrofitError.Kind;
+import retrofit.client.Response;
 
 public class Discogs extends ContextWrapper {
     private final String API_ROOT;

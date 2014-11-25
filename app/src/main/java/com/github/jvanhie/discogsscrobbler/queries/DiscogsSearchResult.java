@@ -16,8 +16,6 @@
 
 package com.github.jvanhie.discogsscrobbler.queries;
 
-import java.util.List;
-
 /**
  * Created by Jono on 27/03/2014.
  */

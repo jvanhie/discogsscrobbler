@@ -26,7 +26,6 @@ import com.github.jvanhie.discogsscrobbler.queries.DiscogsSearchRelease;
 import com.github.jvanhie.discogsscrobbler.util.Discogs;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**

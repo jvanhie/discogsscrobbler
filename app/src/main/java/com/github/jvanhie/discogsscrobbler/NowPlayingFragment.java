@@ -44,7 +44,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.github.jvanhie.discogsscrobbler.adapters.TrackListAdapter;
-import com.github.jvanhie.discogsscrobbler.models.Release;
 import com.github.jvanhie.discogsscrobbler.models.Track;
 import com.github.jvanhie.discogsscrobbler.util.Discogs;
 import com.github.jvanhie.discogsscrobbler.util.DiscogsImageDownloader;
@@ -56,8 +55,6 @@ import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * A fragment representing a single Release detail screen.

@@ -16,8 +16,6 @@
 
 package com.github.jvanhie.discogsscrobbler.queries;
 
-import com.github.jvanhie.discogsscrobbler.models.Release;
-
 /**
  * Created by Jono on 27/03/2014.
  * A broad class that is populated depending on the query

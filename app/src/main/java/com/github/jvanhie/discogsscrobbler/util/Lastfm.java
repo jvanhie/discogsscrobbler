@@ -316,8 +316,6 @@ public class Lastfm extends ContextWrapper {
                         mUserName = mSession.getUsername();
                         saveSession();
 
-                    } else {
-
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

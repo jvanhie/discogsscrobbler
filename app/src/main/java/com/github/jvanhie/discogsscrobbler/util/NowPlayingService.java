@@ -30,7 +30,6 @@ import android.support.v4.app.NotificationCompat;
 
 import com.github.jvanhie.discogsscrobbler.NowPlayingActivity;
 import com.github.jvanhie.discogsscrobbler.R;
-import com.github.jvanhie.discogsscrobbler.ReleaseListActivity;
 import com.github.jvanhie.discogsscrobbler.models.Track;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;

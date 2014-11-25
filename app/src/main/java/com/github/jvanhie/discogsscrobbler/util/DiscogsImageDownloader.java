@@ -16,17 +16,11 @@
 
 package com.github.jvanhie.discogsscrobbler.util;
 
-import com.nostra13.universalimageloader.core.assist.FlushedInputStream;
-import com.nostra13.universalimageloader.core.download.HttpClientImageDownloader;
 import com.nostra13.universalimageloader.core.download.ImageDownloader;
-import com.squareup.okhttp.OkHttpClient;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.URI;
-import java.net.URLConnection;
 
 /**
  * Created by Jono on 25/03/2014.

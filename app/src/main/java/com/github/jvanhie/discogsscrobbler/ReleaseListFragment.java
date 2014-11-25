@@ -42,12 +42,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import com.github.jvanhie.discogsscrobbler.adapters.ReleaseAdapter;
 import com.github.jvanhie.discogsscrobbler.models.Release;
 import com.github.jvanhie.discogsscrobbler.util.Discogs;
 
-import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -241,7 +239,7 @@ public class ReleaseListFragment extends Fragment {
             //we need a different empty msg for empty filter results
             mEmptyHeading.setText("No matches");
             mEmptyText.setText("clear or edit your query");
-            ((ReleaseAdapter) mList.getAdapter()).getFilter().filter(s.toString());
+            ((ReleaseAdapter) mList.getAdapter()).getFilter().filter(s);
         }
     }
 
@@ -260,8 +258,6 @@ public class ReleaseListFragment extends Fragment {
                             public void onResult(boolean success) {
                                 if (success) {
                                     loadList();
-                                } else {
-                                    //something went wrong refreshing the collection
                                 }
                                 mCallbacks.setRefreshVisible(false);
                             }
@@ -285,8 +281,6 @@ public class ReleaseListFragment extends Fragment {
             public void onResult(boolean success) {
                 if (success) {
                     loadList();
-                } else {
-                    //something went wrong refreshing the collection
                 }
                 mCallbacks.setRefreshVisible(false);
             }
