@@ -27,6 +27,8 @@ public class DiscogsScrobbler extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        //bugfix for dodgy discogs connections
+        System.setProperty("http.keepAlive", "false");
         //init crashlytics
         Crashlytics.start(this);
     }

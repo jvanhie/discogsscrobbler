@@ -78,6 +78,7 @@ import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
+import retrofit.RetrofitError.Kind;
 
 public class Discogs extends ContextWrapper {
     private final String API_ROOT;
@@ -383,7 +384,7 @@ public class Discogs extends ContextWrapper {
 
             @Override
             public void failure(RetrofitError error) {
-                if(error.getKind() == RetrofitError.Kind.NETWORK) {
+                if(error.getKind() == Kind.NETWORK || error.getKind() == Kind.UNEXPECTED) {
                     //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
                     if(mRetries.getAndIncrement()<MAX_RETRIES) {
                         new Handler().postDelayed(new Runnable() {
@@ -414,7 +415,7 @@ public class Discogs extends ContextWrapper {
 
             @Override
             public void failure(RetrofitError error) {
-                if(error.getKind() == RetrofitError.Kind.NETWORK) {
+                if(error.getKind() == Kind.NETWORK || error.getKind() == Kind.UNEXPECTED) {
                     //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
                     if(mRetries.getAndIncrement()<MAX_RETRIES) {
                         new Handler().postDelayed(new Runnable() {
@@ -445,7 +446,7 @@ public class Discogs extends ContextWrapper {
 
             @Override
             public void failure(RetrofitError error) {
-                if(error.getKind() == RetrofitError.Kind.NETWORK) {
+                if(error.getKind() == Kind.NETWORK || error.getKind() == Kind.UNEXPECTED) {
                     //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
                     if(mRetries.getAndIncrement()<MAX_RETRIES) {
                         new Handler().postDelayed(new Runnable() {
@@ -476,7 +477,7 @@ public class Discogs extends ContextWrapper {
 
             @Override
             public void failure(RetrofitError error) {
-                if(error.getKind() == RetrofitError.Kind.NETWORK) {
+                if(error.getKind() == Kind.NETWORK || error.getKind() == Kind.UNEXPECTED) {
                     //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
                     if(mRetries.getAndIncrement()<MAX_RETRIES) {
                         new Handler().postDelayed(new Runnable() {
@@ -525,7 +526,7 @@ public class Discogs extends ContextWrapper {
 
             @Override
             public void failure(RetrofitError error) {
-                if(error.getKind() == RetrofitError.Kind.NETWORK) {
+                if(error.getKind() == Kind.NETWORK || error.getKind() == Kind.UNEXPECTED) {
                     //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
                     if(mRetries.getAndIncrement()<MAX_RETRIES) {
                         new Handler().postDelayed(new Runnable() {
@@ -569,7 +570,7 @@ public class Discogs extends ContextWrapper {
 
             @Override
             public void failure(RetrofitError error) {
-                if(error.getKind() == RetrofitError.Kind.NETWORK) {
+                if(error.getKind() == Kind.NETWORK || error.getKind() == Kind.UNEXPECTED) {
                     //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
                     if(mRetries.getAndIncrement()<MAX_RETRIES) {
                         new Handler().postDelayed(new Runnable() {
@@ -613,7 +614,7 @@ public class Discogs extends ContextWrapper {
 
             @Override
             public void failure(RetrofitError error) {
-                if(error.getKind() == RetrofitError.Kind.NETWORK) {
+                if(error.getKind() == Kind.NETWORK || error.getKind() == Kind.UNEXPECTED) {
                     //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
                     if(mRetries.getAndIncrement()<MAX_RETRIES) {
                         new Handler().postDelayed(new Runnable() {
@@ -644,7 +645,7 @@ public class Discogs extends ContextWrapper {
 
             @Override
             public void failure(RetrofitError error) {
-                if (error.getKind() == RetrofitError.Kind.NETWORK) {
+                if (error.getKind() == Kind.NETWORK || error.getKind() == Kind.UNEXPECTED) {
                     //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
                     if (mRetries.getAndIncrement() < MAX_RETRIES) {
                         new Handler().postDelayed(new Runnable() {
@@ -665,36 +666,42 @@ public class Discogs extends ContextWrapper {
     }
 
     public void addRelease(final long id, final DiscogsWaiter waiter) {
-        mDiscogsService.getCollectionRelease(mUserName, id, new Callback<DiscogsRelease>() {
-            @Override
-            public void success(DiscogsRelease discogsRelease, Response response) {
-                //release is already in the collection, we won't add it again!
-                mRetries.set(0);
-                waiter.onResult(false);
-            }
-
-            @Override
-            public void failure(RetrofitError error) {
-                if(error.getKind() == RetrofitError.Kind.NETWORK) {
-                    //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
-                    if(mRetries.getAndIncrement()<MAX_RETRIES) {
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                addRelease(id, waiter);
-                            }
-                        }, 1000);
-                    } else {
-                        //we reached the global max retries, give up
-                        waiter.onResult(false);
-                    }
-                } else if (error.getResponse() != null && error.getResponse().getStatus() == 404) {
-                    //this is actually what we expect -> release not found, we can add it now
+        //first check if the item is already in our local collection, not worth looking online if it is
+        if(getRelease(id) != null) {
+            waiter.onResult(false);
+        } else {
+            //TODO: this seems broken at the moment? 25/11/2014 get a 404 on existing release
+            mDiscogsService.getCollectionRelease(mUserName, id, new Callback<DiscogsRelease>() {
+                @Override
+                public void success(DiscogsRelease discogsRelease, Response response) {
+                    //release is already in the collection, we won't add it again!
                     mRetries.set(0);
-                    reallyAddRelease(id,waiter);
+                    waiter.onResult(false);
                 }
-            }
-        });
+
+                @Override
+                public void failure(RetrofitError error) {
+                    if (error.getKind() == Kind.NETWORK || error.getKind() == Kind.UNEXPECTED) {
+                        //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
+                        if (mRetries.getAndIncrement() < MAX_RETRIES) {
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    addRelease(id, waiter);
+                                }
+                            }, 1000);
+                        } else {
+                            //we reached the global max retries, give up
+                            waiter.onResult(false);
+                        }
+                    } else if (error.getResponse() != null && error.getResponse().getStatus() == 404) {
+                        //this is actually what we expect -> release not found, we can add it now
+                        mRetries.set(0);
+                        reallyAddRelease(id, waiter);
+                    }
+                }
+            });
+        }
     }
 
     private void reallyAddRelease(final long id, final DiscogsWaiter waiter) {
@@ -707,7 +714,7 @@ public class Discogs extends ContextWrapper {
 
             @Override
             public void failure(RetrofitError error) {
-                if(error.getKind() == RetrofitError.Kind.NETWORK) {
+                if(error.getKind() == Kind.NETWORK || error.getKind() == Kind.UNEXPECTED) {
                     //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
                     if(mRetries.getAndIncrement()<MAX_RETRIES) {
                         new Handler().postDelayed(new Runnable() {
@@ -737,7 +744,7 @@ public class Discogs extends ContextWrapper {
 
             @Override
             public void failure(RetrofitError error) {
-                if (error.getKind() == RetrofitError.Kind.NETWORK) {
+                if (error.getKind() == Kind.NETWORK || error.getKind() == Kind.UNEXPECTED) {
                     //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
                     if (mRetries.getAndIncrement() < MAX_RETRIES) {
                         new Handler().postDelayed(new Runnable() {
@@ -767,7 +774,7 @@ public class Discogs extends ContextWrapper {
 
             @Override
             public void failure(RetrofitError error) {
-                if(error.getKind() == RetrofitError.Kind.NETWORK) {
+                if(error.getKind() == Kind.NETWORK || error.getKind() == Kind.UNEXPECTED) {
                     //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
                     if(mRetries.getAndIncrement()<MAX_RETRIES) {
                         new Handler().postDelayed(new Runnable() {
@@ -800,7 +807,7 @@ public class Discogs extends ContextWrapper {
 
             @Override
             public void failure(RetrofitError error) {
-                if(error.getKind() == RetrofitError.Kind.NETWORK) {
+                if(error.getKind() == Kind.NETWORK || error.getKind() == Kind.UNEXPECTED) {
                     //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
                     if(mRetries.getAndIncrement()<MAX_RETRIES) {
                         new Handler().postDelayed(new Runnable() {
@@ -998,7 +1005,7 @@ public class Discogs extends ContextWrapper {
 
             @Override
             public void failure(RetrofitError error) {
-                if(error.getKind() == RetrofitError.Kind.NETWORK) {
+                if(error.getKind() == Kind.NETWORK || error.getKind() == Kind.UNEXPECTED) {
                     //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
                     if(mRetries.getAndIncrement()<MAX_RETRIES) {
                         new Handler().postDelayed(new Runnable() {
@@ -1057,7 +1064,7 @@ public class Discogs extends ContextWrapper {
 
             @Override
             public void failure(RetrofitError error) {
-                if(error.getKind() == RetrofitError.Kind.NETWORK) {
+                if(error.getKind() == Kind.NETWORK || error.getKind() == Kind.UNEXPECTED) {
                     //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
                     if(mRetries.getAndIncrement()<MAX_RETRIES) {
                         new Handler().postDelayed(new Runnable() {
@@ -1226,7 +1233,7 @@ public class Discogs extends ContextWrapper {
 
             @Override
             public void failure(RetrofitError error) {
-                if(error.getKind() == RetrofitError.Kind.NETWORK) {
+                if(error.getKind() == Kind.NETWORK || error.getKind() == Kind.UNEXPECTED) {
                     //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
                     if(mRetries.getAndIncrement()<MAX_RETRIES) {
                         new Handler().postDelayed(new Runnable() {
