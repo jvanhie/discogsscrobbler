@@ -97,7 +97,6 @@ public class ReleaseDetailFragment extends Fragment {
             ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getActivity())
                     .enableLogging()
                     .defaultDisplayImageOptions(options)
-                    .imageDownloader(new DiscogsImageDownloader(mDiscogs))
                     .build();
             mImageLoader.init(config);
         }

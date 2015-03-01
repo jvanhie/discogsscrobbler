@@ -36,7 +36,7 @@ import com.github.jvanhie.discogsscrobbler.adapters.NavDrawerListAdapter;
 /**
  * Created by Jono on 01/04/2014.
  */
-public class DrawerActivity extends ActionBarActivity {
+public abstract class DrawerActivity extends ActionBarActivity {
 
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;

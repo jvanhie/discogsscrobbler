@@ -110,7 +110,6 @@ public class NowPlayingService extends Service {
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this)
                 .enableLogging()
                 .defaultDisplayImageOptions(options)
-                .imageDownloader(new DiscogsImageDownloader(mDiscogs))
                 .build();
         mImageLoader.init(config);
 

@@ -58,7 +58,6 @@
         </activity>
         <activity
             android:name="com.github.jvanhie.discogsscrobbler.DiscogsLoginActivity"
-            android:parentActivityName="com.github.jvanhie.discogsscrobbler.ReleaseListActivity"
             android:label="@string/title_activity_discogs_login">
         </activity>
         <activity

@@ -498,7 +498,9 @@ public class Discogs extends ContextWrapper {
     }
 
     public void getArtistReleases(final long id, final int page, final DiscogsDataWaiter<List<DiscogsSearchRelease>> waiter) {
-        mDiscogsPublicService.getArtistReleases(id, page, new Callback<DiscogsSearch>() {
+        DiscogsService service = mDiscogsPublicService;
+        if(mAccessToken != null && mAccessSecret != null) service = mDiscogsService;
+        service.getArtistReleases(id, page, new Callback<DiscogsSearch>() {
             @Override
             public void success(DiscogsSearch discogsSearch, Response response) {
                 ArrayList<DiscogsSearchRelease> result = new ArrayList<DiscogsSearchRelease>();
@@ -546,7 +548,9 @@ public class Discogs extends ContextWrapper {
     }
 
     public void getLabelReleases(final long id, final int page, final DiscogsDataWaiter<List<DiscogsSearchRelease>> waiter) {
-        mDiscogsPublicService.getLabelReleases(id, page, new Callback<DiscogsSearch>() {
+        DiscogsService service = mDiscogsPublicService;
+        if(mAccessToken != null && mAccessSecret != null) service = mDiscogsService;
+        service.getLabelReleases(id, page, new Callback<DiscogsSearch>() {
             @Override
             public void success(DiscogsSearch discogsSearch, Response response) {
                 if (discogsSearch.pagination.page < discogsSearch.pagination.pages) {
@@ -590,7 +594,9 @@ public class Discogs extends ContextWrapper {
     }
 
     public void getMasterReleases(final long id, final int page, final DiscogsDataWaiter<List<DiscogsSearchRelease>> waiter) {
-        mDiscogsPublicService.getMasterReleases(id, page, new Callback<DiscogsSearch>() {
+        DiscogsService service = mDiscogsPublicService;
+        if(mAccessToken != null && mAccessSecret != null) service = mDiscogsService;
+        service.getMasterReleases(id, page, new Callback<DiscogsSearch>() {
             @Override
             public void success(DiscogsSearch discogsSearch, Response response) {
                 if (discogsSearch.pagination.page < discogsSearch.pagination.pages) {
@@ -635,7 +641,9 @@ public class Discogs extends ContextWrapper {
 
     /*returns a transient release from discogs, cannot be saved to the db unless the flag is set to false before saving*/
     public void getRelease(final long id, final DiscogsDataWaiter<Release> waiter) {
-        mDiscogsPublicService.getRelease(id, new Callback<DiscogsRelease>() {
+        DiscogsService service = mDiscogsPublicService;
+        if(mAccessToken != null && mAccessSecret != null) service = mDiscogsService;
+        service.getRelease(id, new Callback<DiscogsRelease>() {
             @Override
             public void success(DiscogsRelease discogsRelease, Response response) {
                 mRetries.set(0);

@@ -24,7 +24,7 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:id="@+id/release_detail_container">
 
             <ImageView
@@ -45,6 +45,7 @@
                 android:layout_alignParentStart="true"
                 android:layout_alignBottom="@+id/detail_image"
                 android:layout_alignParentEnd="false"
+                android:layout_alignParentRight="false"
                 android:background="#ffffff"
                 android:alpha="0.5"
                 android:id="@+id/linearLayout">
@@ -55,6 +56,7 @@
                     android:textAppearance="?android:attr/textAppearanceLarge"
                     android:text="Title"
                     android:id="@+id/detail_title"
+                    android:layout_marginStart="5dp"
                     android:layout_marginLeft="5dp" />
 
                 <TextView
@@ -63,6 +65,7 @@
                     android:textAppearance="?android:attr/textAppearance"
                     android:text="Artist"
                     android:id="@+id/detail_artist"
+                    android:layout_marginStart="5dp"
                     android:layout_marginLeft="5dp" />
             </LinearLayout>
 
@@ -87,6 +90,7 @@
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:minWidth="100dp"
+                android:layout_marginStart="5dp"
                 android:layout_marginLeft="5dp"
                 android:layout_marginTop="5dp" />
 
@@ -97,7 +101,10 @@
                 android:id="@+id/detail_label"
                 android:layout_alignTop="@+id/textView"
                 android:layout_toRightOf="@+id/textView"
+                android:layout_toEndOf="@id/textView"
+                android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true"
+                android:layout_alignParentLeft="false"
                 android:layout_alignParentStart="false"
                 android:singleLine="true" />
 
@@ -163,6 +170,7 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:id="@+id/detail_format"
                 android:layout_below="@+id/detail_label"
+                android:layout_toEndOf="@id/textView"
                 android:layout_toRightOf="@+id/textView" />
 
             <TextView
@@ -170,6 +178,7 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:id="@+id/detail_country"
+                android:layout_toEndOf="@id/textView3"
                 android:layout_toRightOf="@+id/textView3"
                 android:layout_below="@+id/detail_format" />
 
@@ -178,6 +187,7 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:id="@+id/detail_released"
+                android:layout_toEndOf="@id/textView5"
                 android:layout_toRightOf="@+id/textView5"
                 android:layout_below="@+id/detail_country" />
 
@@ -187,6 +197,7 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:id="@+id/detail_genre"
                 android:layout_alignTop="@+id/textView6"
+                android:layout_toEndOf="@id/textView6"
                 android:layout_toRightOf="@+id/textView6" />
 
             <TextView
@@ -194,6 +205,7 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:id="@+id/detail_style"
+                android:layout_toEndOf="@id/textView7"
                 android:layout_toRightOf="@+id/textView7"
                 android:layout_alignTop="@+id/textView7" />
 
@@ -216,6 +228,7 @@
                 android:layout_below="@+id/textView2"
                 android:layout_alignLeft="@+id/textView2"
                 android:layout_alignStart="@+id/textView2"
+                android:layout_marginEnd="5dp"
                 android:layout_marginRight="5dp" />
 
             <TextView
@@ -227,6 +240,7 @@
                 android:layout_below="@+id/detail_notes"
                 android:layout_alignParentLeft="false"
                 android:layout_alignParentStart="false"
+                android:layout_alignStart="@id/textView2"
                 android:layout_alignLeft="@+id/textView2"
                 android:layout_marginTop="5dp" />
 
@@ -237,6 +251,7 @@
                 android:text="Check for copies for sale"
                 android:id="@+id/detail_marketplace"
                 android:layout_below="@+id/textView8"
+                android:layout_alignStart="@id/textView8"
                 android:layout_alignLeft="@+id/textView8"
                 android:linksClickable="true"
                 android:autoLink="web" />
@@ -248,6 +263,7 @@
                 android:text="Check for copies of all releases"
                 android:id="@+id/detail_marketplace_master"
                 android:layout_below="@+id/detail_marketplace"
+                android:layout_alignStart="@id/detail_marketplace"
                 android:layout_alignLeft="@+id/detail_marketplace"
                 android:linksClickable="true"
                 android:autoLink="web" />
@@ -259,6 +275,7 @@
                 android:text="Discogs price suggestions"
                 android:id="@+id/detail_price_header"
                 android:layout_below="@+id/detail_marketplace_master"
+                android:layout_alignStart="@id/detail_marketplace_master"
                 android:layout_alignLeft="@+id/detail_marketplace_master"
                 android:visibility="gone"
                 android:layout_marginTop="5dp" />

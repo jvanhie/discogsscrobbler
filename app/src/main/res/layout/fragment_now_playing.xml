@@ -14,61 +14,60 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/detail_thumb_height"
+        android:id="@+id/now_playing_image"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:src="@drawable/default_release"
+        android:scaleType="centerCrop" />
 
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/detail_thumb_height"
-                android:id="@+id/now_playing_image"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:src="@drawable/default_release"
-                android:scaleType="centerCrop" />
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignBottom="@+id/now_playing_image"
+        android:layout_alignParentEnd="false"
+        android:layout_alignParentRight="false"
+        android:background="#ffffff"
+        android:alpha="0.5"
+        android:id="@+id/linearLayout">
 
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_alignBottom="@+id/now_playing_image"
-                android:layout_alignParentEnd="false"
-                android:background="#ffffff"
-                android:alpha="0.5"
-                android:id="@+id/linearLayout">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Album"
+            android:id="@+id/now_playing_album"
+            android:layout_marginStart="5dp"
+            android:layout_marginLeft="5dp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="Album"
-                    android:id="@+id/now_playing_album"
-                    android:layout_marginLeft="5dp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearance"
+            android:text="Artist"
+            android:id="@+id/now_playing_artist"
+            android:layout_marginStart="5dp"
+            android:layout_marginLeft="5dp" />
+    </LinearLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearance"
-                    android:text="Artist"
-                    android:id="@+id/now_playing_artist"
-                    android:layout_marginLeft="5dp" />
-            </LinearLayout>
-
-            <ListView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/now_playing_tracklist"
-                android:layout_below="@+id/now_playing_image"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
+    <ListView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/now_playing_tracklist"
+        android:layout_below="@+id/now_playing_image"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
 
-        </RelativeLayout>
-</LinearLayout>
+</RelativeLayout>

@@ -26,6 +26,7 @@
         android:layout_width="25dp"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_marginLeft="12dp"
         android:layout_marginRight="12dp"
         android:layout_centerVertical="true" />
@@ -35,9 +36,13 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_toRightOf="@id/icon"
+        android:layout_toEndOf="@id/icon"
         android:minHeight="?android:attr/listPreferredItemHeightSmall"
         android:textAppearance="?android:attr/textAppearanceListItemSmall"
         android:gravity="center_vertical"
-        android:paddingRight="40dp"/>
+        android:paddingRight="40dp"
+        android:paddingLeft="0dp"
+        android:paddingEnd="40dp"
+        android:paddingStart="0dp"/>
 
 </RelativeLayout>

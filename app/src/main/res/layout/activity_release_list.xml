@@ -37,7 +37,9 @@
                 tools:layout="@android:layout/list_content"
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentStart="false"
-                android:layout_alignParentEnd="false" />
+                android:layout_alignParentLeft="false"
+                android:layout_alignParentEnd="false"
+                android:layout_alignParentRight="false"/>
 
             <ProgressBar
                 style="?android:attr/progressBarStyleHorizontal"

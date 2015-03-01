@@ -88,7 +88,6 @@ public class DiscogsApiActivity extends ActionBarActivity {
 
     class MyJavaScriptInterface
     {
-        @SuppressWarnings("unused")
         @JavascriptInterface
         public void processHTML(String html)
         {

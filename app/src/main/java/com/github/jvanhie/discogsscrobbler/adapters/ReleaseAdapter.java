@@ -69,7 +69,6 @@ public class ReleaseAdapter extends BaseAdapter implements Filterable, SectionIn
                 .build();
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(mContext)
                 .defaultDisplayImageOptions(options)
-                .imageDownloader(new DiscogsImageDownloader(Discogs.getInstance(mContext)))
                 .build();
         mImageLoader.init(config);
     }

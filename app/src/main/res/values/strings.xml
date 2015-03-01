@@ -24,7 +24,6 @@
     <string name="title_search">Search Discogs</string>
     <string name="title_activity_discogs_login">Login to Discogs</string>
     <string name="title_activity_lastfm_login">Login to Last.fm</string>
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="oauth_error">Discogs: could not authenticate</string>
     <string name="lastfm_login_success">Last.fm login successful</string>

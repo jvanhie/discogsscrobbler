@@ -20,6 +20,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
@@ -164,8 +165,9 @@ public class SearchActivity extends DrawerActivity
         //config filter spinner
         final MenuItem filter = menu.findItem(R.id.search_filter);
         Spinner s = (Spinner) filter.getActionView(); // find the spinner
-        SpinnerAdapter mSpinnerAdapter = ArrayAdapter.createFromResource(getSupportActionBar()
+        ArrayAdapter mSpinnerAdapter = ArrayAdapter.createFromResource(getSupportActionBar()
                 .getThemedContext(), R.array.search_filter_items, android.R.layout.simple_spinner_dropdown_item); //  create the adapter from a StringArray
+        mSpinnerAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         s.setAdapter(mSpinnerAdapter); // set the adapter
         s.setSelection(mSearchType,false);
 
@@ -189,7 +191,7 @@ public class SearchActivity extends DrawerActivity
             }
         });
         //make sure only one actionview is expanded
-        filter.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+        MenuItemCompat.setOnActionExpandListener(filter,new MenuItemCompat.OnActionExpandListener() {
             @Override
             public boolean onMenuItemActionExpand(MenuItem menuItem) {
                 //collapse search
@@ -202,7 +204,7 @@ public class SearchActivity extends DrawerActivity
                 return true;
             }
         });
-        search.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+        MenuItemCompat.setOnActionExpandListener(search,new MenuItemCompat.OnActionExpandListener() {
             @Override
             public boolean onMenuItemActionExpand(MenuItem menuItem) {
                 //collapse filter

@@ -19,6 +19,7 @@ package com.github.jvanhie.discogsscrobbler;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -149,32 +150,34 @@ public class ReleaseListActivity extends DrawerActivity
                 mDiscogs.getFolders(new Discogs.DiscogsDataWaiter<List<Folder>>() {
                     @Override
                     public void onResult(boolean success, List<Folder> data) {
-                        mFolders=true;
-                        Spinner s = (Spinner) filter.getActionView(); // find the spinner
-                        ArrayAdapter<Folder> mSpinnerAdapter = new ArrayAdapter<Folder>(getSupportActionBar().getThemedContext(), android.R.layout.simple_spinner_item, data);
-                        mSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                        s.setAdapter(mSpinnerAdapter); // set the adapter
-                        s.setSelection(0, false);
-                        s.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                            @Override
-                            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                                mDiscogs.setFolderId(((Folder) adapterView.getItemAtPosition(i)).folderid);
-                                //reload list with id
-                                mReleaseList.loadList();
-                                filter.collapseActionView();
-                            }
+                        if(success && data != null) {
+                            mFolders = true;
+                            Spinner s = (Spinner) filter.getActionView(); // find the spinner
+                            ArrayAdapter<Folder> mSpinnerAdapter = new ArrayAdapter<Folder>(getSupportActionBar().getThemedContext(), android.R.layout.simple_spinner_dropdown_item, data);
+                            mSpinnerAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+                            s.setAdapter(mSpinnerAdapter); // set the adapter
+                            s.setSelection(0, false);
+                            s.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                                @Override
+                                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                                    mDiscogs.setFolderId(((Folder) adapterView.getItemAtPosition(i)).folderid);
+                                    //reload list with id
+                                    mReleaseList.loadList();
+                                    filter.collapseActionView();
+                                }
 
-                            @Override
-                            public void onNothingSelected(AdapterView<?> adapterView) {
-                                //filter.collapseActionView();
-                            }
-                        });
+                                @Override
+                                public void onNothingSelected(AdapterView<?> adapterView) {
+                                    //filter.collapseActionView();
+                                }
+                            });
+                        }
                     }
                 });
             }
 
             //make sure only one actionview is expanded
-            filter.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            MenuItemCompat.setOnActionExpandListener(filter,new MenuItemCompat.OnActionExpandListener() {
                 @Override
                 public boolean onMenuItemActionExpand(MenuItem menuItem) {
                     //collapse search
@@ -187,7 +190,7 @@ public class ReleaseListActivity extends DrawerActivity
                     return true;
                 }
             });
-            search.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            MenuItemCompat.setOnActionExpandListener(search,new MenuItemCompat.OnActionExpandListener() {
                 @Override
                 public boolean onMenuItemActionExpand(MenuItem menuItem) {
                     //collapse search

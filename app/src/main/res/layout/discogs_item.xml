@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2014 Jono Vanhie-Van Gerwen
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,32 +14,71 @@
   ~ limitations under the License.
   -->
 
-<RelativeLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  android:layout_width="fill_parent"
-  android:layout_height="fill_parent" android:focusable="false"
-    android:background="?android:attr/activatedBackgroundIndicator">
-    <ImageView android:layout_height="75dp" android:layout_width="75dp" android:id="@+id/item_image" android:layout_alignParentLeft="true" android:maxWidth="75dp" android:adjustViewBounds="true"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="?android:attr/activatedBackgroundIndicator"
+    android:focusable="false">
+
+    <ImageView
+        android:id="@+id/item_image"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:adjustViewBounds="true"
+        android:maxWidth="75dp"
         android:scaleType="centerCrop" />
-    <LinearLayout android:layout_alignParentRight="true" android:layout_toRightOf="@id/item_image" android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/linearLayout1" android:orientation="vertical" android:paddingLeft="8dp"
+
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/item_image"
-        android:layout_alignParentTop="true">
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/item_title" android:text="Title"
-            android:textStyle="bold"
-            android:textSize="17sp" />
-        <TextView android:layout_height="wrap_content" android:id="@+id/item_info1" android:layout_width="wrap_content" android:textSize="12sp"/>
-        <TextView android:layout_height="wrap_content" android:id="@+id/item_info2" android:layout_width="wrap_content" android:textSize="12sp"/>
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@id/item_image"
+        android:layout_toEndOf="@id/item_image"
+        android:orientation="vertical"
+        android:paddingEnd="0dp"
+        android:paddingLeft="8dp"
+        android:paddingRight="0dp"
+        android:paddingStart="8dp">
+
+        <TextView
+            android:id="@+id/item_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Title"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/item_info1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/item_info2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp" />
     </LinearLayout>
 
     <ImageView
+        android:id="@+id/group_indicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/group_indicator"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
         android:layout_alignBottom="@+id/linearLayout1"
-        android:src="@android:drawable/arrow_down_float"
-        android:paddingRight="10dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
         android:paddingBottom="10dp"
+        android:paddingEnd="10dp"
+        android:paddingLeft="0dp"
+        android:paddingRight="10dp"
+        android:paddingStart="0dp"
+        android:src="@android:drawable/arrow_down_float"
         android:visibility="invisible" />
 </RelativeLayout>
