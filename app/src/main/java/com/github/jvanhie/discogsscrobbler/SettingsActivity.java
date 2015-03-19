@@ -31,7 +31,11 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.LinearLayout;
 
 import com.github.jvanhie.discogsscrobbler.util.Discogs;
 import com.github.jvanhie.discogsscrobbler.util.Lastfm;
@@ -92,7 +96,7 @@ public class SettingsActivity extends PreferenceActivity {
             }
         });
 
-
+        /*
         try {
             getActionBar().setDisplayHomeAsUpEnabled(true);
         } catch (NullPointerException ex) {
@@ -100,12 +104,22 @@ public class SettingsActivity extends PreferenceActivity {
         }
 
         getActionBar().setHomeButtonEnabled(true);
-
+        */
     }
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
+
+        LinearLayout root = (LinearLayout)findViewById(android.R.id.list).getParent().getParent().getParent();
+        Toolbar bar = (Toolbar) LayoutInflater.from(this).inflate(R.layout.settings_toolbar, root, false);
+        root.addView(bar, 0); // insert at top
+        bar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         setupSimplePreferencesScreen();
     }
