@@ -38,6 +38,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import de.umass.lastfm.Authenticator;
+import de.umass.lastfm.CallException;
 import de.umass.lastfm.Caller;
 import de.umass.lastfm.Session;
 import de.umass.lastfm.scrobble.ScrobbleData;
@@ -114,6 +115,7 @@ public class Lastfm extends ContextWrapper {
                 String title = track.title;
                 String album = track.album;
                 String artist = track.artist;
+                boolean success;
                 int duration = Track.formatDurationToSeconds(track.duration);
                 if(duration==0) {
                     duration= DEFAULT_TRACK_DURATION;
@@ -123,8 +125,10 @@ public class Lastfm extends ContextWrapper {
                 data.setTrack(title);
                 data.setAlbum(album);
                 data.setDuration(duration);
-                ScrobbleResult result = de.umass.lastfm.Track.updateNowPlaying(data, mSession);
-                boolean success = (result.isSuccessful() && !result.isIgnored());
+                try {
+                    ScrobbleResult result = de.umass.lastfm.Track.updateNowPlaying(data, mSession);
+                    success = (result.isSuccessful() && !result.isIgnored());
+                } catch (CallException ex) {success=false;}
                 return success;
             }
 
@@ -161,14 +165,17 @@ public class Lastfm extends ContextWrapper {
                 String title = track.title;
                 String album = track.album;
                 String artist = track.artist;
+                boolean success;
                 int duration = 0;
                 ScrobbleData data = new ScrobbleData();
                 data.setArtist(artist);
                 data.setTrack(title);
                 data.setAlbum(album);
                 data.setDuration(duration);
-                ScrobbleResult result = de.umass.lastfm.Track.updateNowPlaying(data, mSession);
-                boolean success = (result.isSuccessful() && !result.isIgnored());
+                try {
+                    ScrobbleResult result = de.umass.lastfm.Track.updateNowPlaying(data, mSession);
+                    success = (result.isSuccessful() && !result.isIgnored());
+                } catch (CallException ex) {success=false;}
                 return success;
             }
 
@@ -194,13 +201,16 @@ public class Lastfm extends ContextWrapper {
                 String title = track.title;
                 String album = track.album;
                 String artist = track.artist;
+                boolean success;
                 ScrobbleData data = new ScrobbleData();
                 data.setArtist(artist);
                 data.setTrack(title);
                 data.setAlbum(album);
                 data.setTimestamp(time);
-                ScrobbleResult result = de.umass.lastfm.Track.scrobble(data, mSession);
-                boolean success = (result.isSuccessful() && !result.isIgnored());
+                try {
+                    ScrobbleResult result = de.umass.lastfm.Track.scrobble(data, mSession);
+                    success = (result.isSuccessful() && !result.isIgnored());
+                } catch (CallException ex) {success=false;}
                 return success;
             }
 
@@ -280,7 +290,10 @@ public class Lastfm extends ContextWrapper {
         AsyncTask<Void,Void,Boolean> t = new AsyncTask<Void, Void, Boolean>() {
             @Override
             protected Boolean doInBackground(Void... voids) {
-                de.umass.lastfm.Track info = de.umass.lastfm.Track.getInfo(track.artist,track.title,API_KEY);
+                de.umass.lastfm.Track info = null;
+                try {
+                    info = de.umass.lastfm.Track.getInfo(track.artist, track.title, API_KEY);
+                } catch (CallException ex) {}
                 if(info != null) {
                     track.duration = Track.formatDurationToString(info.getDuration());
                 } else {

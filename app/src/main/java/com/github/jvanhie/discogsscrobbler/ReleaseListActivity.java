@@ -16,6 +16,7 @@
 
 package com.github.jvanhie.discogsscrobbler;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -153,7 +154,9 @@ public class ReleaseListActivity extends DrawerActivity
                         if(success && data != null) {
                             mFolders = true;
                             Spinner s = (Spinner) filter.getActionView(); // find the spinner
-                            ArrayAdapter<Folder> mSpinnerAdapter = new ArrayAdapter<Folder>(getSupportActionBar().getThemedContext(), android.R.layout.simple_spinner_dropdown_item, data);
+                            Context theme = getSupportActionBar().getThemedContext();
+                            if(theme == null) return; //another check for a rare bug
+                            ArrayAdapter<Folder> mSpinnerAdapter = new ArrayAdapter<Folder>(theme, android.R.layout.simple_spinner_dropdown_item, data);
                             mSpinnerAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
                             s.setAdapter(mSpinnerAdapter); // set the adapter
                             s.setSelection(0, false);

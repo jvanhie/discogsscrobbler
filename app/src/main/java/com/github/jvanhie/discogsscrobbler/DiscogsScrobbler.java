@@ -18,6 +18,7 @@ package com.github.jvanhie.discogsscrobbler;
 
 import com.activeandroid.app.Application;
 import com.crashlytics.android.Crashlytics;
+import io.fabric.sdk.android.Fabric;
 
 
 /**
@@ -30,7 +31,7 @@ public class DiscogsScrobbler extends Application {
         //bugfix for dodgy discogs connections
         System.setProperty("http.keepAlive", "false");
         //init crashlytics
-        Crashlytics.start(this);
+        Fabric.with(this, new Crashlytics());
     }
 
 }

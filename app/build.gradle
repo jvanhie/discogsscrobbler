@@ -1,10 +1,10 @@
 buildscript {
     repositories {
-        maven { url 'http://download.crashlytics.com/maven' }
+        maven { url 'https://maven.fabric.io/public' }
     }
 
     dependencies {
-        classpath 'com.crashlytics.tools.gradle:crashlytics-gradle:1.+'
+        classpath 'io.fabric.tools:gradle:1.+'
     }
 }
 /*
@@ -26,15 +26,15 @@ buildscript {
 
 
 apply plugin: 'com.android.application'
-apply plugin: 'crashlytics'
+apply plugin: 'io.fabric'
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion '21.1.2'
+    compileSdkVersion 23
+    buildToolsVersion '23.0.1'
 
     defaultConfig {
         minSdkVersion 8
-        targetSdkVersion 21
+        targetSdkVersion 23
         versionCode 3
         versionName "0.9"
     }
@@ -50,23 +50,25 @@ repositories {
     flatDir {
         dirs 'libs'
     }
-    maven { url 'http://download.crashlytics.com/maven' }
+    maven { url 'https://maven.fabric.io/public' }
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:21.0.3'
+    compile 'com.android.support:appcompat-v7:23.0.1'
     compile 'oauth.signpost:signpost-core:1.2.1.2'
     compile 'com.squareup.okhttp:okhttp:2.1.0'
     compile 'com.squareup.okhttp:okhttp-urlconnection:2.1.0'
     compile 'com.squareup.okio:okio:1.0.1'
     compile 'com.squareup.retrofit:retrofit:1.8.0'
     compile 'com.nostra13.universalimageloader:universal-image-loader:1.7.0'
-    compile 'com.android.support:support-v4:21.0.3'
+    compile 'com.android.support:support-v4:23.0.1'
     compile 'de.u-mass:lastfm-java:0.1.2'
     compile 'com.echo.holographlibrary:holographlibrary:1.0.0@aar'
-    compile 'com.crashlytics.android:crashlytics:1.+'
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile('com.crashlytics.sdk.android:crashlytics:2.5.2@aar') {
+        transitive = true;
+    }
 
 
 }
