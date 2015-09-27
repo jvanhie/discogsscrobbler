@@ -272,6 +272,8 @@ public class ReleaseDetailFragment extends Fragment {
             public void onResult(boolean success) {
                 if (success) {
                     Toast.makeText(getActivity(), "Added release to Discogs collection", Toast.LENGTH_SHORT).show();
+                    mRelease.isTransient=false;
+                    getActivity().supportInvalidateOptionsMenu();
                 } else {
                     Toast.makeText(getActivity(), "Release already in Discogs collection", Toast.LENGTH_SHORT).show();
                 }

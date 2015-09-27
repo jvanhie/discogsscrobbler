@@ -67,7 +67,7 @@
         <service android:name="com.github.jvanhie.discogsscrobbler.util.NowPlayingService" android:exported="false"/>
         <receiver android:name="com.github.jvanhie.discogsscrobbler.util.NowPlayingAlarm"/>
         <meta-data android:name="AA_DB_NAME" android:value="discogs.db" />
-        <meta-data android:name="AA_DB_VERSION" android:value="8" />
+        <meta-data android:name="AA_DB_VERSION" android:value="9" />
         <meta-data android:name="com.crashlytics.ApiKey" android:value="69359fc0acb699a09d507a37259df78db0b911c4"/>
     </application>
 

@@ -40,6 +40,9 @@ public class Release extends Model{
     @Column(name = "folder_id")
     public long folder_id;
 
+    @Column(name = "instance_id")
+    public long instance_id;
+
     @Column(name = "title")
     public String title;
 
@@ -158,6 +161,7 @@ public class Release extends Model{
         year=r.year;
         resource_url=r.resource_url;
         folder_id=r.folder_id;
+        instance_id=r.instance_id;
         thumb=r.thumb;
         artist= Discogs.formatArtist(r.artists);
         label= Discogs.formatLabel(r.labels);

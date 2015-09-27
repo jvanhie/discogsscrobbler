@@ -383,9 +383,9 @@ public class Discogs extends ContextWrapper {
 
             @Override
             public void failure(RetrofitError error) {
-                if(error.getKind() == Kind.NETWORK || error.getKind() == Kind.UNEXPECTED) {
+                if (error.getKind() == Kind.NETWORK || error.getKind() == Kind.UNEXPECTED) {
                     //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
-                    if(mRetries.getAndIncrement()<MAX_RETRIES) {
+                    if (mRetries.getAndIncrement() < MAX_RETRIES) {
                         new Handler().postDelayed(new Runnable() {
                             @Override
                             public void run() {
@@ -440,14 +440,14 @@ public class Discogs extends ContextWrapper {
             @Override
             public void success(DiscogsSearch discogsSearch, Response response) {
                 mRetries.set(0);
-                waiter.onResult(true,discogsSearch.results);
+                waiter.onResult(true, discogsSearch.results);
             }
 
             @Override
             public void failure(RetrofitError error) {
-                if(error.getKind() == Kind.NETWORK || error.getKind() == Kind.UNEXPECTED) {
+                if (error.getKind() == Kind.NETWORK || error.getKind() == Kind.UNEXPECTED) {
                     //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
-                    if(mRetries.getAndIncrement()<MAX_RETRIES) {
+                    if (mRetries.getAndIncrement() < MAX_RETRIES) {
                         new Handler().postDelayed(new Runnable() {
                             @Override
                             public void run() {
@@ -476,9 +476,9 @@ public class Discogs extends ContextWrapper {
 
             @Override
             public void failure(RetrofitError error) {
-                if(error.getKind() == Kind.NETWORK || error.getKind() == Kind.UNEXPECTED) {
+                if (error.getKind() == Kind.NETWORK || error.getKind() == Kind.UNEXPECTED) {
                     //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
-                    if(mRetries.getAndIncrement()<MAX_RETRIES) {
+                    if (mRetries.getAndIncrement() < MAX_RETRIES) {
                         new Handler().postDelayed(new Runnable() {
                             @Override
                             public void run() {
@@ -504,20 +504,20 @@ public class Discogs extends ContextWrapper {
             @Override
             public void success(DiscogsSearch discogsSearch, Response response) {
                 ArrayList<DiscogsSearchRelease> result = new ArrayList<DiscogsSearchRelease>();
-                for(DiscogsSearchRelease r : discogsSearch.releases) {
+                for (DiscogsSearchRelease r : discogsSearch.releases) {
                     if (r.type.equals("release")) result.add(r);
                 }
-                if(discogsSearch.pagination.page<discogsSearch.pagination.pages) {
+                if (discogsSearch.pagination.page < discogsSearch.pagination.pages) {
                     //add dummy release - loader to get more
                     DiscogsSearchLoader loader = new DiscogsSearchLoader();
                     loader.title = "Load more releases";
                     loader.artist = "Click here to load more releases";
-                    loader.format = "Page " + (page+1) + " of " + discogsSearch.pagination.pages;
+                    loader.format = "Page " + (page + 1) + " of " + discogsSearch.pagination.pages;
                     loader.type = "loader";
                     loader.id = 0;
                     //loader specific options
                     loader.parenttype = "artist";
-                    loader.page = page+1;
+                    loader.page = page + 1;
                     loader.parentid = id;
                     result.add(loader);
                 }
@@ -527,9 +527,9 @@ public class Discogs extends ContextWrapper {
 
             @Override
             public void failure(RetrofitError error) {
-                if(error.getKind() == Kind.NETWORK || error.getKind() == Kind.UNEXPECTED) {
+                if (error.getKind() == Kind.NETWORK || error.getKind() == Kind.UNEXPECTED) {
                     //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
-                    if(mRetries.getAndIncrement()<MAX_RETRIES) {
+                    if (mRetries.getAndIncrement() < MAX_RETRIES) {
                         new Handler().postDelayed(new Runnable() {
                             @Override
                             public void run() {
@@ -573,9 +573,9 @@ public class Discogs extends ContextWrapper {
 
             @Override
             public void failure(RetrofitError error) {
-                if(error.getKind() == Kind.NETWORK || error.getKind() == Kind.UNEXPECTED) {
+                if (error.getKind() == Kind.NETWORK || error.getKind() == Kind.UNEXPECTED) {
                     //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
-                    if(mRetries.getAndIncrement()<MAX_RETRIES) {
+                    if (mRetries.getAndIncrement() < MAX_RETRIES) {
                         new Handler().postDelayed(new Runnable() {
                             @Override
                             public void run() {
@@ -619,9 +619,9 @@ public class Discogs extends ContextWrapper {
 
             @Override
             public void failure(RetrofitError error) {
-                if(error.getKind() == Kind.NETWORK || error.getKind() == Kind.UNEXPECTED) {
+                if (error.getKind() == Kind.NETWORK || error.getKind() == Kind.UNEXPECTED) {
                     //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
-                    if(mRetries.getAndIncrement()<MAX_RETRIES) {
+                    if (mRetries.getAndIncrement() < MAX_RETRIES) {
                         new Handler().postDelayed(new Runnable() {
                             @Override
                             public void run() {
@@ -677,13 +677,11 @@ public class Discogs extends ContextWrapper {
         if(getRelease(id) != null) {
             waiter.onResult(false);
         } else {
-            //TODO: this seems broken at the moment? 25/11/2014 get a 404 on existing release
-            mDiscogsService.getCollectionRelease(mUserName, id, new Callback<DiscogsRelease>() {
+            mDiscogsService.addRelease(mUserName, id, new Callback<Response>() {
                 @Override
-                public void success(DiscogsRelease discogsRelease, Response response) {
-                    //release is already in the collection, we won't add it again!
+                public void success(Response response, Response response2) {
                     mRetries.set(0);
-                    waiter.onResult(false);
+                    waiter.onResult(true);
                 }
 
                 @Override
@@ -701,44 +699,12 @@ public class Discogs extends ContextWrapper {
                             //we reached the global max retries, give up
                             waiter.onResult(false);
                         }
-                    } else if (error.getResponse() != null && error.getResponse().getStatus() == 404) {
-                        //this is actually what we expect -> release not found, we can add it now
-                        mRetries.set(0);
-                        reallyAddRelease(id, waiter);
+                    } else {
+                        waiter.onResult(false);
                     }
                 }
             });
         }
-    }
-
-    private void reallyAddRelease(final long id, final DiscogsWaiter waiter) {
-        mDiscogsService.addRelease(mUserName, id, new Callback<Response>() {
-            @Override
-            public void success(Response response, Response response2) {
-                mRetries.set(0);
-                waiter.onResult(true);
-            }
-
-            @Override
-            public void failure(RetrofitError error) {
-                if(error.getKind() == Kind.NETWORK || error.getKind() == Kind.UNEXPECTED) {
-                    //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
-                    if(mRetries.getAndIncrement()<MAX_RETRIES) {
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                reallyAddRelease(id, waiter);
-                            }
-                        }, 1000);
-                    } else {
-                        //we reached the global max retries, give up
-                        waiter.onResult(false);
-                    }
-                } else {
-                    waiter.onResult(false);
-                }
-            }
-        });
     }
 
     public void getPriceSuggestions(final long id, final DiscogsDataWaiter<DiscogsPriceSuggestion> waiter) {
@@ -771,8 +737,8 @@ public class Discogs extends ContextWrapper {
         });
     }
 
-    public void removeRelease(final long id, final DiscogsWaiter waiter) {
-        mDiscogsService.removeRelease(mUserName, id, new Callback<Response>() {
+    public void removeRelease(final long id, final long instance, final DiscogsWaiter waiter) {
+        mDiscogsService.removeRelease(mUserName, id, instance, new Callback<Response>() {
             @Override
             public void success(Response r, Response response) {
                 mRetries.set(0);
@@ -787,7 +753,7 @@ public class Discogs extends ContextWrapper {
                         new Handler().postDelayed(new Runnable() {
                             @Override
                             public void run() {
-                                removeRelease(id, waiter);
+                                removeRelease(id, instance, waiter);
                             }
                         }, 1000);
                     } else {
@@ -923,7 +889,7 @@ public class Discogs extends ContextWrapper {
 
         for (Release r : releases) {
             toRemove.add(r.releaseid);
-            removeRelease(r.releaseid, new DiscogsWaiter() {
+            removeRelease(r.releaseid,r.instance_id, new DiscogsWaiter() {
                 @Override
                 public void onResult(boolean success) {
                     if (!success) allSuccess.set(false);

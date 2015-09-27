@@ -56,14 +56,14 @@ public interface DiscogsService {
     @GET("/masters/{id}/versions?per_page=100")
     void getMasterReleases(@Path("id") long id, @Query("page") int page, Callback<DiscogsSearch> callback);
 
-    @GET("/users/{username}/collection/folders/0/releases/{id}/instances/1")
-    void getCollectionRelease(@Path("username") String username, @Path("id") long id, Callback<DiscogsRelease> callback);
+    @GET("/users/{username}/collection/folders/0/releases/{id}/instances/{instance}")
+    void getCollectionRelease(@Path("username") String username, @Path("id") long id, @Path("instance") long instance, Callback<DiscogsRelease> callback);
 
     @POST("/users/{username}/collection/folders/1/releases/{id}")
     void addRelease(@Path("username") String username, @Path("id") long id, Callback<Response> callback);
 
-    @DELETE("/users/{username}/collection/folders/0/releases/{id}/instances/1")
-    void removeRelease(@Path("username") String username, @Path("id") long id, Callback<Response> callback);
+    @DELETE("/users/{username}/collection/folders/0/releases/{id}/instances/{instance}")
+    void removeRelease(@Path("username") String username, @Path("id") long id, @Path("instance") long instance, Callback<Response> callback);
 
     @GET("/database/search")
     void search(@Query("q") String query, Callback<DiscogsSearch> callback);

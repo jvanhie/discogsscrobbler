@@ -36,6 +36,7 @@
             android:key="discogs_seller_settings_button"
             android:summary="@string/pref_description_seller_settings"/>
 
+
     </PreferenceCategory>
 
 </PreferenceScreen>

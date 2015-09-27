@@ -63,14 +63,14 @@ public class DiscogsApiActivity extends ActionBarActivity {
                 progressBar.setVisibility(View.INVISIBLE);
                 super.onPageFinished(view, url);
                 //autofill data
-                if (url.equals("http://www.discogs.com/applications/edit")) {
+                if (url.equals("http://www.discogs.com/applications/edit") || url.equals("https://www.discogs.com/applications/edit")) {
                     String name = "Discogs Scrobbler";
                     String description = "A Discogs collection manager and Last.fm scrobbler. " +
                             "Source code available at https://github.com/jvanhie/discogsscrobbler";
                     mWebView.loadUrl("javascript:(function() { " +
                             "document.getElementById('name').value = '" + name + "'; " +
                             "document.getElementById('description').value = '" + description + "'; })()");
-                } else if (url.contains("http://www.discogs.com/applications/edit/")) {
+                } else if (url.contains("www.discogs.com/applications/edit/")) {
                     //this is a detail screen, scrape data
                     mWebView.loadUrl("javascript:window.HTMLOUT.processHTML(document.getElementById('page_content').innerHTML);");
 

@@ -40,6 +40,7 @@ public class DiscogsCollection {
 
     private class ReleaseSummary {
         private long id;
+        private long instance_id;
         private long folder_id;
         private int rating;
         private DiscogsBasicRelease basic_information;
@@ -47,6 +48,7 @@ public class DiscogsCollection {
         public DiscogsBasicRelease getRelease() {
             basic_information.rating = rating;
             basic_information.folder_id = folder_id;
+            basic_information.instance_id = instance_id;
             return basic_information;
         }
 
@@ -55,6 +57,7 @@ public class DiscogsCollection {
     public class DiscogsBasicRelease {
 
         public long id;
+        public long instance_id;
         public long folder_id;
         public String title;
         public int year;

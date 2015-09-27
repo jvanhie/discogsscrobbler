@@ -128,7 +128,7 @@ public class Lastfm extends ContextWrapper {
                 try {
                     ScrobbleResult result = de.umass.lastfm.Track.updateNowPlaying(data, mSession);
                     success = (result.isSuccessful() && !result.isIgnored());
-                } catch (CallException ex) {success=false;}
+                } catch (RuntimeException ex) {success=false;}
                 return success;
             }
 
@@ -175,7 +175,7 @@ public class Lastfm extends ContextWrapper {
                 try {
                     ScrobbleResult result = de.umass.lastfm.Track.updateNowPlaying(data, mSession);
                     success = (result.isSuccessful() && !result.isIgnored());
-                } catch (CallException ex) {success=false;}
+                } catch (RuntimeException ex) {success=false;}
                 return success;
             }
 
@@ -210,7 +210,7 @@ public class Lastfm extends ContextWrapper {
                 try {
                     ScrobbleResult result = de.umass.lastfm.Track.scrobble(data, mSession);
                     success = (result.isSuccessful() && !result.isIgnored());
-                } catch (CallException ex) {success=false;}
+                } catch (RuntimeException ex) {success=false;}
                 return success;
             }
 
@@ -293,7 +293,7 @@ public class Lastfm extends ContextWrapper {
                 de.umass.lastfm.Track info = null;
                 try {
                     info = de.umass.lastfm.Track.getInfo(track.artist, track.title, API_KEY);
-                } catch (CallException ex) {}
+                } catch (RuntimeException ex) {}
                 if(info != null) {
                     track.duration = Track.formatDurationToString(info.getDuration());
                 } else {
