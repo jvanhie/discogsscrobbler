@@ -40,7 +40,6 @@ import com.github.jvanhie.discogsscrobbler.models.Release;
 import com.github.jvanhie.discogsscrobbler.models.Track;
 import com.github.jvanhie.discogsscrobbler.queries.DiscogsPriceSuggestion;
 import com.github.jvanhie.discogsscrobbler.util.Discogs;
-import com.github.jvanhie.discogsscrobbler.util.DiscogsImageDownloader;
 import com.github.jvanhie.discogsscrobbler.util.Lastfm;
 import com.github.jvanhie.discogsscrobbler.util.NowPlayingService;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;

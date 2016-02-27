@@ -30,8 +30,6 @@ import android.widget.TextView;
 
 import com.github.jvanhie.discogsscrobbler.R;
 import com.github.jvanhie.discogsscrobbler.models.Release;
-import com.github.jvanhie.discogsscrobbler.util.Discogs;
-import com.github.jvanhie.discogsscrobbler.util.DiscogsImageDownloader;
 import com.github.jvanhie.discogsscrobbler.util.SquareView;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;

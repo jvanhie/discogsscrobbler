@@ -46,7 +46,6 @@ import android.widget.TextView;
 import com.github.jvanhie.discogsscrobbler.adapters.TrackListAdapter;
 import com.github.jvanhie.discogsscrobbler.models.Track;
 import com.github.jvanhie.discogsscrobbler.util.Discogs;
-import com.github.jvanhie.discogsscrobbler.util.DiscogsImageDownloader;
 import com.github.jvanhie.discogsscrobbler.util.NowPlayingService;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;

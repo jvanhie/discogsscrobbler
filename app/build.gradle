@@ -30,7 +30,7 @@ apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion '23.0.1'
+    buildToolsVersion '23.0.2'
 
     defaultConfig {
         minSdkVersion 8
@@ -54,14 +54,14 @@ repositories {
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:23.0.1'
+    compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'oauth.signpost:signpost-core:1.2.1.2'
     compile 'com.squareup.okhttp:okhttp:2.1.0'
     compile 'com.squareup.okhttp:okhttp-urlconnection:2.1.0'
     compile 'com.squareup.okio:okio:1.0.1'
     compile 'com.squareup.retrofit:retrofit:1.8.0'
     compile 'com.nostra13.universalimageloader:universal-image-loader:1.7.0'
-    compile 'com.android.support:support-v4:23.0.1'
+    compile 'com.android.support:support-v4:23.1.1'
     compile 'de.u-mass:lastfm-java:0.1.2'
     compile 'com.echo.holographlibrary:holographlibrary:1.0.0@aar'
 

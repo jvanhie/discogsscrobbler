@@ -18,7 +18,7 @@
 <resources>
 
     <string name="app_name">Discogs Scrobbler</string>
-    <string name="user_agent">DiscogsScrobbler/0.5 +http://github.com/jvanhie/discogsscrobbler</string>
+    <string name="user_agent">DiscogsScrobbler/0.9 +http://github.com/jvanhie/discogsscrobbler</string>
     <string name="title_release_detail">Release Detail</string>
     <string name="title_release_tracklist">Tracklist</string>
     <string name="title_search">Search Discogs</string>

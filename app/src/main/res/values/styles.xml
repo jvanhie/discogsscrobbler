@@ -18,7 +18,9 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+        <!-- customizations because of wrong shading of settingsactivity -->
+        <item name="android:textColorPrimary">#fff</item>
+        <item name="actionMenuTextColor">#fff</item>
     </style>
 
 </resources>

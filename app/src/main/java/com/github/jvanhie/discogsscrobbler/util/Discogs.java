@@ -173,8 +173,8 @@ public class Discogs extends ContextWrapper {
         mOAuthConsumer = new DefaultOAuthConsumer(mApiKey,mApiSecret);
 
         mOAuthProvider = new DefaultOAuthProvider(
-                "http://api.discogs.com/oauth/request_token", "http://api.discogs.com/oauth/access_token",
-                "http://www.discogs.com/oauth/authorize");
+                "https://api.discogs.com/oauth/request_token", "https://api.discogs.com/oauth/access_token",
+                "https://www.discogs.com/oauth/authorize");
         mOAuthProvider.setListener(new DiscogsOauthProviderListener());
     }
 
