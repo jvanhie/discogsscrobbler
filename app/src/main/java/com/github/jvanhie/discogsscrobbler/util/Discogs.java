@@ -322,6 +322,10 @@ public class Discogs extends ContextWrapper {
 
     /*end of static functions*/
 
+    public boolean isLoggedIn() {
+        return (mUserName != null);
+    }
+
     public String getUser() {
         return mUserName;
     }

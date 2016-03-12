@@ -105,6 +105,10 @@ public class Lastfm extends ContextWrapper {
         return (mSession != null);
     }
 
+    public String getUserName() {
+        return mUserName;
+    }
+
     public void updateNowPlaying(final Track track, final LastfmWaiter waiter) {
         if(mSession==null) {
             waiter.onResult(false);

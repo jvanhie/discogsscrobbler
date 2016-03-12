@@ -226,9 +226,7 @@ public class SearchActivity extends DrawerActivity
         if (mSelected > 0) {
 
             inflater.inflate(R.menu.release_detail_search, menu);
-            if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("enable_lastfm", true)) {
-                inflater.inflate(R.menu.release_detail_scrobble, menu);
-            }
+            inflater.inflate(R.menu.release_detail_scrobble, menu);
         }
 
 

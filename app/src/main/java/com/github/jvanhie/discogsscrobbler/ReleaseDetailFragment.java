@@ -114,20 +114,16 @@ public class ReleaseDetailFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        if(PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("enable_discogs", true)) {
-            if (mRelease == null || mRelease.isTransient) {
-                //the release is not in the collection, give the user the opportunity to add it
-                inflater.inflate(R.menu.release_detail_search, menu);
-            }
-            if (mRelease != null && !mRelease.isTransient) {
-                //release is in the collection
-                inflater.inflate(R.menu.release_detail_refresh, menu);
-            }
+        if (mRelease == null || mRelease.isTransient) {
+            //the release is not in the collection, give the user the opportunity to add it
+            inflater.inflate(R.menu.release_detail_search, menu);
+        }
+        if (mRelease != null && !mRelease.isTransient) {
+            //release is in the collection
+            inflater.inflate(R.menu.release_detail_refresh, menu);
         }
 
-        if (PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("enable_lastfm", true)) {
-            inflater.inflate(R.menu.release_detail_scrobble, menu);
-        }
+        inflater.inflate(R.menu.release_detail_scrobble, menu);
 
 
 

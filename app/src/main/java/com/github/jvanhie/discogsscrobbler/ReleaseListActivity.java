@@ -125,95 +125,91 @@ public class ReleaseListActivity extends DrawerActivity
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
-        if(PreferenceManager.getDefaultSharedPreferences(this).getBoolean("enable_discogs",true)) {
-            // Inflate the menu; this adds items to the action bar if it is present.
-            MenuInflater inflater = getMenuInflater();
-            inflater.inflate(R.menu.discogs_list, menu);
-            //configure search box
-            final MenuItem search = menu.findItem(R.id.list_search);
-            SearchView searchView = (SearchView) search.getActionView();
-            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-                @Override
-                public boolean onQueryTextSubmit(String s) {
-                    menu.findItem(R.id.list_search).collapseActionView();
-                    return false;
-                }
+        // Inflate the menu; this adds items to the action bar if it is present.
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.discogs_list, menu);
+        //configure search box
+        final MenuItem search = menu.findItem(R.id.list_search);
+        SearchView searchView = (SearchView) search.getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                menu.findItem(R.id.list_search).collapseActionView();
+                return false;
+            }
 
+            @Override
+            public boolean onQueryTextChange(String s) {
+                mReleaseList.filter(s);
+                return false;
+            }
+        });
+        searchView.setQueryHint("Filter your releases");
+        final MenuItem filter = menu.findItem(R.id.list_filter);
+        if(!mFolders) {
+            mDiscogs.getFolders(new Discogs.DiscogsDataWaiter<List<Folder>>() {
                 @Override
-                public boolean onQueryTextChange(String s) {
-                    mReleaseList.filter(s);
-                    return false;
-                }
-            });
-            searchView.setQueryHint("Filter your releases");
-            final MenuItem filter = menu.findItem(R.id.list_filter);
-            if(!mFolders) {
-                mDiscogs.getFolders(new Discogs.DiscogsDataWaiter<List<Folder>>() {
-                    @Override
-                    public void onResult(boolean success, List<Folder> data) {
-                        if(success && data != null) {
-                            mFolders = true;
-                            Spinner s = (Spinner) filter.getActionView(); // find the spinner
-                            Context theme = getSupportActionBar().getThemedContext();
-                            if(theme == null) return; //another check for a rare bug
-                            ArrayAdapter<Folder> mSpinnerAdapter = new ArrayAdapter<Folder>(theme, android.R.layout.simple_spinner_dropdown_item, data);
-                            mSpinnerAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
-                            s.setAdapter(mSpinnerAdapter); // set the adapter
-                            s.setSelection(0, false);
-                            s.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                                @Override
-                                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                                    mDiscogs.setFolderId(((Folder) adapterView.getItemAtPosition(i)).folderid);
-                                    //reload list with id
-                                    mReleaseList.loadList();
-                                    filter.collapseActionView();
-                                }
+                public void onResult(boolean success, List<Folder> data) {
+                    if(success && data != null) {
+                        mFolders = true;
+                        Spinner s = (Spinner) filter.getActionView(); // find the spinner
+                        Context theme = getSupportActionBar().getThemedContext();
+                        if(theme == null) return; //another check for a rare bug
+                        ArrayAdapter<Folder> mSpinnerAdapter = new ArrayAdapter<Folder>(theme, android.R.layout.simple_spinner_dropdown_item, data);
+                        mSpinnerAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+                        s.setAdapter(mSpinnerAdapter); // set the adapter
+                        s.setSelection(0, false);
+                        s.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                            @Override
+                            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                                mDiscogs.setFolderId(((Folder) adapterView.getItemAtPosition(i)).folderid);
+                                //reload list with id
+                                mReleaseList.loadList();
+                                filter.collapseActionView();
+                            }
 
-                                @Override
-                                public void onNothingSelected(AdapterView<?> adapterView) {
-                                    //filter.collapseActionView();
-                                }
-                            });
-                        }
+                            @Override
+                            public void onNothingSelected(AdapterView<?> adapterView) {
+                                //filter.collapseActionView();
+                            }
+                        });
                     }
-                });
-            }
-
-            //make sure only one actionview is expanded
-            MenuItemCompat.setOnActionExpandListener(filter,new MenuItemCompat.OnActionExpandListener() {
-                @Override
-                public boolean onMenuItemActionExpand(MenuItem menuItem) {
-                    //collapse search
-                    search.collapseActionView();
-                    return true;
-                }
-
-                @Override
-                public boolean onMenuItemActionCollapse(MenuItem menuItem) {
-                    return true;
                 }
             });
-            MenuItemCompat.setOnActionExpandListener(search,new MenuItemCompat.OnActionExpandListener() {
-                @Override
-                public boolean onMenuItemActionExpand(MenuItem menuItem) {
-                    //collapse search
-                    filter.collapseActionView();
-                    return true;
-                }
+        }
 
-                @Override
-                public boolean onMenuItemActionCollapse(MenuItem menuItem) {
-                    return true;
-                }
-            });
-
-            //s.setSelection(mSearchType,false);
-
-            if (mSelected > 0) {
-                if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("enable_lastfm", true)) {
-                    inflater.inflate(R.menu.release_detail_scrobble, menu);
-                }
+        //make sure only one actionview is expanded
+        MenuItemCompat.setOnActionExpandListener(filter,new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem menuItem) {
+                //collapse search
+                search.collapseActionView();
+                return true;
             }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem menuItem) {
+                return true;
+            }
+        });
+        MenuItemCompat.setOnActionExpandListener(search,new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem menuItem) {
+                //collapse search
+                filter.collapseActionView();
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem menuItem) {
+                return true;
+            }
+        });
+
+        //s.setSelection(mSearchType,false);
+
+        if (mSelected > 0) {
+            inflater.inflate(R.menu.release_detail_scrobble, menu);
         }
         return true;
     }

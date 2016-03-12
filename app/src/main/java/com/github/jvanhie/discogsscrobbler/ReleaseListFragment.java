@@ -151,14 +151,6 @@ public class ReleaseListFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        //check if the user wants to enable discogs support, if not, stop here
-        if(!PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("enable_discogs",true)) {
-            View emptyView = inflater.inflate(R.layout.fragment_empty, container, false);
-            ((TextView)emptyView.findViewById(R.id.empty_heading)).setText("Discogs not enabled");
-            ((TextView)emptyView.findViewById(R.id.empty_text)).setText("Cannot display your collection without Discogs support, enable Discogs in the settings menu if you'd like to use this feature");
-            mCallbacks.onAdapterSet();
-            return emptyView;
-        }
 
         String layout = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("collection_view","");
         if(layout.equals("list")) {
@@ -246,7 +238,7 @@ public class ReleaseListFragment extends Fragment {
 
     private void checkOnlineCollection() {
         if(mDiscogs==null) mDiscogs = Discogs.getInstance(getActivity());
-        if (mDiscogs.getUser() != null) {
+        if (mDiscogs.isLoggedIn()) {
             mCallbacks.setRefreshVisible(true);
             mDiscogs.isCollectionChanged(new Discogs.DiscogsWaiter() {
                 @Override

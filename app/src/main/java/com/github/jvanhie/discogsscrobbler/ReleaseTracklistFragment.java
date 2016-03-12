@@ -121,7 +121,7 @@ public class ReleaseTracklistFragment extends ListFragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        if(PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("enable_discogs", true)) {
+
             if (mRelease == null || mRelease.isTransient) {
                 //the release is not in the collection, give the user the opportunity to add it
                 inflater.inflate(R.menu.release_detail_search, menu);
@@ -130,13 +130,8 @@ public class ReleaseTracklistFragment extends ListFragment {
                 //release is in the collection
                 inflater.inflate(R.menu.release_detail_refresh, menu);
             }
-        }
 
-        if (PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("enable_lastfm", true)) {
             inflater.inflate(R.menu.release_detail_scrobble, menu);
-        }
-
-
     }
 
     @Override

@@ -20,13 +20,13 @@
     <!-- Strings related to Settings -->
 
     <string name="pref_header_lastfm">Last.fm</string>
-    <string name="pref_title_enable_lastfm">Enable Last.fm</string>
-    <string name="pref_description_enable_lastfm">Enables scrobbling to Last.fm</string>
+    <string name="pref_title_enable_lastfm">Connect to Last.fm</string>
+    <string name="pref_description_enable_lastfm">Sign in</string>
 
     <string name="pref_header_discogs">Discogs</string>
 
-    <string name="pref_title_enable_discogs">Enable Discogs</string>
-    <string name="pref_description_enable_discogs">Enables Discogs collection management</string>
+    <string name="pref_title_enable_discogs">Connect to Discogs</string>
+    <string name="pref_description_enable_discogs">Sign in</string>
 
     <string name="pref_title_collection_view">Collection view</string>
     <string name="pref_description_collection_view">How to display your Discogs collection</string>

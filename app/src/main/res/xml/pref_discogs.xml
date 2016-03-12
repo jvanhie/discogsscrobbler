@@ -16,45 +16,45 @@
   ~ limitations under the License.
   -->
 
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory
+<android.support.v7.preference.PreferenceScreen  xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <android.support.v7.preference.PreferenceCategory
         android:title="@string/pref_header_discogs"
         >
 
-        <SwitchPreference
+        <android.support.v7.preference.SwitchPreferenceCompat
             android:key="enable_discogs"
             android:title="@string/pref_title_enable_discogs"
             android:summary="@string/pref_description_enable_discogs"
-            android:defaultValue="true" />
+            android:defaultValue="false" />
 
-        <ListPreference
+        <android.support.v7.preference.ListPreference
             android:key="collection_view"
-            android:dependency="enable_discogs"
             android:title="@string/pref_title_collection_view"
             android:summary="@string/pref_description_collection_view"
             android:entries="@array/pref_collection_view_entries"
             android:entryValues="@array/pref_collection_view_values"
             android:defaultValue="@string/pref_collection_view_default" />
 
-        <CheckBoxPreference
+        <android.support.v7.preference.CheckBoxPreference
             android:key="collection_auto_refresh"
             android:title="Check collection at startup"
             android:summary="Perform an automated check whenever you check your Collection. Can always be performed manually"
             android:defaultValue="true"
             />
 
-        <CheckBoxPreference
+        <android.support.v7.preference.CheckBoxPreference
             android:key="release_auto_add"
             android:title="Auto add releases"
             android:summary="Add a scrobbled release to your Discogs collection if it's not already in it"
             android:defaultValue="false"
             />
 
-        <Preference android:key="discogs_preload_collection"
+        <android.support.v7.preference.Preference android:key="discogs_preload_collection"
             android:dependency="enable_discogs"
             android:title="@string/pref_title_preload_collection"
             android:summary="@string/pref_description_preload_collection"/>
 
-    </PreferenceCategory>
+    </android.support.v7.preference.PreferenceCategory>
 
-</PreferenceScreen>
+</android.support.v7.preference.PreferenceScreen>

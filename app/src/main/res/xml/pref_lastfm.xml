@@ -16,22 +16,22 @@
   ~ limitations under the License.
   -->
 
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory
+<android.support.v7.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <android.support.v7.preference.PreferenceCategory
         android:title="@string/pref_header_lastfm"
         >
-    <SwitchPreference
+    <android.support.v7.preference.SwitchPreferenceCompat
         android:key="enable_lastfm"
         android:title="@string/pref_title_enable_lastfm"
         android:summary="@string/pref_description_enable_lastfm"
-        android:defaultValue="true" />
-    </PreferenceCategory>
+        android:defaultValue="false" />
 
-    <EditTextPreference
+    <android.support.v7.preference.EditTextPreference
         android:key="recently_played_size"
-        android:dependency="enable_lastfm"
         android:title="Recently Played size"
         android:summary="How many releases do you want to store in the Recently Played list?"
         android:numeric="integer"
         android:defaultValue="50" />
-</PreferenceScreen>
+
+    </android.support.v7.preference.PreferenceCategory>
+</android.support.v7.preference.PreferenceScreen>
