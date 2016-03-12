@@ -36,6 +36,13 @@
             android:entryValues="@array/pref_collection_view_values"
             android:defaultValue="@string/pref_collection_view_default" />
 
+        <android.support.v7.preference.EditTextPreference
+            android:key="grid_size"
+            android:title="@string/pref_title_grid_size"
+            android:summary="@string/pref_description_grid_size"
+            android:defaultValue="100%"
+            />
+
         <android.support.v7.preference.CheckBoxPreference
             android:key="collection_auto_refresh"
             android:title="Check collection at startup"

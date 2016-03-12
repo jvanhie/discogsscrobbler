@@ -84,6 +84,7 @@ public class ReleaseListFragment extends Fragment {
 
     //we'll need this to determine our width in dp;
     private float logicalDensity;
+    private double artSize = 1.0;
     private boolean mGrid = false;
 
     private TextView mEmptyHeading;
@@ -161,6 +162,13 @@ public class ReleaseListFragment extends Fragment {
             mList = new GridView(getActivity());
             mList.setId(android.R.id.list);
             mGrid = true;
+            try {
+                String scaling = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("grid_size", "100%");
+                scaling=scaling.replace("%","");
+                artSize = Integer.parseInt(scaling)/100.0;
+            } catch(NumberFormatException e) {
+                Toast.makeText(getActivity(),"Cannot parse grid size scaling, check your settings", Toast.LENGTH_SHORT).show();
+            }
         }
 
         mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -212,7 +220,7 @@ public class ReleaseListFragment extends Fragment {
                     if(mGrid) {
                         GridView grid = (GridView) mList;
                         int col = grid.getNumColumns();
-                        int newCol = Math.round((fragmentWidth / logicalDensity) / (float) 150);
+                        int newCol = (int)Math.round(((fragmentWidth / logicalDensity) / (float) 150)/artSize);
                         if(col != newCol) {
                             int pos = grid.getFirstVisiblePosition();
                             //if an item is selected, focus on this instead

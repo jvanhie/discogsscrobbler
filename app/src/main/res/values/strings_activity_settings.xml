@@ -30,6 +30,9 @@
 
     <string name="pref_title_collection_view">Collection view</string>
     <string name="pref_description_collection_view">How to display your Discogs collection</string>
+    <string name="pref_title_grid_size">Grid size scaling</string>
+    <string name="pref_description_grid_size">Change the album art size</string>
+
     <string name="pref_collection_view_default">list</string>
     <string-array name="pref_collection_view_entries">
         <item>List</item>
