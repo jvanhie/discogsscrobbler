@@ -47,6 +47,6 @@ public class Folder extends Model {
 
     @Override
     public String toString() {
-        return name;
+        return "" + name + " ("+ count+")";
     }
 }
