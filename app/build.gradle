@@ -37,6 +37,11 @@ android {
         targetSdkVersion 23
         versionCode 5
         versionName "0.95"
+        generatedDensities = []
+    }
+    // This is handled for you by the 2.0+ Gradle Plugin
+    aaptOptions {
+        additionalParameters "--no-version-vectors"
     }
     buildTypes {
         release {
@@ -44,6 +49,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
+
 }
 
 repositories {
@@ -67,7 +73,7 @@ dependencies {
     compile 'com.echo.holographlibrary:holographlibrary:1.0.0@aar'
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile('com.crashlytics.sdk.android:crashlytics:2.5.2@aar') {
+    compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
         transitive = true;
     }
 
