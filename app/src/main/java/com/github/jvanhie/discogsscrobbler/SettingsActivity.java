@@ -81,7 +81,6 @@ public class SettingsActivity extends DrawerActivity implements SharedPreference
 
     public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences,String s)
     {
-        System.out.println(s);
         if (s.equals("enable_discogs")) {
             if (!sharedPreferences.getBoolean(s, true)) {
                 //user has logged out of Discogs
