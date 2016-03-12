@@ -167,7 +167,6 @@ public class SearchActivity extends DrawerActivity
         Spinner s = (Spinner) filter.getActionView(); // find the spinner
         ArrayAdapter mSpinnerAdapter = ArrayAdapter.createFromResource(getSupportActionBar()
                 .getThemedContext(), R.array.search_filter_items, android.R.layout.simple_spinner_dropdown_item); //  create the adapter from a StringArray
-        mSpinnerAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         s.setAdapter(mSpinnerAdapter); // set the adapter
         s.setSelection(mSearchType,false);
 

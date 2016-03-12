@@ -156,7 +156,6 @@ public class ReleaseListActivity extends DrawerActivity
                         Context theme = getSupportActionBar().getThemedContext();
                         if(theme == null) return; //another check for a rare bug
                         ArrayAdapter<Folder> mSpinnerAdapter = new ArrayAdapter<Folder>(theme, android.R.layout.simple_spinner_dropdown_item, data);
-                        mSpinnerAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
                         s.setAdapter(mSpinnerAdapter); // set the adapter
                         s.setSelection(0, false);
                         s.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
