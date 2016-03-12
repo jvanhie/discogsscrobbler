@@ -313,7 +313,11 @@ public class ReleaseDetailFragment extends Fragment {
                             @Override
                             public void onResult(boolean success) {
                                 if(getActivity()!=null) {
-                                    Toast.makeText(getActivity(), "Scrobbled " + mRelease.tracklist().size() + " tracks", Toast.LENGTH_SHORT).show();
+                                    if(success) {
+                                        Toast.makeText(getActivity(), "Scrobbled " + mRelease.tracklist().size() + " tracks", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(getActivity(), "Could not scrobble to last.fm", Toast.LENGTH_SHORT).show();
+                                    }
                                 }
                             }
                         });
@@ -332,7 +336,19 @@ public class ReleaseDetailFragment extends Fragment {
             }
         } else {
             //log in first
-            lastfm.logIn();
+            lastfm.logIn(new Lastfm.LastfmWaiter() {
+                @Override
+                public void onResult(boolean success) {
+                    if(getActivity()!=null) {
+                        if(success) {
+                            Toast.makeText(getActivity(), "Logged in to last.fm", Toast.LENGTH_SHORT).show();
+                            scrobble();
+                        } else {
+                            Toast.makeText(getActivity(), "Could not log in to last.fm", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
+            });
         }
     }
 

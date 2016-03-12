@@ -17,6 +17,7 @@
 package com.github.jvanhie.discogsscrobbler.util;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -28,6 +29,7 @@ import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.github.jvanhie.discogsscrobbler.R;
 import com.github.jvanhie.discogsscrobbler.models.Track;
@@ -210,6 +212,17 @@ public class Lastfm extends ContextWrapper {
                 try {
                     ScrobbleResult result = de.umass.lastfm.Track.scrobble(data, mSession);
                     success = (result.isSuccessful() && !result.isIgnored());
+                    if(!success && result.getErrorCode()==9) {
+                        //if last.fm revoked our session key, log out and notify the user
+                        logOut();
+                        if(mContext!=null && mContext instanceof Activity) {
+                            ((Activity)mContext).runOnUiThread(new Runnable() {
+                                public void run() {
+                                    Toast.makeText(mContext, "Credentials revoked by last.fm, please log in again", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    }
                 } catch (RuntimeException ex) {success=false;}
                 return success;
             }
@@ -318,7 +331,7 @@ public class Lastfm extends ContextWrapper {
         }
     }
 
-    public void getSession(final String username, final String password) {
+    public void getSession(final String username, final String password, final LastfmWaiter loginWaiter) {
         AsyncTask t = new AsyncTask() {
             @Override
             protected Object doInBackground(Object[] objects) {
@@ -328,19 +341,24 @@ public class Lastfm extends ContextWrapper {
                         mAccessKey = mSession.getKey();
                         mUserName = mSession.getUsername();
                         saveSession();
-
+                        return true;
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                return true;
+                return false;
+            }
+
+            @Override
+            protected void onPostExecute(Object o) {
+                loginWaiter.onResult((Boolean)o);
             }
         };
         t.execute();
     }
 
     @SuppressLint("InflateParams")
-    public void logIn() {
+    public void logIn(final LastfmWaiter loginWaiter) {
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         // Get the layout inflater
         LayoutInflater inflater = LayoutInflater.from(mContext);
@@ -353,12 +371,13 @@ public class Lastfm extends ContextWrapper {
                     public void onClick(DialogInterface dialog, int id) {
                         String username = ((EditText)dialogcontent.findViewById(R.id.lastfm_username)).getText().toString();
                         String password = ((EditText)dialogcontent.findViewById(R.id.lastfm_password)).getText().toString();
-                        getSession(username,password);
+                        getSession(username,password,loginWaiter);
                     }
                 })
                 .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         //cancelled
+                        loginWaiter.onResult(false);
                     }
                 });
         builder.create().show();
@@ -367,6 +386,7 @@ public class Lastfm extends ContextWrapper {
     public void logOut() {
         mAccessKey = null;
         mUserName = null;
+        mSession = null;
         saveSession();
     }
 

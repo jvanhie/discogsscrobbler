@@ -851,8 +851,8 @@ public class Discogs extends ContextWrapper {
                                             }
                                         }
                                     });
-                                    //Discogs requests a local rate limit of 1 request per second
-                                    Thread.sleep(1000);
+                                    //Discogs requests a local rate limit of 240 request per minute
+                                    Thread.sleep(250);
                                 } catch(InterruptedException e) {
                                     //stop the task on interrupt (thrown when user dismisses the dialog)
                                     break;

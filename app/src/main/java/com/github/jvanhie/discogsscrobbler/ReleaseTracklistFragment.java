@@ -280,7 +280,19 @@ public class ReleaseTracklistFragment extends ListFragment {
 
         } else {
             //log in first
-            lastfm.logIn();
+            lastfm.logIn(new Lastfm.LastfmWaiter() {
+                @Override
+                public void onResult(boolean success) {
+                    if(getActivity()!=null) {
+                        if(success) {
+                            Toast.makeText(getActivity(), "Logged in to last.fm", Toast.LENGTH_SHORT).show();
+                            scrobble();
+                        } else {
+                            Toast.makeText(getActivity(), "Could not log in to last.fm", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
+            });
         }
     }
 }
