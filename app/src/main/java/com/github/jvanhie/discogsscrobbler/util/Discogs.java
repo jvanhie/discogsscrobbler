@@ -108,6 +108,7 @@ public class Discogs extends ContextWrapper {
 
     private List<Release> collection;
     private List<DiscogsBasicRelease> onlineCollection = new ArrayList<DiscogsBasicRelease>();
+    private List<Long> newReleases =  new ArrayList<Long>();
 
     private Context mContext;
 
@@ -678,13 +679,15 @@ public class Discogs extends ContextWrapper {
 
     public void addRelease(final long id, final DiscogsWaiter waiter) {
         //first check if the item is already in our local collection, not worth looking online if it is
-        if(getRelease(id) != null) {
+        if(getRelease(id) != null || newReleases.contains(id)) {
             waiter.onResult(false);
         } else {
             mDiscogsService.addRelease(mUserName, id, new Callback<Response>() {
                 @Override
                 public void success(Response response, Response response2) {
                     mRetries.set(0);
+                    //add release to transient list of new additions to prevent duplicate additions (to be cleared when the local collection syncs with Discogs)
+                    newReleases.add(id);
                     waiter.onResult(true);
                 }
 
@@ -751,9 +754,9 @@ public class Discogs extends ContextWrapper {
 
             @Override
             public void failure(RetrofitError error) {
-                if(error.getKind() == Kind.NETWORK || error.getKind() == Kind.UNEXPECTED) {
+                if (error.getKind() == Kind.NETWORK || error.getKind() == Kind.UNEXPECTED) {
                     //we should retry network errors with a 1 second delay (discogs rate limit rules), unless we reach our global max retries
-                    if(mRetries.getAndIncrement()<MAX_RETRIES) {
+                    if (mRetries.getAndIncrement() < MAX_RETRIES) {
                         new Handler().postDelayed(new Runnable() {
                             @Override
                             public void run() {
@@ -1093,8 +1096,15 @@ public class Discogs extends ContextWrapper {
             mFoldersChanged=false;
         }
 
-        //sync complete, reload collection from db
+        //sync complete, reload collection from db and clear transient new releases db
+        newReleases.clear();
         loadCollection();
+
+        //verify the identical size of local and online collection (so we can catch those annoying duplicate online release)
+        if(onlineCollection.size() != collection.size() && mContext != null) {
+            Toast.makeText(mContext, "Possible duplicate release found, please fix this on Discogs.com", Toast.LENGTH_LONG).show();
+        }
+
     }
 
     public void syncFolders() {
