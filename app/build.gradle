@@ -35,8 +35,8 @@ android {
     defaultConfig {
         minSdkVersion 8
         targetSdkVersion 23
-        versionCode 6
-        versionName "0.96"
+        versionCode 7
+        versionName "0.99"
         generatedDensities = []
     }
     // This is handled for you by the 2.0+ Gradle Plugin
